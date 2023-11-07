@@ -1,0 +1,28 @@
+{
+  "name": "grvt-js-client",
+  "version": "0.0.1",
+  "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gravity-technologies/grvt-js-client.git"
+  },
+  "keywords": [
+    "GRVT"
+  ],
+  "author": "danh@grvt.io",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/gravity-technologies/grvt-js-client/issues"
+  },
+  "homepage": "https://github.com/gravity-technologies/grvt-js-client#readme",
+  "dependencies": {
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
