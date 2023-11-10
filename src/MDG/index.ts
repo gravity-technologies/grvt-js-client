@@ -1,4 +1,4 @@
-import { validConfig, type IConfig } from 'interfaces'
+import { validConfig, type IConfig } from '../interfaces'
 import { MDGBook } from './book'
 import { MDGTicker } from './ticker'
 import { MDGTrades } from './trades'

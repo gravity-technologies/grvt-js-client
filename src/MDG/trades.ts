@@ -1,4 +1,4 @@
-import { type IConfig } from 'interfaces'
+import { type IConfig } from '../interfaces'
 
 export class MDGTrades {
   private readonly fullUrl: string

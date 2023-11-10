@@ -2,13 +2,13 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
     "outDir": "./lib",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "typeRoots": [
       "node_modules/@types",
       "types"
@@ -16,7 +16,6 @@
   },
   "include": [
     "types",
-    "interfaces/**/*",
     "src/**/*"
   ],
   "exclude": [
