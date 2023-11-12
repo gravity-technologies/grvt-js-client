@@ -1,10 +1,14 @@
 export * from './schema-maps'
 
+interface SchemaMap {
+  [key: string]: string | Array<string | SchemaMap>
+}
+
 export class Utils {
   /**
    * Maps a payload from a lite schema to a full schema or vice versa.
    */
-  static schemaMap (payload: any = {}, schemaMaps: Record<string, string> = {}): any {
+  static schemaMap (payload: any = {}, schemaMaps: SchemaMap = {}): any {
     if (typeof payload !== 'object') {
       return payload
     }
@@ -16,8 +20,12 @@ export class Utils {
     const result: Record<string, any> = {}
 
     for (const [key, value] of Object.entries(payload)) {
-      const _key = schemaMaps[key] || key
-      result[_key] = Utils.schemaMap(value, schemaMaps)
+      const [_key, schemaMap] = (
+        Array.isArray(schemaMaps[key])
+          ? schemaMaps[key]
+          : [schemaMaps[key]]
+      ) as [string, SchemaMap]
+      result[_key] = Utils.schemaMap(value, schemaMap)
     }
 
     return result
