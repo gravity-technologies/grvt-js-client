@@ -1,4 +1,4 @@
-import { type ECurrency, type EInstrumentKind } from '../interfaces'
+import { type ECurrency, type EInstrumentSettlementPeriod } from '../interfaces'
 
 export enum EWsMethod {
   SUBSCRIBE = 'subscribe',
@@ -38,7 +38,7 @@ export enum EWsStream {
 }
 
 export interface EWsStreamParam {
-  kind: EInstrumentKind[]
+  kind: EInstrumentSettlementPeriod[]
   underlying: ECurrency[]
   quote: ECurrency[]
   rate?: number
