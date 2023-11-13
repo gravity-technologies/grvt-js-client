@@ -1,13 +1,14 @@
 import axios from 'axios'
-import { type IConfig } from '../interfaces'
+import { validConfig, type IConfig } from '../interfaces'
 
 export class MDGCandlestick {
   private readonly _fullUrl: string
   private readonly _liteUrl: string
 
   constructor (config: IConfig) {
-    this._fullUrl = `${config.host}/full/${config.version}`
-    this._liteUrl = `${config.host}/lite/${config.version}`
+    const parseConfig = validConfig(config)
+    this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
+    this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
   }
 
   /**

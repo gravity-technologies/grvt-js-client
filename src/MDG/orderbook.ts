@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { type IAPIOrderbookLevelsRequest, type IApiOrderbookLevelsResponse, type IConfig } from '../interfaces'
+import { validConfig, type IAPIOrderbookLevelsRequest, type IApiOrderbookLevelsResponse, type IConfig } from '../interfaces'
 import { API_ORDERBOOK_LEVELS_REQUEST_MAP, API_ORDERBOOK_LEVELS_RESPONSE_MAP, Utils } from '../utils'
 
 export class MDGOrderbook {
@@ -7,8 +7,9 @@ export class MDGOrderbook {
   private readonly _liteUrl: string
 
   constructor (config: IConfig) {
-    this._fullUrl = `${config.host}/full/${config.version}`
-    this._liteUrl = `${config.host}/lite/${config.version}`
+    const parseConfig = validConfig(config)
+    this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
+    this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
   }
 
   /**

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { type IApiGetInstrumentRequest, type IApiGetInstrumentResponse, type IApiGetInstrumentsRequest, type IApiGetInstrumentsResponse, type IConfig } from '../interfaces'
+import { validConfig, type IApiGetInstrumentRequest, type IApiGetInstrumentResponse, type IApiGetInstrumentsRequest, type IApiGetInstrumentsResponse, type IConfig } from '../interfaces'
 import { API_GET_INSTRUMENTS_REQUEST_MAP, API_GET_INSTRUMENTS_RESPONSE_MAP, API_GET_INSTRUMENT_REQUEST_MAP, API_GET_INSTRUMENT_RESPONSE_MAP, Utils } from '../utils'
 
 export class MDGInstrument {
@@ -7,8 +7,9 @@ export class MDGInstrument {
   private readonly _liteUrl: string
 
   constructor (config: IConfig) {
-    this._fullUrl = `${config.host}/full/${config.version}`
-    this._liteUrl = `${config.host}/lite/${config.version}`
+    const parseConfig = validConfig(config)
+    this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
+    this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
   }
 
   /**
