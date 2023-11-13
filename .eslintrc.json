@@ -23,6 +23,9 @@
     "sourceType": "module"
   },
   "rules": {
+    "no-return-await": "error",
+    "@typescript-eslint/return-await": "off",
+    "@typescript-eslint/promise-function-async": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-extraneous-class": "off",
     "@typescript-eslint/strict-boolean-expressions": "off"

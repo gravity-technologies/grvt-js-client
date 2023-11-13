@@ -1,18 +1,24 @@
 import { validConfig, type IConfig } from '../interfaces'
-import { MDGBook } from './book'
+import { MDGCandlestick } from './candlestick'
+import { MDGInstrument } from './instrument'
+import { MDGOrderbook } from './orderbook'
 import { MDGTicker } from './ticker'
-import { MDGTrades } from './trades'
+import { MDGTrade } from './trade'
 
 export class MDG {
+  readonly instrument: MDGInstrument
+  readonly candlestick: MDGCandlestick
   readonly ticker: MDGTicker
-  readonly book: MDGBook
-  readonly trades: MDGTrades
+  readonly orderbook: MDGOrderbook
+  readonly trades: MDGTrade
 
   constructor (config: IConfig) {
     const parseConfig = validConfig(config)
 
+    this.instrument = new MDGInstrument(parseConfig)
+    this.candlestick = new MDGCandlestick(parseConfig)
     this.ticker = new MDGTicker(parseConfig)
-    this.book = new MDGBook(parseConfig)
-    this.trades = new MDGTrades(parseConfig)
+    this.orderbook = new MDGOrderbook(parseConfig)
+    this.trades = new MDGTrade(parseConfig)
   }
 }
