@@ -15,14 +15,11 @@
     "url": "https://github.com/gravity-technologies/grvt-js-client/issues"
   },
   "homepage": "https://github.com/gravity-technologies/grvt-js-client#readme",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib"
-  ],
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
+    "postbuild": "cp package.json dist/ && cp README.md dist/ && cp LICENSE dist/",
+    "link-local": "cd dist/ && npm link && cd ..",
     "lint": "npx eslint src/**/*.{js,ts}",
     "lint-fix": "npx eslint src/**/*.{js,ts} --fix",
     "test": "echo \"Error: no test specified\" && exit 1"

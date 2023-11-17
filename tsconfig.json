@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

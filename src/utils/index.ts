@@ -5,6 +5,13 @@ interface SchemaMap {
 }
 
 export class Utils {
+  static timeout<T = any>(promise: Promise<T>, ms?: number, error?: Error) {
+    return Promise.race([
+      promise,
+      new Promise((resolve, reject) => setTimeout(() => { reject(error) }, ms))
+    ]) as Promise<T>
+  }
+
   /**
    * Maps a payload from a lite schema to a full schema or vice versa.
    */

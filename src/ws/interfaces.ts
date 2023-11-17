@@ -4,43 +4,37 @@ export enum EWsMethod {
   SUBSCRIBE = 'subscribe',
 }
 
-// export enum EWsStream {
-//   MINI_TICKER_SNAP_LITE = 'lite.v1.mini.snap',
-//   MINI_TICKER_SNAP_FULL = 'full.v1.mini.snap',
-//   MINI_TICKER_DELTA_LITE = 'lite.v1.mini.delta',
-//   MINI_TICKER_DELTA_FULL = 'full.v1.mini.delta',
-
-//   TICKER_SNAP_LITE = 'lite.v1.ticker.snap',
-//   TICKER_SNAP_FULL = 'full.v1.ticker.snap',
-//   TICKER_DELTA_LITE = 'lite.v1.ticker.delta',
-//   TICKER_DELTA_FULL = 'full.v1.ticker.delta',
-
-//   ORDER_BOOK_SNAP_LITE = 'lite.v1.orderbook.snap',
-//   ORDER_BOOK_SNAP_FULL = 'full.v1.orderbook.snap',
-//   ORDER_BOOK_DELTA_LITE = 'lite.v1.orderbook.delta',
-//   ORDER_BOOK_DELTA_FULL = 'full.v1.orderbook.delta',
-
-//   TRADES_LITE = 'lite.v1.trades',
-//   TRADES_FULL = 'full.v1.trades',
-// }
-
-export enum EWsStream {
-  MINI_TICKER_SNAP = 'MINI_TICKER_SNAP',
-  MINI_TICKER_DELTA = 'MINI_TICKER_DELTA',
-
-  TICKER_SNAP = 'TICKER_SNAP',
-  TICKER_DELTA = 'TICKER_DELTA',
-
-  ORDER_BOOK_SNAP = 'ORDER_BOOK_SNAP',
-  ORDER_BOOK_DELTA = 'ORDER_BOOK_DELTA',
-
-  TRADES = 'TRADES',
+export enum EStreamEndpoints {
+  MINI_SNAP_V1 = 'lite.v1.mini.snap',
+  MINI_DELTA_V1 = 'lite.v1.mini.delta',
+  TICKER_SNAP_V1 = 'lite.v1.ticker.snap',
+  TICKER_DELTA_V1 = 'lite.v1.ticker.delta',
+  ORDERBOOK_SNAP_V1 = 'lite.v1.orderbook.snap',
+  ORDERBOOK_DELTA_V1 = 'lite.v1.orderbook.delta',
+  TRADES_V1 = 'lite.v1.trades',
 }
 
+export const StreamEndpoints = Object.freeze([
+  'lite.v1.mini.snap',
+  'full.v1.mini.snap',
+  'lite.v1.mini.delta',
+  'full.v1.mini.delta',
+  'lite.v1.ticker.snap',
+  'full.v1.ticker.snap',
+  'lite.v1.ticker.delta',
+  'full.v1.ticker.delta',
+  'lite.v1.orderbook.snap',
+  'full.v1.orderbook.snap',
+  'lite.v1.orderbook.delta',
+  'full.v1.orderbook.delta',
+  'lite.v1.trades',
+  'full.v1.trades'
+])
+
 export interface EWsStreamParam {
-  kind: EInstrumentSettlementPeriod[]
-  underlying: ECurrency[]
-  quote: ECurrency[]
+  kind: EInstrumentSettlementPeriod
+  underlying: ECurrency
+  quote: ECurrency
   rate?: number
   depth?: number
   greeks?: boolean

@@ -4,5 +4,6 @@
 .idea/
 .nyc_output/
 node_modules/
-lib/
 coverage/
+lib/
+dist/

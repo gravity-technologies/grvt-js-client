@@ -1,17 +1,16 @@
-export class WS {
-  private readonly _ws: WebSocket
+export class WS extends WebSocket {
   private readonly _onopenListeners: Array<(ev: Event) => any> = []
   private readonly _onmessageListeners: Array<(ev: MessageEvent) => any> = []
   private readonly _onerrorListeners: Array<(ev: Event) => any> = []
   private readonly _oncloseListeners: Array<(ev: CloseEvent) => any> = []
 
   constructor (url: string) {
-    this._ws = new WebSocket(url)
+    super(url)
 
-    this._ws.onopen = (...args) => { this._onopen(...args) }
-    this._ws.onmessage = (...args) => { this._onmessage(...args) }
-    this._ws.onerror = (...args) => { this._onerror(...args) }
-    this._ws.onclose = (...args) => { this._onclose(...args) }
+    this.onopen = (...args) => { this._onopen(...args) }
+    this.onmessage = (...args) => { this._onmessage(...args) }
+    this.onerror = (...args) => { this._onerror(...args) }
+    this.onclose = (...args) => { this._onclose(...args) }
   }
 
   private _onopen (event: Event) {
@@ -20,7 +19,7 @@ export class WS {
     }
   }
 
-  onopen (listener: (ev: Event) => any) {
+  onOpen (listener: (ev: Event) => any) {
     return this._onopenListeners.push(listener) - 1
   }
 
@@ -35,7 +34,7 @@ export class WS {
     }
   }
 
-  onmessage (listener: (ev: MessageEvent) => any) {
+  onMessage (listener: (ev: MessageEvent) => any) {
     return this._onmessageListeners.push(listener) - 1
   }
 
@@ -50,7 +49,7 @@ export class WS {
     }
   }
 
-  onerror (listener: (ev: Event) => any) {
+  onError (listener: (ev: Event) => any) {
     return this._onerrorListeners.push(listener) - 1
   }
 
@@ -65,7 +64,7 @@ export class WS {
     }
   }
 
-  onclose (listener: (ev: CloseEvent) => any) {
+  onClose (listener: (ev: CloseEvent) => any) {
     return this._oncloseListeners.push(listener) - 1
   }
 
