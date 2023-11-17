@@ -10,12 +10,6 @@ Using npm:
 npm install grvt
 ```
 
-Using bower:
-
-```bash
-bower install grvt
-```
-
 Using yarn:
 
 ```bash
