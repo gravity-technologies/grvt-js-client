@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/release.yaml
+      - .github/workflows/release-n-publish.yml
       - src/**
 
 jobs:
@@ -48,5 +48,5 @@ jobs:
             cache-dependency-path: package-lock.json
 
         - run: npm ci
-        - run: npm config set _authToken=${{ secrets.NPM_PUBLISH_TOKEN }}
+        - run: npm config set //registry.npmjs.org/:_authToken xxxxxxxx
         - run: npm run release
