@@ -9,7 +9,7 @@ on:
       - src/**
 
 jobs:
-  publish:
+  ReleaseAndPublish:
     runs-on: ubuntu-latest
     env:
       node: '20.9.0'
