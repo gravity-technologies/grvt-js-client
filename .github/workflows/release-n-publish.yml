@@ -3,7 +3,7 @@ name: Release & Publish
 on:
   push:
     branches:
-      - d/construct
+      - main
     paths:
       - .github/workflows/release.yaml
       - src/**
