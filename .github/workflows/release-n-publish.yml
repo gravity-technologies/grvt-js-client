@@ -5,7 +5,7 @@ on:
     branches:
       - ci
     paths:
-      - .github/workflows/release.yaml
+      - .github/workflows/release-n-publish.yaml
       - src/**
 
 jobs:
