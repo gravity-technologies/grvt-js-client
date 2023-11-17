@@ -1,11 +1,7 @@
 {
-  "name": "grvt-js-client",
-  "version": "0.0.1",
+  "name": "grvt",
+  "version": "0.0.1-beta.0",
   "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gravity-technologies/grvt-js-client.git"
@@ -19,10 +15,29 @@
     "url": "https://github.com/gravity-technologies/grvt-js-client/issues"
   },
   "homepage": "https://github.com/gravity-technologies/grvt-js-client#readme",
+  "scripts": {
+    "start": "tsc --watch",
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "postbuild": "cp package.json dist/ && cp README.md dist/ && cp LICENSE dist/",
+    "prerelease": "npm run build",
+    "release": "cd dist/ && npm publish",
+    "link-local": "cd dist/ && npm link && cd ..",
+    "lint": "npx eslint src/**/*.{js,ts}",
+    "lint-fix": "npx eslint src/**/*.{js,ts} --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "axios": "^0.27.2"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "eslint": "^8.53.0",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }
 }
