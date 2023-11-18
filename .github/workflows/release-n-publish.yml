@@ -48,5 +48,6 @@ jobs:
             cache-dependency-path: package-lock.json
 
         - run: npm ci
-        - run: npm config set //registry.npmjs.org/:_authToken xxxxxxxx
+        - run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_PUBLISH_TOKEN }}
+        - run: npm whoami
         - run: npm run release
