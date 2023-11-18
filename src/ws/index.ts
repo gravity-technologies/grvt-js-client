@@ -10,6 +10,10 @@ interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'qu
   quote: ECurrency[]
   rate: number
 }
+type TSubscribeParams = Array<{
+  stream: string
+  stream_params: IParsedParams
+}>
 type TMessageHandler = (data: IMiniTicker | ITicker | IOrderbookLevels | IPublicTrade) => void
 
 export class WS extends WebSocket {
@@ -50,11 +54,8 @@ export class WS extends WebSocket {
     // }))
   }
 
-  private getParamsKeyPairs (params: Array<{
-    stream: string
-    stream_params: IParsedParams
-  }>) {
-    return params.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
+  private getParamsKeyPairs (subscribeParams: TSubscribeParams) {
+    return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
       for (const kind of streamParams.kind) {
         for (const underlying of streamParams.underlying) {
           for (const quote of streamParams.quote) {
@@ -79,18 +80,16 @@ export class WS extends WebSocket {
   }
 
   private readonly _pairs: Record<string, TMessageHandler[]> = {}
-  private bindListeners (pairs: string[], onMessage?: TMessageHandler) {
-    if (!onMessage) {
-      return
+  private bindListeners (pair: string, onMessage: TMessageHandler) {
+    if (!this._pairs[pair]) {
+      this._pairs[pair] = []
     }
-    for (const pair of pairs) {
-      if (!this._pairs[pair]) {
-        this._pairs[pair] = []
-      }
-      if (!this._pairs[pair].includes(onMessage)) {
-        this._pairs[pair].push(onMessage)
-      }
+    const index = this._pairs[pair].indexOf(onMessage)
+    if (~index) {
+      return `${pair}_${index}` // already bound
     }
+    const length = this._pairs[pair].push(onMessage)
+    return `${pair}_${length - 1}`
   }
 
   private messageLiteToFull (message: {
@@ -153,37 +152,18 @@ export class WS extends WebSocket {
   override readonly onerror = () => {}
   override readonly onclose = () => {}
 
-  /**
-   * Only supports one pair for now
-   */
-  subscribe (options: {
-    stream: TStreamEndpoint
-    params: EWsStreamParam
-  }, onMessage?: TMessageHandler) {
-    const message = {
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: [{
-        stream: this.parseStream(options.stream).replace(/^full\./, 'lite.'),
-        stream_params: this.parseParams(options.params)
-      }]
-    }
-    const pairs = this.getParamsKeyPairs(message.params)
-    const pair = pairs[0] // only allow one pair for now
+  private _subscribe (pair: string, subscribeParams: TSubscribeParams) {
     if (this._pairs[pair]) {
-      this.bindListeners(pairs, onMessage)
       return
     }
     let _resolve: (value: void | PromiseLike<void>) => void
     const onConnected = (e: MessageEvent<string>) => {
-      const params = JSON.parse(e.data)?.results as Parameters<typeof this.getParamsKeyPairs>[0]
+      const params = JSON.parse(e.data)?.results as TSubscribeParams
       if (!params) {
         return
       }
       const [responsePair] = this.getParamsKeyPairs(params)
       if (responsePair === pair) {
-        this.bindListeners(pairs, onMessage)
         _resolve()
       }
     }
@@ -191,17 +171,47 @@ export class WS extends WebSocket {
       _resolve = resolve
       this.addEventListener('message', onConnected)
     })
-    this.send(JSON.stringify(message))
+    this.send(JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: subscribeParams
+    }))
     return Utils.timeout(promise, 30000, new Error('Connect Timeout')).finally(() => {
       this.removeEventListener('message', onConnected)
     })
+  }
+
+  /**
+   * Only supports one pair for now
+   */
+  subscribe (options: {
+    stream: TStreamEndpoint
+    params: EWsStreamParam
+  }, onMessage: TMessageHandler, onError?: (error: Error) => void) {
+    const subscribeParams = [{
+      stream: this.parseStream(options.stream).replace(/^full\./, 'lite.'),
+      stream_params: this.parseParams(options.params)
+    }]
+    const [pair] = this.getParamsKeyPairs(subscribeParams) // only allow one pair for now
+    void this._subscribe(pair, subscribeParams)?.catch(onError)
+    return this.bindListeners(pair, onMessage)
+  }
+
+  unsubscribe (listenerKey: string) {
+    const [pair, index] = listenerKey.split('_')
+    if (!this._pairs[pair]) {
+      return
+    }
+    this._pairs[pair].splice(Number(index), 1)
+    // TODO: if no more listeners, send a message to unsubscribe
+    // if (!this._pairs[pair].length) {}
   }
 
   async connected (delay = 100) {
     if (this._connected) {
       return this
     }
-
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(this.connected())
