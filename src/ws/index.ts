@@ -1,3 +1,4 @@
+import { customAlphabet } from 'nanoid'
 import { type ECurrency, type EInstrumentSettlementPeriod, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
 import { Utils, WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP } from '../utils'
 import { StreamEndpoints, type EStreamEndpoints, type EWsStreamParam } from './interfaces'
@@ -19,15 +20,14 @@ type TMessageHandler = (data: IMiniTicker | ITicker | IOrderbookLevels | IPublic
 export class WS extends WebSocket {
   private _connected = false
 
-  private parseStream (stream: TStreamEndpoint) {
+  private _parseStream (stream: TStreamEndpoint) {
     if (StreamEndpoints.includes(stream)) {
       return stream
     }
-
-    throw new Error('MDGStream: unknown stream')
+    throw new Error('Unknown stream')
   }
 
-  private parseParams (params: EWsStreamParam): IParsedParams {
+  private _parseParams (params: EWsStreamParam): IParsedParams {
     return {
       ...params,
       kind: [params.kind],
@@ -41,20 +41,9 @@ export class WS extends WebSocket {
         5000
       )
     }
-
-    // return params.map((param) => ({
-    //   ...param,
-    //   rate: Math.min(
-    //     Math.max(
-    //       param.rate ? param.rate : 1000,
-    //       200
-    //     ),
-    //     5000
-    //   )
-    // }))
   }
 
-  private getParamsKeyPairs (subscribeParams: TSubscribeParams) {
+  private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
     return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
       for (const kind of streamParams.kind) {
         for (const underlying of streamParams.underlying) {
@@ -79,20 +68,88 @@ export class WS extends WebSocket {
     }, [])
   }
 
-  private readonly _pairs: Record<string, TMessageHandler[]> = {}
-  private bindListeners (pair: string, onMessage: TMessageHandler) {
-    if (!this._pairs[pair]) {
-      this._pairs[pair] = []
+  private _keyPairsToParams (pairedKey: string): TSubscribeParams | undefined {
+    for (const streamEndpoint of StreamEndpoints) {
+      if (pairedKey.startsWith(streamEndpoint + '.')) {
+        const [kind, underlying, quote, rate, depthOrGreeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EInstrumentSettlementPeriod[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            depth: ['false', 'true'].includes(depthOrGreeks)
+              ? undefined
+              : Number(depthOrGreeks),
+            greeks: ['false', 'true'].includes(depthOrGreeks)
+              ? ['false', 'true'].indexOf(depthOrGreeks) === 1
+              : undefined
+          }
+        }]
+      }
     }
-    const index = this._pairs[pair].indexOf(onMessage)
-    if (~index) {
-      return `${pair}_${index}` // already bound
-    }
-    const length = this._pairs[pair].push(onMessage)
-    return `${pair}_${length - 1}`
   }
 
-  private messageLiteToFull (message: {
+  private _sendSubscribe (subscribeParams: TSubscribeParams) {
+    this.send(JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: subscribeParams
+    }))
+  }
+
+  private _sendUnSubscribe (subscribeParams: TSubscribeParams) {
+    this.send(JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: subscribeParams
+    }))
+  }
+
+  /**
+   * START: Pairs
+   */
+
+  private readonly _pairs: Record<string, Record<string, TMessageHandler>> = {}
+
+  private _addConsumer (pair: string, onMessage: TMessageHandler) {
+    if (!this._pairs[pair]) {
+      this._pairs[pair] = {}
+    }
+    const key = Object.entries(this._pairs[pair]).find(
+      ([, callback]) => callback === onMessage
+    )?.[0]
+    if (key) {
+      return `${pair}_${key}` // already bound
+    }
+    const newKey = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5)()
+    this._pairs[pair][newKey] = onMessage
+    return `${pair}_${newKey}`
+  }
+
+  private _removeConsumer (consumerKey: string) {
+    const [pair, key] = consumerKey.split('_')
+    if (!this._pairs[pair]) {
+      return
+    }
+    const { [key]: _, ...keep } = this._pairs[pair]
+    this._pairs[pair] = keep
+    if (!Object.keys(keep).length) {
+      const unsubscribeParams = this._keyPairsToParams(pair)
+      if (unsubscribeParams) {
+        this._sendUnSubscribe(unsubscribeParams)
+      }
+    }
+  }
+
+  /**
+   * END: Pairs
+   */
+
+  private _messageLiteToFull (message: {
     s: string
     n: string
     f: any
@@ -124,18 +181,22 @@ export class WS extends WebSocket {
       if (['subscribe', 'unsubscribe'].includes(message.method)) {
         return
       }
-
       const stream = message.s as string
       if (this._pairs[stream]?.length) {
-        const result = this.messageLiteToFull(message)
+        const result = this._messageLiteToFull(message)
         if (result) {
-          for (const callback of this._pairs[stream]) {
+          for (const callback of Object.values(this._pairs[stream])) {
             callback(result)
           }
         }
       }
     })
   }
+
+  override readonly onopen = () => {}
+  override readonly onmessage = () => {}
+  override readonly onerror = () => {}
+  override readonly onclose = () => {}
 
   onClose (callback: (e: CloseEvent) => void) {
     this.addEventListener('close', callback)
@@ -147,38 +208,29 @@ export class WS extends WebSocket {
     return this
   }
 
-  override readonly onopen = () => {}
-  override readonly onmessage = () => {}
-  override readonly onerror = () => {}
-  override readonly onclose = () => {}
-
-  private _subscribe (pair: string, subscribeParams: TSubscribeParams) {
+  private async _subscribe (pair: string, subscribeParams: TSubscribeParams) {
     if (this._pairs[pair]) {
       return
     }
+    await this.connected()
     let _resolve: (value: void | PromiseLike<void>) => void
-    const onConnected = (e: MessageEvent<string>) => {
+    const onPaired = (e: MessageEvent<string>) => {
       const params = JSON.parse(e.data)?.results as TSubscribeParams
       if (!params) {
         return
       }
-      const [responsePair] = this.getParamsKeyPairs(params)
+      const [responsePair] = this._paramsToKeyPairs(params)
       if (responsePair === pair) {
         _resolve()
       }
     }
     const promise = new Promise<void>((resolve) => {
       _resolve = resolve
-      this.addEventListener('message', onConnected)
+      this.addEventListener('message', onPaired)
     })
-    this.send(JSON.stringify({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: subscribeParams
-    }))
+    this._sendSubscribe(subscribeParams)
     return Utils.timeout(promise, 30000, new Error('Connect Timeout')).finally(() => {
-      this.removeEventListener('message', onConnected)
+      this.removeEventListener('message', onPaired)
     })
   }
 
@@ -189,23 +241,17 @@ export class WS extends WebSocket {
     stream: TStreamEndpoint
     params: EWsStreamParam
   }, onMessage: TMessageHandler, onError?: (error: Error) => void) {
-    const subscribeParams = [{
-      stream: this.parseStream(options.stream).replace(/^full\./, 'lite.'),
-      stream_params: this.parseParams(options.params)
+    const subscribeParams: TSubscribeParams = [{
+      stream: this._parseStream(options.stream).replace(/^full\./, 'lite.'),
+      stream_params: this._parseParams(options.params)
     }]
-    const [pair] = this.getParamsKeyPairs(subscribeParams) // only allow one pair for now
+    const [pair] = this._paramsToKeyPairs(subscribeParams) // only allow one pair for now
     void this._subscribe(pair, subscribeParams)?.catch(onError)
-    return this.bindListeners(pair, onMessage)
+    return this._addConsumer(pair, onMessage)
   }
 
-  unsubscribe (listenerKey: string) {
-    const [pair, index] = listenerKey.split('_')
-    if (!this._pairs[pair]) {
-      return
-    }
-    this._pairs[pair].splice(Number(index), 1)
-    // TODO: if no more listeners, send a message to unsubscribe
-    // if (!this._pairs[pair].length) {}
+  unsubscribe (consumerKey: string) {
+    this._removeConsumer(consumerKey)
   }
 
   async connected (delay = 100) {
