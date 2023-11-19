@@ -120,14 +120,14 @@ export class WS extends WebSocket {
       this._pairs[pair] = {}
     }
     const key = Object.entries(this._pairs[pair]).find(
-      ([, callback]) => callback === onMessage
+      ([, consumer]) => consumer === onMessage
     )?.[0]
     if (key) {
       return `${pair}_${key}` // already bound
     }
-    const newKey = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5)()
-    this._pairs[pair][newKey] = onMessage
-    return `${pair}_${newKey}`
+    const consumerKey = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5)()
+    this._pairs[pair][consumerKey] = onMessage
+    return `${pair}_${consumerKey}`
   }
 
   private _removeConsumer (consumerKey: string) {
@@ -182,12 +182,11 @@ export class WS extends WebSocket {
         return
       }
       const stream = message.s as string
-      if (this._pairs[stream]?.length) {
-        const result = this._messageLiteToFull(message)
-        if (result) {
-          for (const callback of Object.values(this._pairs[stream])) {
-            callback(result)
-          }
+      const result = this._messageLiteToFull(message)
+      const consumers = Object.values(this._pairs[stream])
+      if (result && consumers?.length) {
+        for (const consumer of consumers) {
+          consumer(result)
         }
       }
     })
