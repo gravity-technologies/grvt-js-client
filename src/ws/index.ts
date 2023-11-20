@@ -31,8 +31,8 @@ export class WS extends WebSocket {
     return {
       ...params,
       kind: [params.kind],
-      underlying: [params.underlying],
-      quote: [params.quote],
+      underlying: [params.underlying as ECurrency],
+      quote: [params.quote as ECurrency],
       rate: Math.min(
         Math.max(
           params.rate ? params.rate : 1000,

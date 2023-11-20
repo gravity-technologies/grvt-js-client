@@ -33,8 +33,8 @@ export const StreamEndpoints = Object.freeze([
 
 export interface EWsStreamParam {
   kind: EInstrumentSettlementPeriod
-  underlying: ECurrency
-  quote: ECurrency
+  underlying: `${ECurrency}`
+  quote: `${ECurrency}`
   rate?: number
   depth?: number
   greeks?: boolean
