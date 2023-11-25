@@ -28,7 +28,7 @@ export class TDGRfq {
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq
    */
   createRfq (params: IApiCreateRfqRequest) {
-    return axios.post(this._liteUrl + '/cancel_order', Utils.schemaMap(params, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE)).then(
+    return axios.post(this._liteUrl + '/create_rfq', Utils.schemaMap(params, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CREATE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqResponse
       }
