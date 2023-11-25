@@ -1,2 +1,2 @@
+export * from './codegen'
 export * from './config.interface'
-export * from './data.interface'

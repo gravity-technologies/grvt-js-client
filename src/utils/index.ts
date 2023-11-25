@@ -1,8 +1,4 @@
-export * from './schema-maps'
-
-interface SchemaMap {
-  [key: string]: string | Array<string | SchemaMap>
-}
+import { type SchemaMap } from '../interfaces'
 
 export class Utils {
   static timeout<T = any>(promise: Promise<T>, ms?: number, error?: Error) {

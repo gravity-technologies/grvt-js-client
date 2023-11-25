@@ -1,8 +1,7 @@
 import { customAlphabet } from 'nanoid'
-import { type ECurrency, type EInstrumentSettlementPeriod, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
-import { Utils, WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP } from '../utils'
+import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EInstrumentSettlementPeriod, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
+import { Utils } from '../utils'
 import { StreamEndpoints, type EStreamEndpoints, type EWsStreamParam } from './interfaces'
-export * from './interfaces'
 
 type TStreamEndpoint = EStreamEndpoints | typeof StreamEndpoints[number]
 interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'quote' | 'rate'> {

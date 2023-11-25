@@ -14,28 +14,28 @@ export class MDGCandlestick {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#trade-candlestick
    */
-  retrieveTradeCandlestick (payload: any) {
+  tradeCandlestick (payload: any) {
     return axios.post(this._fullUrl + '/trade_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mark-candlestick
    */
-  retrieveMarkCandlestick (payload: any) {
+  markCandlestick (payload: any) {
     return axios.post(this._fullUrl + '/mark_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#index-candlestick
    */
-  retrieveIndexCandlestick (payload: any) {
+  indexCandlestick (payload: any) {
     return axios.post(this._fullUrl + '/index_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mid-candlestick
    */
-  retrieveMidCandlestick (payload: any) {
+  midCandlestick (payload: any) {
     return axios.post(this._fullUrl + '/mid_kline', payload)
   }
 }
