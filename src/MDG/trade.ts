@@ -21,8 +21,8 @@ export class MDGTrade {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
    */
-  recentTrades (params: IApiRecentTradeRequest) {
-    return axios.get(this._liteUrl + '/trades', { params: Utils.schemaMap(params, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE) }).then(
+  recentTrades (payload: IApiRecentTradeRequest) {
+    return axios.post(this._liteUrl + '/trades', Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse
       }
