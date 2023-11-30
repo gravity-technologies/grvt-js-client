@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { API_RECENT_TRADE_REQUEST_MAP, API_RECENT_TRADE_RESPONSE_MAP, validConfig, type IApiRecentTradeRequest, type IApiRecentTradeResponse, type IConfig } from '../interfaces'
+import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
 /**
@@ -22,7 +22,7 @@ export class MDGTrade {
    * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
    */
   recentTrades (payload: IApiRecentTradeRequest) {
-    return axios.post(this._liteUrl + '/trades', Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE)).then(
+    return RestfulService.post(this._liteUrl + '/trades', Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse
       }

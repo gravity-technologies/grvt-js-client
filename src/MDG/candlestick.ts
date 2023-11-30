@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { validConfig, type IConfig } from '../interfaces'
+import { RestfulService } from '../services'
 
 export class MDGCandlestick {
   private readonly _fullUrl: string
@@ -15,27 +15,27 @@ export class MDGCandlestick {
    * @see https://docs.gravitymarkets.io/market_data_api/#trade-candlestick
    */
   tradeCandlestick (payload: any) {
-    return axios.post(this._fullUrl + '/trade_kline', payload)
+    return RestfulService.post(this._fullUrl + '/trade_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mark-candlestick
    */
   markCandlestick (payload: any) {
-    return axios.post(this._fullUrl + '/mark_kline', payload)
+    return RestfulService.post(this._fullUrl + '/mark_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#index-candlestick
    */
   indexCandlestick (payload: any) {
-    return axios.post(this._fullUrl + '/index_kline', payload)
+    return RestfulService.post(this._fullUrl + '/index_kline', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mid-candlestick
    */
   midCandlestick (payload: any) {
-    return axios.post(this._fullUrl + '/mid_kline', payload)
+    return RestfulService.post(this._fullUrl + '/mid_kline', payload)
   }
 }
