@@ -30,7 +30,6 @@ export class MDGTrade {
   }
 
   /**
-   * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/market_data_api/#historical-trades
    */
   historicalTrades () {
