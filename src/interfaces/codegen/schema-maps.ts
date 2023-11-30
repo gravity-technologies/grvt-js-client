@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 export interface SchemaMap {
-  [key: string]: string | Array<string | SchemaMap>
+  [key: string]: string | Array<string | SchemaMap | SchemaMap[] | SchemaMap[][]>
 }
 
 export interface SchemaPairMap {
@@ -117,6 +117,26 @@ export const MINI_TICKER_MAP: SchemaPairMap = Object.freeze({
   }
 })
 
+// Schema map for the 'SIGNATURE' struct.
+export const SIGNATURE_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    signer: 's',
+    r: 'r',
+    s: 's1',
+    v: 'v',
+    expiration: 'e',
+    nonce: 'n'
+  },
+  LITE_TO_FULL: {
+    s: 'signer',
+    r: 'r',
+    s1: 's',
+    v: 'v',
+    e: 'expiration',
+    n: 'nonce'
+  }
+})
+
 // Schema map for the 'ORDER_STATE' struct.
 export const ORDER_STATE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
@@ -155,23 +175,21 @@ export const ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
   }
 })
 
-// Schema map for the 'SIGNATURE' struct.
-export const SIGNATURE_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'ORDER_LEG' struct.
+export const ORDER_LEG_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    signer: 's',
-    r: 'r',
-    s: 's1',
-    v: 'v',
-    expiration: 'e',
-    nonce: 'n'
+    asset: ['a', ASSET_MAP.FULL_TO_LITE],
+    size: 's',
+    limit_price: 'lp',
+    oco_limit_price: 'ol',
+    is_buying_asset: 'ib'
   },
   LITE_TO_FULL: {
-    s: 'signer',
-    r: 'r',
-    s1: 's',
-    v: 'v',
-    e: 'expiration',
-    n: 'nonce'
+    a: ['asset', ASSET_MAP.LITE_TO_FULL],
+    s: 'size',
+    lp: 'limit_price',
+    ol: 'oco_limit_price',
+    ib: 'is_buying_asset'
   }
 })
 
@@ -189,7 +207,7 @@ export const ORDER_MAP: SchemaPairMap = Object.freeze({
     post_only: 'po',
     reduce_only: 'ro',
     is_paying_base_currency: 'ip',
-    legs: 'l',
+    legs: ['l', [ORDER_LEG_MAP.FULL_TO_LITE]],
     signature: ['s', SIGNATURE_MAP.FULL_TO_LITE],
     metadata: ['m', ORDER_METADATA_MAP.FULL_TO_LITE],
     state: ['s1', ORDER_STATE_MAP.FULL_TO_LITE]
@@ -206,28 +224,10 @@ export const ORDER_MAP: SchemaPairMap = Object.freeze({
     po: 'post_only',
     ro: 'reduce_only',
     ip: 'is_paying_base_currency',
-    l: 'legs',
+    l: ['legs', [ORDER_LEG_MAP.LITE_TO_FULL]],
     s: ['signature', SIGNATURE_MAP.LITE_TO_FULL],
     m: ['metadata', ORDER_METADATA_MAP.LITE_TO_FULL],
     s1: ['state', ORDER_STATE_MAP.LITE_TO_FULL]
-  }
-})
-
-// Schema map for the 'ORDER_LEG' struct.
-export const ORDER_LEG_MAP: SchemaPairMap = Object.freeze({
-  FULL_TO_LITE: {
-    asset: ['a', ASSET_MAP.FULL_TO_LITE],
-    size: 's',
-    limit_price: 'lp',
-    oco_limit_price: 'ol',
-    is_buying_asset: 'ib'
-  },
-  LITE_TO_FULL: {
-    a: ['asset', ASSET_MAP.LITE_TO_FULL],
-    s: 'size',
-    lp: 'limit_price',
-    ol: 'oco_limit_price',
-    ib: 'is_buying_asset'
   }
 })
 
@@ -250,14 +250,14 @@ export const ORDERBOOK_LEVELS_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
     asset: ['a', ASSET_MAP.FULL_TO_LITE],
-    bids: 'b',
-    asks: 'a1'
+    bids: ['b', [ORDERBOOK_LEVEL_MAP.FULL_TO_LITE]],
+    asks: ['a1', [ORDERBOOK_LEVEL_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
     et: 'event_time',
     a: ['asset', ASSET_MAP.LITE_TO_FULL],
-    b: 'bids',
-    a1: 'asks'
+    b: ['bids', [ORDERBOOK_LEVEL_MAP.LITE_TO_FULL]],
+    a1: ['asks', [ORDERBOOK_LEVEL_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -351,46 +351,6 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
   }
 })
 
-// Schema map for the 'RFQ_BOOK' struct.
-export const RFQ_BOOK_MAP: SchemaPairMap = Object.freeze({
-  FULL_TO_LITE: {
-    full: 'f',
-    partial: 'p'
-  },
-  LITE_TO_FULL: {
-    f: 'full',
-    p: 'partial'
-  }
-})
-
-// Schema map for the 'RFQ_BOOK_LEVEL' struct.
-export const RFQ_BOOK_LEVEL_MAP: SchemaPairMap = Object.freeze({
-  FULL_TO_LITE: {
-    level_expiration: 'le',
-    level_price: 'lp',
-    lots: 'l',
-    legs: 'l1'
-  },
-  LITE_TO_FULL: {
-    le: 'level_expiration',
-    lp: 'level_price',
-    l: 'lots',
-    l1: 'legs'
-  }
-})
-
-// Schema map for the 'RFQ_BOOK_LEVEL_LEG' struct.
-export const RFQ_BOOK_LEVEL_LEG_MAP: SchemaPairMap = Object.freeze({
-  FULL_TO_LITE: {
-    asset: ['a', ASSET_MAP.FULL_TO_LITE],
-    quotes: 'q'
-  },
-  LITE_TO_FULL: {
-    a: ['asset', ASSET_MAP.LITE_TO_FULL],
-    q: 'quotes'
-  }
-})
-
 // Schema map for the 'RFQ_BOOK_QUOTE' struct.
 export const RFQ_BOOK_QUOTE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
@@ -411,51 +371,43 @@ export const RFQ_BOOK_QUOTE_MAP: SchemaPairMap = Object.freeze({
   }
 })
 
-// Schema map for the 'RFQ_STATE' struct.
-export const RFQ_STATE_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'RFQ_BOOK_LEVEL_LEG' struct.
+export const RFQ_BOOK_LEVEL_LEG_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    rfq_status: 'rs',
-    reject_reason: 'rr',
-    update_time: 'ut'
+    asset: ['a', ASSET_MAP.FULL_TO_LITE],
+    quotes: ['q', [RFQ_BOOK_QUOTE_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    rs: 'rfq_status',
-    rr: 'reject_reason',
-    ut: 'update_time'
+    a: ['asset', ASSET_MAP.LITE_TO_FULL],
+    q: ['quotes', [RFQ_BOOK_QUOTE_MAP.LITE_TO_FULL]]
   }
 })
 
-// Schema map for the 'RFQ' struct.
-export const RFQ_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'RFQ_BOOK_LEVEL' struct.
+export const RFQ_BOOK_LEVEL_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    rfq_id: 'ri',
-    sub_account_id: 'sa',
-    is_public: 'ip',
-    strategy: 's',
-    expiry: 'e',
-    receipients: 'r',
-    is_anonymous: 'ia',
-    allow_partial: 'ap',
-    legs: 'l',
-    bids: ['b', RFQ_BOOK_MAP.FULL_TO_LITE],
-    asks: ['a', RFQ_BOOK_MAP.FULL_TO_LITE],
-    create_time: 'ct',
-    state: ['s1', RFQ_STATE_MAP.FULL_TO_LITE]
+    level_expiration: 'le',
+    level_price: 'lp',
+    lots: 'l',
+    legs: ['l1', [RFQ_BOOK_LEVEL_LEG_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    ri: 'rfq_id',
-    sa: 'sub_account_id',
-    ip: 'is_public',
-    s: 'strategy',
-    e: 'expiry',
-    r: 'receipients',
-    ia: 'is_anonymous',
-    ap: 'allow_partial',
-    l: 'legs',
-    b: ['bids', RFQ_BOOK_MAP.LITE_TO_FULL],
-    a: ['asks', RFQ_BOOK_MAP.LITE_TO_FULL],
-    ct: 'create_time',
-    s1: ['state', RFQ_STATE_MAP.LITE_TO_FULL]
+    le: 'level_expiration',
+    lp: 'level_price',
+    l: 'lots',
+    l1: ['legs', [RFQ_BOOK_LEVEL_LEG_MAP.LITE_TO_FULL]]
+  }
+})
+
+// Schema map for the 'RFQ_BOOK' struct.
+export const RFQ_BOOK_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    full: ['f', [RFQ_BOOK_QUOTE_MAP.FULL_TO_LITE]],
+    partial: ['p', [RFQ_BOOK_LEVEL_MAP.FULL_TO_LITE]]
+  },
+  LITE_TO_FULL: {
+    f: ['full', [RFQ_BOOK_QUOTE_MAP.LITE_TO_FULL]],
+    p: ['partial', [RFQ_BOOK_LEVEL_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -489,6 +441,20 @@ export const RFQ_QUOTE_MAP: SchemaPairMap = Object.freeze({
   }
 })
 
+// Schema map for the 'RFQ_STATE' struct.
+export const RFQ_STATE_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    rfq_status: 'rs',
+    reject_reason: 'rr',
+    update_time: 'ut'
+  },
+  LITE_TO_FULL: {
+    rs: 'rfq_status',
+    rr: 'reject_reason',
+    ut: 'update_time'
+  }
+})
+
 // Schema map for the 'SPOT_BALANCE' struct.
 export const SPOT_BALANCE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
@@ -512,8 +478,8 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     initial_margin: 'im',
     maintanence_margin: 'mm',
     available_margin: 'am',
-    assets: 'a',
-    positions: 'p'
+    assets: ['a', [SPOT_BALANCE_MAP.FULL_TO_LITE]],
+    positions: ['p', [POSITIONS_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -524,8 +490,8 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     im: 'initial_margin',
     mm: 'maintanence_margin',
     am: 'available_margin',
-    a: 'assets',
-    p: 'positions'
+    a: ['assets', [SPOT_BALANCE_MAP.LITE_TO_FULL]],
+    p: ['positions', [POSITIONS_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -604,6 +570,40 @@ export const TICKER_MAP: SchemaPairMap = Object.freeze({
     av: 'avg_volume',
     av1: 'avg_volume_change',
     g: ['greeks', GREEKS_MAP.LITE_TO_FULL]
+  }
+})
+
+// Schema map for the 'RFQ' struct.
+export const RFQ_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    rfq_id: 'ri',
+    sub_account_id: 'sa',
+    is_public: 'ip',
+    strategy: 's',
+    expiry: 'e',
+    receipients: 'r',
+    is_anonymous: 'ia',
+    allow_partial: 'ap',
+    legs: ['l', [RFQ_LEG_MAP.FULL_TO_LITE]],
+    bids: ['b', RFQ_BOOK_MAP.FULL_TO_LITE],
+    asks: ['a', RFQ_BOOK_MAP.FULL_TO_LITE],
+    create_time: 'ct',
+    state: ['s1', RFQ_STATE_MAP.FULL_TO_LITE]
+  },
+  LITE_TO_FULL: {
+    ri: 'rfq_id',
+    sa: 'sub_account_id',
+    ip: 'is_public',
+    s: 'strategy',
+    e: 'expiry',
+    r: 'receipients',
+    ia: 'is_anonymous',
+    ap: 'allow_partial',
+    l: ['legs', [RFQ_LEG_MAP.LITE_TO_FULL]],
+    b: ['bids', RFQ_BOOK_MAP.LITE_TO_FULL],
+    a: ['asks', RFQ_BOOK_MAP.LITE_TO_FULL],
+    ct: 'create_time',
+    s1: ['state', RFQ_STATE_MAP.LITE_TO_FULL]
   }
 })
 
@@ -866,20 +866,20 @@ export const API_GET_INSTRUMENTS_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_GET_INSTRUMENTS_RESPONSE' struct.
 export const API_GET_INSTRUMENTS_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    results: 'r'
+    results: ['r', [INSTRUMENT_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    r: 'results'
+    r: ['results', [INSTRUMENT_MAP.LITE_TO_FULL]]
   }
 })
 
 // Schema map for the 'API_MINI_TICKER_RESPONSE' struct.
 export const API_MINI_TICKER_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    results: 'r'
+    results: ['r', MINI_TICKER_MAP.FULL_TO_LITE]
   },
   LITE_TO_FULL: {
-    r: 'results'
+    r: ['results', MINI_TICKER_MAP.LITE_TO_FULL]
   }
 })
 
@@ -902,10 +902,10 @@ export const API_OPEN_ORDERS_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_OPEN_ORDERS_RESPONSE' struct.
 export const API_OPEN_ORDERS_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    orders: 'o'
+    orders: ['o', [ORDER_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    o: 'orders'
+    o: ['orders', [ORDER_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -922,10 +922,10 @@ export const API_OPEN_RFQ_QUOTES_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_OPEN_RFQ_QUOTES_RESPONSE' struct.
 export const API_OPEN_RFQ_QUOTES_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    rfq_quotes: 'rq'
+    rfq_quotes: ['rq', [RFQ_QUOTE_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    rq: 'rfq_quotes'
+    rq: ['rfq_quotes', [RFQ_QUOTE_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -942,10 +942,10 @@ export const API_OPEN_RFQS_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_OPEN_RFQS_RESPONSE' struct.
 export const API_OPEN_RFQS_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    rfqs: 'r'
+    rfqs: ['r', [RFQ_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    r: 'rfqs'
+    r: ['rfqs', [RFQ_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -978,10 +978,10 @@ export const API_POSITIONS_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_POSITIONS_RESPONSE' struct.
 export const API_POSITIONS_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    results: 'r'
+    results: ['r', [POSITIONS_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    r: 'results'
+    r: ['results', [POSITIONS_MAP.LITE_TO_FULL]]
   }
 })
 
@@ -1000,10 +1000,10 @@ export const API_RECENT_TRADE_REQUEST_MAP: SchemaPairMap = Object.freeze({
 // Schema map for the 'API_RECENT_TRADE_RESPONSE' struct.
 export const API_RECENT_TRADE_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    results: 'r'
+    results: ['r', [PUBLIC_TRADE_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
-    r: 'results'
+    r: ['results', [PUBLIC_TRADE_MAP.LITE_TO_FULL]]
   }
 })
 

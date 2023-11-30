@@ -11,22 +11,24 @@ export class Utils {
   /**
    * Maps a payload from a lite schema to a full schema or vice versa.
    */
-  static schemaMap (payload: any = {}, schemaMaps: SchemaMap = {}): any {
+  static schemaMap (payload: any = {}, schemaMaps: SchemaMap | SchemaMap[] = {}): any {
     if (typeof payload !== 'object') {
       return payload
     }
 
+    const _schemaMaps = (schemaMaps as SchemaMap[])?.[0] || schemaMaps
+
     if (Array.isArray(payload)) {
-      return payload.map((item) => Utils.schemaMap(item, schemaMaps))
+      return payload.map((item) => Utils.schemaMap(item, _schemaMaps))
     }
 
     const result: Record<string, any> = {}
 
     for (const [key, value] of Object.entries(payload)) {
       const [_key, schemaMap] = (
-        Array.isArray(schemaMaps[key])
-          ? schemaMaps[key]
-          : [schemaMaps[key]]
+        Array.isArray(_schemaMaps[key])
+          ? _schemaMaps[key]
+          : [_schemaMaps[key]]
       ) as [string, SchemaMap]
       result[_key] = Utils.schemaMap(value, schemaMap)
     }
