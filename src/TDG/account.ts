@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP, validConfig, type IApiSubAccountSummaryRequest, type IApiSubAccountSummaryResponse, type IConfig } from '../interfaces'
+import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
 export class TDGAccount {
@@ -17,7 +17,7 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#deposit
    */
   deposit (params: any) {
-    return axios.post(this._liteUrl + '/deposit', params)
+    return RestfulService.post(this._liteUrl + '/deposit', params)
   }
 
   /**
@@ -25,7 +25,7 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
   transfer (params: any) {
-    return axios.post(this._liteUrl + '/transfer', params)
+    return RestfulService.post(this._liteUrl + '/transfer', params)
   }
 
   /**
@@ -33,14 +33,14 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
    */
   withdrawal (params: any) {
-    return axios.post(this._liteUrl + '/withdrawal', params)
+    return RestfulService.post(this._liteUrl + '/withdrawal', params)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
   subAccountSummary (params: IApiSubAccountSummaryRequest) {
-    return axios.post(this._liteUrl + '/account_summary', Utils.schemaMap(params, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE)).then(
+    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(params, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
       }
@@ -52,7 +52,7 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-history
    */
   subAccountHistory (params: any) {
-    return axios.get(this._liteUrl + '/account_history', { params })
+    return RestfulService.get(this._liteUrl + '/account_history', { params })
   }
 
   /**
@@ -60,7 +60,7 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#trade-history
    */
   tradeHistory (params: any) {
-    return axios.get(this._liteUrl + '/trade_history', { params })
+    return RestfulService.get(this._liteUrl + '/trade_history', { params })
   }
 
   /**
@@ -68,6 +68,6 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#transaction-history
    */
   transactionHistory (params: any) {
-    return axios.get(this._liteUrl + '/transaction_history', { params })
+    return RestfulService.get(this._liteUrl + '/transaction_history', { params })
   }
 }
