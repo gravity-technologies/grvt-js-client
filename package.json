@@ -1,6 +1,6 @@
 {
   "name": "grvt",
-  "version": "0.0.1-beta.11",
+  "version": "0.0.1-beta.12",
   "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "link-local": "cp package.json dist/ && cd dist/ && npm link && cd ..",
     "lint": "npx eslint src/**/*.{js,ts}",
     "lint-fix": "npx eslint src/**/*.{js,ts} --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon dist/index.js"
   },
   "dependencies": {
     "axios": "^0.27.2",
@@ -38,6 +38,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-n": "^16.3.0",
     "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }

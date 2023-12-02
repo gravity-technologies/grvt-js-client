@@ -26,8 +26,8 @@ export class MDGInstrument {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#get-instruments
    */
-  instruments (params: IApiGetInstrumentsRequest) {
-    return RestfulService.get(this._liteUrl + '/instruments', { params: Utils.schemaMap(params, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE) }).then(
+  instruments (payload: IApiGetInstrumentsRequest) {
+    return RestfulService.post(this._liteUrl + '/instruments', Utils.schemaMap(payload, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_GET_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentsResponse
       }
