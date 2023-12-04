@@ -22,11 +22,13 @@ export class MDGTrade {
    * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
    */
   recentTrades (payload: IApiRecentTradeRequest) {
-    return RestfulService.post(this._liteUrl + '/trades', Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE)).then(
-      (response) => {
-        return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse
-      }
-    )
+    return RestfulService.post(
+      this._liteUrl + '/trades',
+      Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse
+    })
   }
 
   /**

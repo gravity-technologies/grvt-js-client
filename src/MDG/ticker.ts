@@ -16,21 +16,25 @@ export class MDGTicker {
    * @see https://docs.gravitymarkets.io/market_data_api/#mini-ticker
    */
   retrieveMini (payload: IAPIMiniTickerRequest) {
-    return RestfulService.post(this._liteUrl + '/mini', Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE)).then(
-      (response) => {
-        return Utils.schemaMap(response.data, API_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiMiniTickerResponse
-      }
-    )
+    return RestfulService.post(
+      this._liteUrl + '/mini',
+      Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiMiniTickerResponse
+    })
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#ticker
    */
   retrieve (payload: IApiTickerRequest) {
-    return RestfulService.post(this._liteUrl + '/ticker', Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE)).then(
-      (response) => {
-        return Utils.schemaMap(response.data, API_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiTickerResponse
-      }
-    )
+    return RestfulService.post(
+      this._liteUrl + '/ticker',
+      Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiTickerResponse
+    })
   }
 }

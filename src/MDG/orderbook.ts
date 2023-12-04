@@ -16,10 +16,12 @@ export class MDGOrderbook {
    * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
    */
   retrieve (payload: IAPIOrderbookLevelsRequest) {
-    return RestfulService.post(this._liteUrl + '/book', Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE)).then(
-      (response) => {
-        return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
-      }
-    )
+    return RestfulService.post(
+      this._liteUrl + '/book',
+      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
+    })
   }
 }
