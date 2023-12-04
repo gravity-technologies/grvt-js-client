@@ -15,27 +15,27 @@ export class MDGCandlestick {
    * @see https://docs.gravitymarkets.io/market_data_api/#trade-candlestick
    */
   tradeCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/trade_kline', payload)
+    return RestfulService.post(this._fullUrl + '/trade_kline', payload, { withCredentials: false })
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mark-candlestick
    */
   markCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/mark_kline', payload)
+    return RestfulService.post(this._fullUrl + '/mark_kline', payload, { withCredentials: false })
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#index-candlestick
    */
   indexCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/index_kline', payload)
+    return RestfulService.post(this._fullUrl + '/index_kline', payload, { withCredentials: false })
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mid-candlestick
    */
   midCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/mid_kline', payload)
+    return RestfulService.post(this._fullUrl + '/mid_kline', payload, { withCredentials: false })
   }
 }
