@@ -20,7 +20,7 @@ export class Utils {
   /**
    * Maps a payload from a lite schema to a full schema or vice versa.
    */
-  static schemaMap (payload: any = {}, schemaMaps: SchemaMap | SchemaMap[] = {}): any {
+  static schemaMap (payload: any = {}, schemaMaps: SchemaMap | SchemaMap[] = {}, isFullToLite = false): any {
     if (typeof payload !== 'object') {
       return payload
     }
@@ -28,7 +28,7 @@ export class Utils {
     const _schemaMaps = (schemaMaps as SchemaMap[])?.[0] || schemaMaps
 
     if (Array.isArray(payload)) {
-      return payload.map((item) => Utils.schemaMap(item, _schemaMaps))
+      return payload.map((item) => Utils.schemaMap(item, _schemaMaps, isFullToLite))
     }
 
     const result: Record<string, any> = {}
@@ -39,7 +39,14 @@ export class Utils {
           ? _schemaMaps[key]
           : [_schemaMaps[key]]
       ) as [string, SchemaMap]
-      result[_key] = Utils.schemaMap(value, schemaMap)
+      // now only covert bigint hex for non array
+      result[_key] = Utils.schemaMap(
+        isFullToLite
+          ? Utils.coverBigInt(key, value)
+          : value,
+        schemaMap,
+        isFullToLite
+      )
     }
 
     return result

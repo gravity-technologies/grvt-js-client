@@ -24,7 +24,7 @@ export class MDGTrade {
   recentTrades (payload: IApiRecentTradeRequest) {
     return RestfulService.post(
       this._liteUrl + '/trades',
-      Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse

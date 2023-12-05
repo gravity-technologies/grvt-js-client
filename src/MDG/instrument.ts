@@ -18,7 +18,7 @@ export class MDGInstrument {
   instrument (payload: IApiGetInstrumentRequest) {
     return RestfulService.post(
       this._liteUrl + '/instrument',
-      Utils.schemaMap(payload, API_GET_INSTRUMENT_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_GET_INSTRUMENT_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_INSTRUMENT_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentResponse
@@ -31,7 +31,7 @@ export class MDGInstrument {
   instruments (payload: IApiGetInstrumentsRequest) {
     return RestfulService.post(
       this._liteUrl + '/instruments',
-      Utils.schemaMap(payload, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentsResponse

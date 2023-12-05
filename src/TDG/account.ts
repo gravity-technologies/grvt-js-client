@@ -40,7 +40,7 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
   subAccountSummary (params: IApiSubAccountSummaryRequest) {
-    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(params, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE)).then(
+    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(params, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
       }
