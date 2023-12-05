@@ -1,6 +1,15 @@
-import { type SchemaMap } from '../interfaces'
+import { HexStringMap, type SchemaMap } from '../interfaces'
 
 export class Utils {
+  static coverBigInt (field: string, value: any) {
+    if (typeof value === 'bigint') {
+      return HexStringMap.includes(field)
+        ? `0x${value.toString(16)}`
+        : value.toString()
+    }
+    return value
+  }
+
   static timeout<T = any>(promise: Promise<T>, ms?: number, error?: Error) {
     return Promise.race([
       promise,
