@@ -18,7 +18,7 @@ export class MDGTicker {
   retrieveMini (payload: IAPIMiniTickerRequest) {
     return RestfulService.post(
       this._liteUrl + '/mini',
-      Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiMiniTickerResponse
@@ -31,7 +31,7 @@ export class MDGTicker {
   retrieve (payload: IApiTickerRequest) {
     return RestfulService.post(
       this._liteUrl + '/ticker',
-      Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiTickerResponse

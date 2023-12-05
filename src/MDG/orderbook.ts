@@ -18,7 +18,7 @@ export class MDGOrderbook {
   retrieve (payload: IAPIOrderbookLevelsRequest) {
     return RestfulService.post(
       this._liteUrl + '/book',
-      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE),
+      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse

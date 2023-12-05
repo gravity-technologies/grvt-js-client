@@ -8,16 +8,13 @@ import axios from 'axios'
 
 const jsonReplacerBigInt = (key: string, value: any) => {
   if (typeof value === 'bigint') {
-    const maxInt64 = BigInt('0x7fffffffffffffff')
-    return value > maxInt64
-      ? `0x${value.toString(16)}`
-      : value.toString()
+    return value.toString()
   }
   return value
 }
 
 const jsonReviverBigInt = (key: string, value: any) => {
-  if (typeof value === 'string' && /^\d+$/.test(value)) {
+  if (typeof value === 'string' && (/^\d+$/.test(value) || /^0x[0-9a-fA-F]+$/.test(value))) {
     return BigInt(value)
   }
   return value
