@@ -1,9 +1,9 @@
 import { customAlphabet } from 'nanoid'
 import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EInstrumentSettlementPeriod, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
 import { Utils } from '../utils'
-import { StreamEndpoints, type EStreamEndpoints, type EWsStreamParam } from './interfaces'
+import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
 
-type TStreamEndpoint = EStreamEndpoints | typeof StreamEndpoints[number]
+type TStreamEndpoint = `${EStreamEndpoints}`
 
 interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'quote' | 'rate'> {
   kind: EInstrumentSettlementPeriod[]
@@ -23,7 +23,7 @@ export class WS extends WebSocket {
   private _connected = false
 
   private _parseStream (stream: TStreamEndpoint) {
-    if (StreamEndpoints.includes(stream)) {
+    if (Object.values(EStreamEndpoints).includes(stream as EStreamEndpoints)) {
       return stream
     }
     throw new Error('Unknown stream')
@@ -71,7 +71,7 @@ export class WS extends WebSocket {
   }
 
   private _keyPairsToParams (pairedKey: string): TSubscribeParams | undefined {
-    for (const streamEndpoint of StreamEndpoints) {
+    for (const streamEndpoint of Object.values(EStreamEndpoints)) {
       if (pairedKey.startsWith(streamEndpoint + '.')) {
         const [kind, underlying, quote, rate, depthOrGreeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
