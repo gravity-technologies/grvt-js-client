@@ -1,14 +1,14 @@
 import { customAlphabet } from 'nanoid'
-import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EInstrumentSettlementPeriod, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
+import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EKind, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
 import { Utils } from '../utils'
 import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
 
 type TStreamEndpoint = `${EStreamEndpoints}`
 
 interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'quote' | 'rate'> {
-  kind: EInstrumentSettlementPeriod[]
-  underlying: ECurrency[]
-  quote: ECurrency[]
+  kind: Array<`${EKind}`>
+  underlying: Array<`${ECurrency}`>
+  quote: Array<`${ECurrency}`>
   rate: number
 }
 
@@ -77,7 +77,7 @@ export class WS extends WebSocket {
         return [{
           stream: streamEndpoint,
           stream_params: {
-            kind: [String(kind).toUpperCase()] as EInstrumentSettlementPeriod[],
+            kind: [String(kind).toUpperCase()] as EKind[],
             underlying: [String(underlying).toUpperCase()] as ECurrency[],
             quote: [String(quote).toUpperCase()] as ECurrency[],
             rate: Number(rate),
@@ -238,8 +238,8 @@ export class WS extends WebSocket {
   /**
    * Only supports one pair for now
    */
-  subscribe (options: {
-    stream: TStreamEndpoint
+  subscribe <T extends TStreamEndpoint>(options: {
+    stream: T
     params: EWsStreamParam
   }, onMessage: TMessageHandler, onError?: (error: Error) => void) {
     const subscribeParams: TSubscribeParams = [{
