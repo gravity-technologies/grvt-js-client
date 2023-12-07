@@ -1,15 +1,17 @@
 import { customAlphabet } from 'nanoid'
-import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EKind, type IMiniTicker, type IOrderbookLevels, type IPublicTrade, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSTickerResponse } from '../interfaces'
+import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_ORDER_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_RFQ_QUOTE_RESPONSE_MAP, WS_RFQ_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EKind, type IMiniTicker, type IOrder, type IOrderbookLevels, type IPublicTrade, type IRfq, type IRfqQuote, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSRfqQuoteResponse, type IWSRfqResponse, type IWSTickerResponse, type IWsOrderResponse } from '../interfaces'
 import { Utils } from '../utils'
 import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
+
+type TEntities = IMiniTicker | ITicker | IOrderbookLevels | IPublicTrade | IOrder | IRfq | IRfqQuote
 
 type TStreamEndpoint = `${EStreamEndpoints}`
 
 interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'quote' | 'rate'> {
-  kind: Array<`${EKind}`>
-  underlying: Array<`${ECurrency}`>
-  quote: Array<`${ECurrency}`>
-  rate: number
+  kind?: Array<`${EKind}`>
+  underlying?: Array<`${ECurrency}`>
+  quote?: Array<`${ECurrency}`>
+  rate?: number
 }
 
 type TSubscribeParams = Array<{
@@ -17,7 +19,7 @@ type TSubscribeParams = Array<{
   stream_params: IParsedParams
 }>
 
-type TMessageHandler = (data: IMiniTicker | ITicker | IOrderbookLevels | IPublicTrade) => void
+type TMessageHandler = (data: TEntities) => void
 
 export class WS extends WebSocket {
   private _connected = false
@@ -32,7 +34,7 @@ export class WS extends WebSocket {
   private _parseParams (params: EWsStreamParam): IParsedParams {
     return {
       ...params,
-      kind: [params.kind],
+      kind: params.kind ? [params.kind] : undefined,
       underlying: [params.underlying as ECurrency],
       quote: [params.quote as ECurrency],
       rate: Math.min(
@@ -47,22 +49,70 @@ export class WS extends WebSocket {
 
   private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
     return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
-      for (const kind of streamParams.kind) {
-        for (const underlying of streamParams.underlying) {
-          for (const quote of streamParams.quote) {
-            const pairsArgs: Array<string | number | boolean> = [stream, kind, underlying, quote]
+      for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
+        for (const underlying of (streamParams.underlying?.length ? streamParams.underlying : [undefined])) {
+          for (const quote of (streamParams.quote?.length ? streamParams.quote : [undefined])) {
             if (stream.includes('.v1.mini.')) {
-              pairsArgs.push(streamParams.rate)
+              merged.push([
+                stream,
+                kind,
+                underlying,
+                quote,
+                streamParams.rate ?? 1000
+              ].join('.').toLowerCase())
+              continue
             } else if (stream.includes('.v1.ticker.')) {
-              pairsArgs.push(streamParams.rate)
-              pairsArgs.push(false) // tried other values, but only false works
+              merged.push([
+                stream,
+                kind,
+                underlying,
+                quote,
+                streamParams.rate ?? 1000,
+                false // tried other values, but only false works
+              ].join('.').toLowerCase())
+              continue
             } else if (stream.includes('.v1.orderbook.')) {
-              pairsArgs.push(streamParams.rate)
-              pairsArgs.push(streamParams.depth ?? 0)
+              merged.push([
+                stream,
+                kind,
+                underlying,
+                quote,
+                streamParams.rate ?? 1000,
+                streamParams.depth ?? 0
+              ].join('.').toLowerCase())
+              continue
             } else if (stream.includes('.v1.trades.')) {
-              pairsArgs.push(0) // tried rate, but only 0 works
+              merged.push([
+                stream,
+                kind,
+                underlying,
+                quote,
+                0 // tried rate, but only 0 works
+              ].join('.').toLowerCase())
+              continue
+            } else if (stream.includes('.v1.order')) {
+              merged.push([
+                stream.split('.').reverse().join('.'),
+                BigInt(streamParams.sub_account_id ?? 0).toString(),
+                kind,
+                underlying,
+                quote,
+                streamParams.create_only ? 'create' : 'stat'
+              ].join('.').toLowerCase())
+              continue
+            } else if (stream.includes('.v1.rfq')) {
+              merged.push([
+                stream.split('.').reverse().join('.'),
+                BigInt(streamParams.sub_account_id ?? 0).toString()
+              ].join('.').toLowerCase())
+              continue
+            } else if (stream.includes('.v1.rfq_quote')) {
+              merged.push([
+                stream.split('.').reverse().join('.'),
+                BigInt(streamParams.sub_account_id ?? 0).toString()
+              ].join('.').toLowerCase())
+              continue
             }
-            merged.push(pairsArgs.join('.').toLowerCase())
           }
         }
       }
@@ -154,8 +204,8 @@ export class WS extends WebSocket {
   private _messageLiteToFull (message: {
     s: string
     n: string
-    f: any
-  }): IMiniTicker | ITicker | IOrderbookLevels | IPublicTrade | undefined {
+    f: TEntities
+  }) {
     if (message.s.includes('.v1.mini.')) {
       return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
     } else if (message.s.includes('.v1.ticker.')) {
@@ -164,6 +214,12 @@ export class WS extends WebSocket {
       return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
     } else if (message.s.includes('.v1.trades.')) {
       return (Utils.schemaMap(message, WS_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSRecentTradeResponse).f
+    } else if (message.s.includes('order.v1.')) { // TDG reverse compare with MDG
+      return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+    } else if (message.s.includes('rfq.v1.')) { // TDG reverse compare with MDG
+      return (Utils.schemaMap(message, WS_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqResponse).f
+    } else if (message.s.includes('rfq_quote.v1.')) { // TDG reverse compare with MDG
+      return (Utils.schemaMap(message, WS_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqQuoteResponse).f
     }
   }
 

@@ -1,4 +1,4 @@
-import { type ECurrency, type EKind } from '../interfaces'
+import { type ECurrency, type EKind, type EVenue, type IWSMiniTickerRequest, type IWSOrderbookLevelsRequest, type IWSPositionsRequest, type IWSPrivateTradeRequest, type IWSRecentTradeRequest, type IWSRfqQuoteRequest, type IWSRfqRequest, type IWSTickerRequest, type IWsOrderRequest, type IWsOrderStateRequest } from '../interfaces'
 
 export enum EWsMethod {
   SUBSCRIBE = 'subscribe',
@@ -46,12 +46,23 @@ export enum EStreamEndpoints {
   FULL_RFQ_QUOTE_V1 = 'full.v1.rfq_quote'
 }
 
-export interface EWsStreamParam {
-  kind: `${EKind}`
-  underlying: `${ECurrency}`
-  quote: `${ECurrency}`
-  rate?: number
-  depth?: number
-  greeks?: boolean
-  aggregate?: number
+// export interface EWsStreamParam {
+//   sub_account_id?: bigint
+//   kind: `${EKind}`
+//   underlying: `${ECurrency}`
+//   quote: `${ECurrency}`
+//   rate?: number
+//   depth?: number
+//   greeks?: boolean
+//   aggregate?: number
+//   create_only?: boolean
+//   update_only?: boolean
+// }
+
+type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSRecentTradeRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest
+export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue'> {
+  kind?: `${EKind}`
+  underlying?: `${ECurrency}`
+  quote?: `${ECurrency}`
+  venue?: Array<`${EVenue}`>
 }
