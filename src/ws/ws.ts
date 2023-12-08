@@ -244,7 +244,7 @@ export class WS extends WebSocket {
       const consumers = Object.values(this._pairs[stream] || {})
       if (result && consumers?.length) {
         for (const consumer of consumers) {
-          consumer(result)
+          typeof consumer === 'function' && consumer(result)
         }
       }
     })
