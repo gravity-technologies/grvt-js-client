@@ -15,8 +15,8 @@ export class TDGOrder {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-order
    */
-  create (params: IApiCreateOrderRequest) {
-    return RestfulService.post(this._liteUrl + '/create_order', Utils.schemaMap(params, API_CREATE_ORDER_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  create (payload: IApiCreateOrderRequest) {
+    return RestfulService.post(this._liteUrl + '/create_order', Utils.schemaMap(payload, API_CREATE_ORDER_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CREATE_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateOrderResponse
       }
@@ -26,8 +26,8 @@ export class TDGOrder {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-order
    */
-  cancel (params: IApiCancelOrderRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_order', Utils.schemaMap(params, API_CANCEL_ORDER_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancel (payload: IApiCancelOrderRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_order', Utils.schemaMap(payload, API_CANCEL_ORDER_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelOrderResponse
       }
@@ -37,8 +37,8 @@ export class TDGOrder {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-orders
    */
-  cancelAll (params: IApiCancelAllOrdersRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_all_orders', Utils.schemaMap(params, API_CANCEL_ALL_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancelAll (payload: IApiCancelAllOrdersRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_all_orders', Utils.schemaMap(payload, API_CANCEL_ALL_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_ALL_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllOrdersResponse
       }
@@ -56,8 +56,8 @@ export class TDGOrder {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-orders
    */
-  openOrders (params: IApiOpenOrdersRequest) {
-    return RestfulService.get(this._liteUrl + '/open_orders', { params: Utils.schemaMap(params, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true) }).then(
+  openOrders (payload: IApiOpenOrdersRequest) {
+    return RestfulService.post(this._liteUrl + '/open_orders', Utils.schemaMap(payload, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_OPEN_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenOrdersResponse
       }
