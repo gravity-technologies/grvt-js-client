@@ -16,31 +16,31 @@ export class TDGAccount {
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#deposit
    */
-  deposit (params: any) {
-    return RestfulService.post(this._liteUrl + '/deposit', params)
+  deposit (payload: any) {
+    return RestfulService.post(this._liteUrl + '/deposit', payload)
   }
 
   /**
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
-  transfer (params: any) {
-    return RestfulService.post(this._liteUrl + '/transfer', params)
+  transfer (payload: any) {
+    return RestfulService.post(this._liteUrl + '/transfer', payload)
   }
 
   /**
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
    */
-  withdrawal (params: any) {
-    return RestfulService.post(this._liteUrl + '/withdrawal', params)
+  withdrawal (payload: any) {
+    return RestfulService.post(this._liteUrl + '/withdrawal', payload)
   }
 
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
-  subAccountSummary (params: IApiSubAccountSummaryRequest) {
-    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(params, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  subAccountSummary (payload: IApiSubAccountSummaryRequest) {
+    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
       }

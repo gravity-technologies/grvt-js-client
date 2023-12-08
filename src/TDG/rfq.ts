@@ -27,8 +27,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq
    */
-  createRfq (params: IApiCreateRfqRequest) {
-    return RestfulService.post(this._liteUrl + '/create_rfq', Utils.schemaMap(params, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  createRfq (payload: IApiCreateRfqRequest) {
+    return RestfulService.post(this._liteUrl + '/create_rfq', Utils.schemaMap(payload, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CREATE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqResponse
       }
@@ -38,8 +38,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq
    */
-  cancelRfq (params: IApiCancelRfqRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_rfq', Utils.schemaMap(params, API_CANCEL_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancelRfq (payload: IApiCancelRfqRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_rfq', Utils.schemaMap(payload, API_CANCEL_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqResponse
       }
@@ -49,8 +49,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfqs
    */
-  cancelAllRfqs (params: IApiCancelAllRfqsRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_all_rfqs', Utils.schemaMap(params, API_CANCEL_ALL_RFQS_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancelAllRfqs (payload: IApiCancelAllRfqsRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_all_rfqs', Utils.schemaMap(payload, API_CANCEL_ALL_RFQS_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqsResponse
       }
@@ -60,8 +60,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#trade-rfq
    */
-  tradeRfq (params: IApiTradeRfqRequest) {
-    return RestfulService.post(this._liteUrl + '/trade_rfq', Utils.schemaMap(params, API_TRADE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  tradeRfq (payload: IApiTradeRfqRequest) {
+    return RestfulService.post(this._liteUrl + '/trade_rfq', Utils.schemaMap(payload, API_TRADE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_TRADE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeRfqResponse
       }
@@ -71,8 +71,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-rfqs
    */
-  openRfqs (params: IApiOpenRfqsRequest) {
-    return RestfulService.get(this._liteUrl + '/open_rfqs', { params: Utils.schemaMap(params, API_OPEN_RFQS_REQUEST_MAP.FULL_TO_LITE, true) }).then(
+  openRfqs (payload: IApiOpenRfqsRequest) {
+    return RestfulService.post(this._liteUrl + '/open_rfqs', Utils.schemaMap(payload, API_OPEN_RFQS_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_OPEN_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqsResponse
       }
@@ -94,8 +94,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq-quote
    */
-  createQuote (params: IApiCreateRfqQuoteRequest) {
-    return RestfulService.post(this._liteUrl + '/quote_rfq', Utils.schemaMap(params, API_CREATE_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  createQuote (payload: IApiCreateRfqQuoteRequest) {
+    return RestfulService.post(this._liteUrl + '/quote_rfq', Utils.schemaMap(payload, API_CREATE_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CREATE_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqQuoteResponse
       }
@@ -105,8 +105,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq-quote
    */
-  cancelQuote (params: IApiCancelRfqQuoteRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_rfq_quote', Utils.schemaMap(params, API_CANCEL_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancelQuote (payload: IApiCancelRfqQuoteRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_rfq_quote', Utils.schemaMap(payload, API_CANCEL_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqQuoteResponse
       }
@@ -116,8 +116,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfq-quotes
    */
-  cancelAllQuotes (params: IApiCancelAllRfqQuotesRequest) {
-    return RestfulService.post(this._liteUrl + '/cancel_all_rfq_quotes', Utils.schemaMap(params, API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true)).then(
+  cancelAllQuotes (payload: IApiCancelAllRfqQuotesRequest) {
+    return RestfulService.post(this._liteUrl + '/cancel_all_rfq_quotes', Utils.schemaMap(payload, API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqQuotesResponse
       }
@@ -127,8 +127,8 @@ export class TDGRfq {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-rfq-quotes
    */
-  openQuotes (params: IApiOpenRfqQuotesRequest) {
-    return RestfulService.get(this._liteUrl + '/open_rfq_quotes', { params: Utils.schemaMap(params, API_OPEN_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true) }).then(
+  openQuotes (payload: IApiOpenRfqQuotesRequest) {
+    return RestfulService.post(this._liteUrl + '/open_rfq_quotes', Utils.schemaMap(payload, API_OPEN_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true)).then(
       (response) => {
         return Utils.schemaMap(response.data, API_OPEN_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqQuotesResponse
       }
