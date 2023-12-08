@@ -3,8 +3,9 @@ import { HexStringMap, type SchemaMap } from '../interfaces'
 export class Utils {
   static coverBigInt (field: string, value: any) {
     if (typeof value === 'bigint') {
+      const hexStr = value.toString(16)
       return HexStringMap.includes(field)
-        ? `0x${value.toString(16)}`
+        ? `0x${hexStr.length % 2 === 0 ? '' : '0'}${hexStr}`
         : value.toString()
     }
     return value
