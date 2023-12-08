@@ -241,7 +241,7 @@ export class WS extends WebSocket {
       }
       const stream = message.s as string
       const result = this._messageLiteToFull(message)
-      const consumers = Object.values(this._pairs[stream])
+      const consumers = Object.values(this._pairs[stream] || {})
       if (result && consumers?.length) {
         for (const consumer of consumers) {
           consumer(result)
