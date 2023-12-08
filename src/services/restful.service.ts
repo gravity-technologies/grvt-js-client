@@ -32,3 +32,11 @@ export const RestfulService = axios.create({
     // ...ensureTruthyArray(axios.defaults.transformResponse),
   ]
 })
+
+RestfulService.interceptors.response.use(undefined, (error) => {
+  if (error.response?.data?.api_msg) {
+    error.message = error.response.data.api_msg
+  }
+
+  throw error
+})
