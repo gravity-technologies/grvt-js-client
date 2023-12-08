@@ -177,7 +177,7 @@ export class WS extends WebSocket {
     if (key) {
       return `${pair}_${key}` // already bound
     }
-    const consumerKey = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5)()
+    const consumerKey = Date.now() + customAlphabet('abcdefghijklmnopqrstuvwxyz', 3)()
     this._pairs[pair][consumerKey] = onMessage
     return `${pair}_${consumerKey}`
   }
@@ -266,7 +266,7 @@ export class WS extends WebSocket {
   }
 
   private async _subscribe (pair: string, subscribeParams: TSubscribeParams) {
-    if (this._pairs[pair]) {
+    if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
     await this.connected()
