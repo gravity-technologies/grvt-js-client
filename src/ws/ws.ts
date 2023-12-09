@@ -235,7 +235,7 @@ export class WS extends WebSocket {
     //   this.close()
     // })
     this.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JSON.parse(e.data)
+      const message = JSON.parse(e.data, Utils.jsonReviverBigInt)
       if (['subscribe', 'unsubscribe'].includes(message.method)) {
         return
       }
@@ -272,7 +272,7 @@ export class WS extends WebSocket {
     await this.connected()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const params = JSON.parse(e.data)?.results as TSubscribeParams
+      const params = JSON.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
       if (!params) {
         return
       }
