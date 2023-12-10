@@ -377,7 +377,7 @@ export interface IApiGetInstrumentsResponse {
 
 export interface IApiMiniTickerResponse {
   // The mini ticker matching the request asset
-  results?: IMiniTicker[]
+  results?: IMiniTicker
 }
 
 export interface IApiOpenOrdersRequest {
@@ -457,6 +457,11 @@ export interface IApiSubAccountSummaryRequest {
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   results?: ISubAccount
+}
+
+export interface IApiTDGAckResponse {
+  // Gravity has acknowledged that the request has been successfully received and it will process it in the backend
+  acknowledgement?: boolean
 }
 
 export interface IApiTickerRequest {
