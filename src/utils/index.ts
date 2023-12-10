@@ -36,7 +36,7 @@ export class Utils {
    * Maps a payload from a lite schema to a full schema or vice versa.
    */
   static schemaMap (payload: any = {}, schemaMaps: SchemaMap | SchemaMap[] = {}, isFullToLite = false): any {
-    if (typeof payload !== 'object') {
+    if (!payload || typeof payload !== 'object') {
       return payload
     }
 
