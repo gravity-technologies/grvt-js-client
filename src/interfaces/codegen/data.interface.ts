@@ -665,10 +665,10 @@ export interface IOrderState {
   status?: EOrderStatus
   // The reason for rejection or cancellation
   reject_reason?: EOrderRejectReason
-  // The number of assets available for orderbook matching. Sorted in same order as Order.Legs
-  size_left?: bigint[]
-  // The number of assets available for execution. Sorted in same order as Order.Legs
-  size_unfilled?: bigint[]
+  // The number of assets available for orderbook/RFQ matching. Sorted in same order as Order.Legs
+  book_size?: bigint[]
+  // The total number of assets traded. Sorted in same order as Order.Legs
+  traded_size?: bigint[]
   // Time at which the order was updated by GRVT, expressed in unix nanoseconds
   update_time?: bigint
 }

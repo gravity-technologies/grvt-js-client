@@ -142,15 +142,15 @@ export const ORDER_STATE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     status: 's',
     reject_reason: 'rr',
-    size_left: 'sl',
-    size_unfilled: 'su',
+    book_size: 'bs',
+    traded_size: 'ts',
     update_time: 'ut'
   },
   LITE_TO_FULL: {
     s: 'status',
     rr: 'reject_reason',
-    sl: 'size_left',
-    su: 'size_unfilled',
+    bs: 'book_size',
+    ts: 'traded_size',
     ut: 'update_time'
   }
 })
