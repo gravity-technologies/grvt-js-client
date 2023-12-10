@@ -273,7 +273,7 @@ export class WS {
       jsonrpc: '2.0',
       method: 'subscribe',
       params: subscribeParams
-    }))
+    }, Utils.jsonReplacerBigInt))
   }
 
   private _sendUnSubscribe (subscribeParams: TSubscribeParams) {
@@ -282,7 +282,7 @@ export class WS {
       jsonrpc: '2.0',
       method: 'unsubscribe',
       params: subscribeParams
-    }))
+    }, Utils.jsonReplacerBigInt))
   }
 
   /**
