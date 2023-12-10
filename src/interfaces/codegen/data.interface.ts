@@ -83,6 +83,10 @@ export enum EOrderRejectReason {
   RFQ_EXPIRED = 'RFQ_EXPIRED',
   // the AXE has expired
   AXE_EXPIRED = 'AXE_EXPIRED',
+  // the FOK order could not be fully matched
+  FAIL_FOK = 'FAIL_FOK',
+  // the AON order could not be fully matched
+  FAIL_AON = 'FAIL_AON',
 }
 
 export enum EOrderStatus {
