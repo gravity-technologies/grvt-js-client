@@ -52,7 +52,7 @@ export class WS extends WebSocket {
       for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
         for (const underlying of (streamParams.underlying?.length ? streamParams.underlying : [undefined])) {
           for (const quote of (streamParams.quote?.length ? streamParams.quote : [undefined])) {
-            if (stream.includes('.v1.mini.')) {
+            if (stream.includes('.v1.mini')) {
               merged.push([
                 stream,
                 kind,
@@ -61,7 +61,7 @@ export class WS extends WebSocket {
                 streamParams.rate ?? 1000
               ].join('.').toLowerCase())
               continue
-            } else if (stream.includes('.v1.ticker.')) {
+            } else if (stream.includes('.v1.ticker')) {
               merged.push([
                 stream,
                 kind,
@@ -71,7 +71,7 @@ export class WS extends WebSocket {
                 false // tried other values, but only false works
               ].join('.').toLowerCase())
               continue
-            } else if (stream.includes('.v1.orderbook.')) {
+            } else if (stream.includes('.v1.orderbook')) {
               merged.push([
                 stream,
                 kind,
@@ -81,7 +81,7 @@ export class WS extends WebSocket {
                 streamParams.depth ?? 0
               ].join('.').toLowerCase())
               continue
-            } else if (stream.includes('.v1.trades.')) {
+            } else if (stream.includes('.v1.trades')) {
               merged.push([
                 stream,
                 kind,
