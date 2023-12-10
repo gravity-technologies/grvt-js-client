@@ -39,25 +39,22 @@ export class WS {
     this._bindWebSocketListeners()
   }
 
-  private _connect () {
-    this._ws = new WebSocket(this._options.url, this._options.protocols)
-    this._bindWebSocketListeners()
-  }
-
   private _bindWebSocketListeners () {
     this._ws.addEventListener('open', (e: Event) => {
       this._connected = true
-      this._subscribeCurrentPairs()
+      if (this._retries) {
+        this._subscribeCurrentPairs()
+      }
     })
     this._ws.addEventListener('close', (e: CloseEvent) => {
       this._connected = false
       const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
       if (typeof retryTimeout === 'number') {
         return setTimeout(() => {
-          this._connect()
+          this._ws = new WebSocket(this._options.url, this._options.protocols)
+          this._bindWebSocketListeners()
         }, retryTimeout)
       }
-
       throw retryTimeout
     })
     // this._ws.addEventListener('error', (e: Event) => {
@@ -102,6 +99,9 @@ export class WS {
     }
   }
 
+  /**
+   * Reverse of _keyPairsToParams
+   */
   private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
     return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
       for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
@@ -175,94 +175,87 @@ export class WS {
     }, [])
   }
 
+  /**
+   * Revert of _paramsToKeyPairs
+   */
   private _keyPairsToParams (pairedKey: string): TSubscribeParams | undefined {
     for (const streamEndpoint of Object.values(EStreamEndpoints)) {
-      if (pairedKey.startsWith(streamEndpoint + '.')) {
-        // const [kind, underlying, quote, rate, depthOrGreeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-        // return [{
-        //   stream: streamEndpoint,
-        //   stream_params: {
-        //     kind: [String(kind).toUpperCase()] as EKind[],
-        //     underlying: [String(underlying).toUpperCase()] as ECurrency[],
-        //     quote: [String(quote).toUpperCase()] as ECurrency[],
-        //     rate: Number(rate),
-        //     depth: ['false', 'true'].includes(depthOrGreeks)
-        //       ? undefined
-        //       : Number(depthOrGreeks),
-        //     greeks: ['false', 'true'].includes(depthOrGreeks)
-        //       ? ['false', 'true'].indexOf(depthOrGreeks) === 1
-        //       : undefined
-        //   }
-        // }]
-
-        // const [kind, underlying, quote, rate, depthOrGreeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-        if (streamEndpoint.includes('.v1.mini')) {
-          const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-          return [{
-            stream: streamEndpoint,
-            stream_params: {
-              kind: [String(kind).toUpperCase()] as EKind[],
-              underlying: [String(underlying).toUpperCase()] as ECurrency[],
-              quote: [String(quote).toUpperCase()] as ECurrency[],
-              rate: Number(rate)
-            }
-          }]
-        } else if (streamEndpoint.includes('.v1.ticker')) {
-          const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-          return [{
-            stream: streamEndpoint,
-            stream_params: {
-              kind: [String(kind).toUpperCase()] as EKind[],
-              underlying: [String(underlying).toUpperCase()] as ECurrency[],
-              quote: [String(quote).toUpperCase()] as ECurrency[],
-              rate: Number(rate),
-              greeks: ['false', 'true'].indexOf(greeks) === 1
-            }
-          }]
-        } else if (streamEndpoint.includes('.v1.orderbook')) {
-          const [kind, underlying, quote, rate, depth] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-          return [{
-            stream: streamEndpoint,
-            stream_params: {
-              kind: [String(kind).toUpperCase()] as EKind[],
-              underlying: [String(underlying).toUpperCase()] as ECurrency[],
-              quote: [String(quote).toUpperCase()] as ECurrency[],
-              rate: Number(rate),
-              depth: Number(depth) || 0
-            }
-          }]
-        } else if (streamEndpoint.includes('.v1.trades')) {
-          merged.push([
-            stream,
-            kind,
-            underlying,
-            quote,
-            0 // tried rate, but only 0 works
-          ].join('.').toLowerCase())
-          continue
-        } else if (streamEndpoint.includes('.v1.order')) {
-          merged.push([
-            stream.split('.').reverse().join('.'),
-            BigInt(streamParams.sub_account_id ?? 0).toString(),
-            kind,
-            underlying,
-            quote,
-            streamParams.create_only ? 'create' : 'stat'
-          ].join('.').toLowerCase())
-          continue
-        } else if (streamEndpoint.includes('.v1.rfq')) {
-          merged.push([
-            stream.split('.').reverse().join('.'),
-            BigInt(streamParams.sub_account_id ?? 0).toString()
-          ].join('.').toLowerCase())
-          continue
-        } else if (streamEndpoint.includes('.v1.rfq_quote')) {
-          merged.push([
-            stream.split('.').reverse().join('.'),
-            BigInt(streamParams.sub_account_id ?? 0).toString()
-          ].join('.').toLowerCase())
-          continue
-        }
+      if (streamEndpoint.includes('.v1.mini')) {
+        const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate)
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.ticker')) {
+        const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            greeks: ['false', 'true'].indexOf(greeks) === 1
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.orderbook')) {
+        const [kind, underlying, quote, rate, depth] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            depth: Number(depth) || 0
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.trades')) {
+        const [kind, underlying, quote, rate, limit] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            // venue: 'all', // TODO
+            limit: Number(limit) || 0
+          }
+        }]
+      } else if (streamEndpoint.includes('order.v1.')) {
+        const [subAccountId, kind, underlying, quote, create] = pairedKey.replace(/^order\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId),
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            create_only: ['create', 'stat'].indexOf(create) === 0
+          }
+        }]
+      } else if (streamEndpoint.includes('rfq.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId)
+          }
+        }]
+      } else if (streamEndpoint.includes('rfq_quote.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId)
+          }
+        }]
       }
     }
   }
@@ -360,7 +353,10 @@ export class WS {
   private _subscribeCurrentPairs () {
     const pairs = Object.keys(this._pairs)
     for (const pair of pairs) {
-      console.log('ws.ts:294', this._keyPairsToParams(pair))
+      const subscribeParams = this._keyPairsToParams(pair)
+      if (subscribeParams?.length) {
+        this._sendSubscribe(subscribeParams)
+      }
     }
   }
 
