@@ -21,8 +21,60 @@ type TSubscribeParams = Array<{
 
 type TMessageHandler = (data: TEntities) => void
 
-export class WS extends WebSocket {
+interface IOptions {
+  url: string | URL
+  protocols?: string | string[]
+  reconnectStrategy?: ((retries: number) => number | Error)
+}
+
+export class WS {
+  private _ws: WebSocket
+  private _retries = 0
   private _connected = false
+  private readonly _options: IOptions
+
+  constructor (options: IOptions) {
+    this._options = options
+    this._ws = new WebSocket(this._options.url, this._options.protocols)
+    this._bindWebSocketListeners()
+  }
+
+  private _bindWebSocketListeners () {
+    this._ws.addEventListener('open', (e: Event) => {
+      this._connected = true
+      if (this._retries) {
+        this._subscribeCurrentPairs()
+      }
+    })
+    this._ws.addEventListener('close', (e: CloseEvent) => {
+      this._connected = false
+      const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
+      if (typeof retryTimeout === 'number') {
+        return setTimeout(() => {
+          this._ws = new WebSocket(this._options.url, this._options.protocols)
+          this._bindWebSocketListeners()
+        }, retryTimeout)
+      }
+      throw retryTimeout
+    })
+    // this._ws.addEventListener('error', (e: Event) => {
+    //   this.close()
+    // })
+    this._ws.addEventListener('message', (e: MessageEvent<string>) => {
+      const message = JSON.parse(e.data, Utils.jsonReviverBigInt)
+      if (['subscribe', 'unsubscribe'].includes(message.method)) {
+        return
+      }
+      const stream = message.s as string
+      const result = this._messageLiteToFull(message)
+      const consumers = Object.values(this._pairs[stream] || {})
+      if (result && consumers?.length) {
+        for (const consumer of consumers) {
+          typeof consumer === 'function' && consumer(result)
+        }
+      }
+    })
+  }
 
   private _parseStream (stream: TStreamEndpoint) {
     if (Object.values(EStreamEndpoints).includes(stream as EStreamEndpoints)) {
@@ -47,6 +99,9 @@ export class WS extends WebSocket {
     }
   }
 
+  /**
+   * Reverse of _keyPairsToParams
+   */
   private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
     return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
       for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
@@ -120,10 +175,24 @@ export class WS extends WebSocket {
     }, [])
   }
 
+  /**
+   * Revert of _paramsToKeyPairs
+   */
   private _keyPairsToParams (pairedKey: string): TSubscribeParams | undefined {
     for (const streamEndpoint of Object.values(EStreamEndpoints)) {
-      if (pairedKey.startsWith(streamEndpoint + '.')) {
-        const [kind, underlying, quote, rate, depthOrGreeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+      if (streamEndpoint.includes('.v1.mini')) {
+        const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate)
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.ticker')) {
+        const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
@@ -131,12 +200,60 @@ export class WS extends WebSocket {
             underlying: [String(underlying).toUpperCase()] as ECurrency[],
             quote: [String(quote).toUpperCase()] as ECurrency[],
             rate: Number(rate),
-            depth: ['false', 'true'].includes(depthOrGreeks)
-              ? undefined
-              : Number(depthOrGreeks),
-            greeks: ['false', 'true'].includes(depthOrGreeks)
-              ? ['false', 'true'].indexOf(depthOrGreeks) === 1
-              : undefined
+            greeks: ['false', 'true'].indexOf(greeks) === 1
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.orderbook')) {
+        const [kind, underlying, quote, rate, depth] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            depth: Number(depth) || 0
+          }
+        }]
+      } else if (streamEndpoint.includes('.v1.trades')) {
+        const [kind, underlying, quote, rate, limit] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate),
+            // venue: 'all', // TODO
+            limit: Number(limit) || 0
+          }
+        }]
+      } else if (streamEndpoint.includes('order.v1.')) {
+        const [subAccountId, kind, underlying, quote, create] = pairedKey.replace(/^order\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId),
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            create_only: ['create', 'stat'].indexOf(create) === 0
+          }
+        }]
+      } else if (streamEndpoint.includes('rfq.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId)
+          }
+        }]
+      } else if (streamEndpoint.includes('rfq_quote.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)/, '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            sub_account_id: BigInt(subAccountId)
           }
         }]
       }
@@ -144,7 +261,7 @@ export class WS extends WebSocket {
   }
 
   private _sendSubscribe (subscribeParams: TSubscribeParams) {
-    this.send(JSON.stringify({
+    this._ws.send(JSON.stringify({
       id: 1,
       jsonrpc: '2.0',
       method: 'subscribe',
@@ -153,7 +270,7 @@ export class WS extends WebSocket {
   }
 
   private _sendUnSubscribe (subscribeParams: TSubscribeParams) {
-    this.send(JSON.stringify({
+    this._ws.send(JSON.stringify({
       id: 1,
       jsonrpc: '2.0',
       method: 'unsubscribe',
@@ -223,46 +340,24 @@ export class WS extends WebSocket {
     }
   }
 
-  constructor (url: string | URL, protocols?: string | string[]) {
-    super(url, protocols)
-    this.addEventListener('open', (e: Event) => {
-      this._connected = true
-    })
-    this.addEventListener('close', (e: CloseEvent) => {
-      this._connected = false
-    })
-    // this.addEventListener('error', (e: Event) => {
-    //   this.close()
-    // })
-    this.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JSON.parse(e.data, Utils.jsonReviverBigInt)
-      if (['subscribe', 'unsubscribe'].includes(message.method)) {
-        return
-      }
-      const stream = message.s as string
-      const result = this._messageLiteToFull(message)
-      const consumers = Object.values(this._pairs[stream] || {})
-      if (result && consumers?.length) {
-        for (const consumer of consumers) {
-          typeof consumer === 'function' && consumer(result)
-        }
-      }
-    })
-  }
-
-  override readonly onopen = () => {}
-  override readonly onmessage = () => {}
-  override readonly onerror = () => {}
-  override readonly onclose = () => {}
-
   onClose (callback: (e: CloseEvent) => void) {
-    this.addEventListener('close', callback)
+    this._ws.addEventListener('close', callback)
     return this
   }
 
   onError (callback: (e: Event) => void) {
-    this.addEventListener('error', callback)
+    this._ws.addEventListener('error', callback)
     return this
+  }
+
+  private _subscribeCurrentPairs () {
+    const pairs = Object.keys(this._pairs)
+    for (const pair of pairs) {
+      const subscribeParams = this._keyPairsToParams(pair)
+      if (subscribeParams?.length) {
+        this._sendSubscribe(subscribeParams)
+      }
+    }
   }
 
   private async _subscribe (pair: string, subscribeParams: TSubscribeParams) {
@@ -283,11 +378,11 @@ export class WS extends WebSocket {
     }
     const promise = new Promise<void>((resolve) => {
       _resolve = resolve
-      this.addEventListener('message', onPaired)
+      this._ws.addEventListener('message', onPaired)
     })
     this._sendSubscribe(subscribeParams)
     return Utils.timeout(promise, 30000, new Error('Connect Timeout')).finally(() => {
-      this.removeEventListener('message', onPaired)
+      this._ws.removeEventListener('message', onPaired)
     })
   }
 
