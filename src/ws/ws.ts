@@ -28,32 +28,49 @@ interface IOptions {
 }
 
 export class WS {
-  private _ws: WebSocket
   private _retries = 0
-  private _connected = false
+  private _connecting = false
   private readonly _options: IOptions
+
+  private __ws: WebSocket | undefined
+
+  private get _ws () {
+    if (!this.__ws) {
+      return this._createWs()
+    }
+    return this.__ws
+  }
+
+  private set _ws (ws: WebSocket) {
+    if (this.__ws?.readyState === 1) {
+      this.__ws.close()
+    }
+    this.__ws = ws
+  }
 
   constructor (options: IOptions) {
     this._options = options
+  }
+
+  private _createWs () {
     this._ws = new WebSocket(this._options.url, this._options.protocols)
     this._bindWebSocketListeners()
+    return this._ws
   }
 
   private _bindWebSocketListeners () {
     this._ws.addEventListener('open', (e: Event) => {
-      this._connected = true
       if (this._retries) {
         this._subscribeCurrentPairs()
       }
     })
     this._ws.addEventListener('close', (e: CloseEvent) => {
-      this._connected = false
+      if (!this._connecting) {
+        return
+      }
       const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
       if (typeof retryTimeout === 'number') {
-        return setTimeout(() => {
-          this._ws = new WebSocket(this._options.url, this._options.protocols)
-          this._bindWebSocketListeners()
-        }, retryTimeout)
+        return setTimeout(this._createWs.bind(this), retryTimeout)
       }
       throw retryTimeout
     })
@@ -261,21 +278,25 @@ export class WS {
   }
 
   private _sendSubscribe (subscribeParams: TSubscribeParams) {
-    this._ws.send(JSON.stringify({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: subscribeParams
-    }, Utils.jsonReplacerBigInt))
+    if (this._ws.readyState === 1) {
+      this._ws.send(JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'subscribe',
+        params: subscribeParams
+      }, Utils.jsonReplacerBigInt))
+    }
   }
 
   private _sendUnSubscribe (subscribeParams: TSubscribeParams) {
-    this._ws.send(JSON.stringify({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'unsubscribe',
-      params: subscribeParams
-    }, Utils.jsonReplacerBigInt))
+    if (this._ws.readyState === 1) {
+      this._ws.send(JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'unsubscribe',
+        params: subscribeParams
+      }, Utils.jsonReplacerBigInt))
+    }
   }
 
   /**
@@ -364,7 +385,7 @@ export class WS {
     if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
-    await this.connected()
+    await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
       const params = JSON.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
@@ -398,21 +419,42 @@ export class WS {
       stream_params: this._parseParams(options.params)
     }]
     const [pair] = this._paramsToKeyPairs(subscribeParams) // only allow one pair for now
-    void this._subscribe(pair, subscribeParams)?.catch(onError)
+    void Utils.timeout(
+      this._subscribe(pair, subscribeParams),
+      30000,
+      new Error('Connect Timeout')
+    ).catch(onError)
     return this._addConsumer(pair, onMessage)
   }
 
   unsubscribe (consumerKey: string) {
     this._removeConsumer(consumerKey)
+    return this
   }
 
-  async connected (delay = 100) {
-    if (this._connected) {
+  connect () {
+    if (!this._connecting) {
+      this._connecting = true
+      this._createWs()
+    }
+    return this
+  }
+
+  disconnect () {
+    if (this._connecting) {
+      this._connecting = false
+      this._ws.close()
+    }
+    return this
+  }
+
+  ready (delay = 100) {
+    if (this._ws.readyState === 1) {
       return this
     }
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(this.connected())
+        resolve(this.ready())
       }, delay)
     })
   }
