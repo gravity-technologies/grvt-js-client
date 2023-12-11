@@ -4,22 +4,6 @@ export enum EWsMethod {
   SUBSCRIBE = 'subscribe',
 }
 
-// export enum EStreamEndpoints {
-//   // MDG
-//   MINI_SNAP_V1 = 'lite.v1.mini.snap',
-//   MINI_DELTA_V1 = 'lite.v1.mini.delta',
-//   TICKER_SNAP_V1 = 'lite.v1.ticker.snap',
-//   TICKER_DELTA_V1 = 'lite.v1.ticker.delta',
-//   ORDERBOOK_SNAP_V1 = 'lite.v1.orderbook.snap',
-//   ORDERBOOK_DELTA_V1 = 'lite.v1.orderbook.delta',
-//   TRADES_V1 = 'lite.v1.trades',
-
-//   // TDG
-//   ORDER_V1 = 'lite.v1.order',
-//   RFQ_V1 = 'lite.v1.rfq',
-//   RFQ_QUOTE_V1 = 'lite.v1.rfq_quote',
-// }
-
 export enum EStreamEndpoints {
   // MDG
   LITE_MINI_SNAP_V1 = 'lite.v1.mini.snap',
@@ -40,24 +24,19 @@ export enum EStreamEndpoints {
   // TDG
   LITE_ORDER_V1 = 'lite.v1.order',
   FULL_ORDER_V1 = 'full.v1.order',
+  // FULL_ORDER_STATE_V1 = 'full.v1.order.state', // TODO: not implement
+  // LITE_ORDER_STATE_V1 = 'lite.v1.order.state', // TODO: not implement
+  LITE_RFQ_QUOTE_V1 = 'lite.v1.rfq_quote',
+  FULL_RFQ_QUOTE_V1 = 'full.v1.rfq_quote',
   LITE_RFQ_V1 = 'lite.v1.rfq',
   FULL_RFQ_V1 = 'full.v1.rfq',
-  LITE_RFQ_QUOTE_V1 = 'lite.v1.rfq_quote',
-  FULL_RFQ_QUOTE_V1 = 'full.v1.rfq_quote'
+  // FULL_SUB_ACCOUNT_V1 = 'full.v1.sub_account', // TODO: not implement
+  // LITE_SUB_ACCOUNT_V1 = 'lite.v1.sub_account', // TODO: not implement
+  // FULL_TRADE_V1 = 'full.v1.trade', // TODO: not implement
+  // LITE_TRADE_V1 = 'lite.v1.trade', // TODO: not implement
+  // FULL_TRANSACTION_V1 = 'full.v1.transaction', // TODO: not implement
+  // LITE_TRANSACTION_V1 = 'lite.v1.transaction', // TODO: not implement
 }
-
-// export interface EWsStreamParam {
-//   sub_account_id?: bigint
-//   kind: `${EKind}`
-//   underlying: `${ECurrency}`
-//   quote: `${ECurrency}`
-//   rate?: number
-//   depth?: number
-//   greeks?: boolean
-//   aggregate?: number
-//   create_only?: boolean
-//   update_only?: boolean
-// }
 
 type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSRecentTradeRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest
 export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue'> {
