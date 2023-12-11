@@ -285,9 +285,6 @@ export class WS {
   }
 
   private _sendSubscribe (subscribeParams: TSubscribeParams) {
-    if (subscribeParams[0].stream === 'lite.v1.mini.snap') {
-      throw new Error('Cannot subscribe to mini snap')
-    }
     if (this._ws.readyState === 1) {
       this._ws.send(JSON.stringify({
         id: 1,
