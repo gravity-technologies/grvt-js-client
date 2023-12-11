@@ -60,9 +60,7 @@ export class WS {
 
   private _bindWebSocketListeners () {
     this._ws.addEventListener('open', (e: Event) => {
-      if (this._retries) {
-        this._subscribeCurrentPairs()
-      }
+      this._subscribeCurrentPairs()
     })
     this._ws.addEventListener('close', (e: CloseEvent) => {
       if (!this._connecting) {
@@ -197,7 +195,16 @@ export class WS {
    */
   private _keyPairsToParams (pairedKey: string): TSubscribeParams | undefined {
     for (const streamEndpoint of Object.values(EStreamEndpoints)) {
-      if (streamEndpoint.includes('.v1.mini')) {
+      if (
+        !pairedKey.startsWith(streamEndpoint) && (
+          !(pairedKey.startsWith('order.v1.') && streamEndpoint.endsWith('.v1.order')) &&
+          !(pairedKey.startsWith('rfq.v1.') && streamEndpoint.endsWith('.v1.rfq')) &&
+          !(pairedKey.startsWith('rfq_quote.v1.') && streamEndpoint.endsWith('.v1.rfq_quote'))
+        )
+      ) {
+        continue
+      }
+      if (pairedKey.includes('.v1.mini')) {
         const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
@@ -208,7 +215,7 @@ export class WS {
             rate: Number(rate)
           }
         }]
-      } else if (streamEndpoint.includes('.v1.ticker')) {
+      } else if (pairedKey.includes('.v1.ticker')) {
         const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
@@ -220,7 +227,7 @@ export class WS {
             greeks: ['false', 'true'].indexOf(greeks) === 1
           }
         }]
-      } else if (streamEndpoint.includes('.v1.orderbook')) {
+      } else if (pairedKey.includes('.v1.orderbook')) {
         const [kind, underlying, quote, rate, depth] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
@@ -232,7 +239,7 @@ export class WS {
             depth: Number(depth) || 0
           }
         }]
-      } else if (streamEndpoint.includes('.v1.trades')) {
+      } else if (pairedKey.includes('.v1.trades')) {
         const [kind, underlying, quote, rate, limit] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
@@ -245,8 +252,8 @@ export class WS {
             limit: Number(limit) || 0
           }
         }]
-      } else if (streamEndpoint.includes('order.v1.')) {
-        const [subAccountId, kind, underlying, quote, create] = pairedKey.replace(/^order\.v1\.(full|lite)/, '').split('.')
+      } else if (pairedKey.startsWith('order.v1.')) {
+        const [subAccountId, kind, underlying, quote, create] = pairedKey.replace(/^order\.v1\.(full|lite)\./, '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
@@ -257,16 +264,16 @@ export class WS {
             create_only: ['create', 'stat'].indexOf(create) === 0
           }
         }]
-      } else if (streamEndpoint.includes('rfq.v1.')) {
-        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)/, '').split('.')
+      } else if (pairedKey.startsWith('rfq.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)\./, '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
             sub_account_id: BigInt(subAccountId)
           }
         }]
-      } else if (streamEndpoint.includes('rfq_quote.v1.')) {
-        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)/, '').split('.')
+      } else if (pairedKey.startsWith('rfq_quote.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)\./, '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
@@ -278,6 +285,9 @@ export class WS {
   }
 
   private _sendSubscribe (subscribeParams: TSubscribeParams) {
+    if (subscribeParams[0].stream === 'lite.v1.mini.snap') {
+      throw new Error('Cannot subscribe to mini snap')
+    }
     if (this._ws.readyState === 1) {
       this._ws.send(JSON.stringify({
         id: 1,
@@ -410,10 +420,14 @@ export class WS {
   /**
    * Only supports one pair for now
    */
-  subscribe <T extends TStreamEndpoint>(options: {
-    stream: T
-    params: EWsStreamParam
-  }, onMessage: TMessageHandler, onError?: (error: Error) => void) {
+  subscribe <T extends TStreamEndpoint>(
+    options: {
+      stream: T
+      params: EWsStreamParam
+    },
+    onMessage: TMessageHandler,
+    onError?: (error: Error) => void
+  ) {
     const subscribeParams: TSubscribeParams = [{
       stream: this._parseStream(options.stream).replace(/^full\./, 'lite.'),
       stream_params: this._parseParams(options.params)
@@ -450,7 +464,10 @@ export class WS {
 
   ready (delay = 100) {
     if (this._ws.readyState === 1) {
-      return this
+      return Promise.resolve(this)
+    }
+    if (this._ws.readyState === 3) {
+      return Promise.reject(new Error('WebSocket is closed'))
     }
     return new Promise((resolve) => {
       setTimeout(() => {
