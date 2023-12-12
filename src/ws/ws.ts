@@ -115,6 +115,7 @@ export class WS {
   }
 
   /**
+   * @see /backend/svc/marketdatagateway/client/websocket.go#generateRoomName
    * Reverse of _keyPairsToParams
    */
   private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
@@ -122,23 +123,23 @@ export class WS {
       for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
         for (const underlying of (streamParams.underlying?.length ? streamParams.underlying : [undefined])) {
           for (const quote of (streamParams.quote?.length ? streamParams.quote : [undefined])) {
-            if (stream.includes('.v1.mini')) {
-              merged.push([
-                stream,
-                kind,
-                underlying,
-                quote,
-                streamParams.rate ?? 1000
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.ticker')) {
+            if (stream.includes('.v1.ticker')) {
               merged.push([
                 stream,
                 kind,
                 underlying,
                 quote,
                 streamParams.rate ?? 1000,
-                false // tried other values, but only false works
+                streamParams.greeks ?? false
+              ].join('.').toLowerCase())
+              continue
+            } else if (stream.includes('.v1.mini')) {
+              merged.push([
+                stream,
+                kind,
+                underlying,
+                quote,
+                streamParams.rate ?? 1000
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.orderbook')) {
@@ -157,7 +158,7 @@ export class WS {
                 kind,
                 underlying,
                 quote,
-                0 // tried rate, but only 0 works
+                0
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.order')) {
@@ -170,13 +171,13 @@ export class WS {
                 streamParams.create_only ? 'create' : 'stat'
               ].join('.').toLowerCase())
               continue
-            } else if (stream.includes('.v1.rfq')) {
+            } else if (stream.includes('.v1.rfq_quote')) {
               merged.push([
                 stream.split('.').reverse().join('.'),
                 BigInt(streamParams.sub_account_id ?? 0).toString()
               ].join('.').toLowerCase())
               continue
-            } else if (stream.includes('.v1.rfq_quote')) {
+            } else if (stream.includes('.v1.rfq')) {
               merged.push([
                 stream.split('.').reverse().join('.'),
                 BigInt(streamParams.sub_account_id ?? 0).toString()
@@ -198,24 +199,13 @@ export class WS {
       if (
         !pairedKey.startsWith(streamEndpoint) && (
           !(pairedKey.startsWith('order.v1.') && streamEndpoint.endsWith('.v1.order')) &&
-          !(pairedKey.startsWith('rfq.v1.') && streamEndpoint.endsWith('.v1.rfq')) &&
-          !(pairedKey.startsWith('rfq_quote.v1.') && streamEndpoint.endsWith('.v1.rfq_quote'))
+          !(pairedKey.startsWith('rfq_quote.v1.') && streamEndpoint.endsWith('.v1.rfq_quote')) &&
+          !(pairedKey.startsWith('rfq.v1.') && streamEndpoint.endsWith('.v1.rfq'))
         )
       ) {
         continue
       }
-      if (pairedKey.includes('.v1.mini')) {
-        const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-        return [{
-          stream: streamEndpoint,
-          stream_params: {
-            kind: [String(kind).toUpperCase()] as EKind[],
-            underlying: [String(underlying).toUpperCase()] as ECurrency[],
-            quote: [String(quote).toUpperCase()] as ECurrency[],
-            rate: Number(rate)
-          }
-        }]
-      } else if (pairedKey.includes('.v1.ticker')) {
+      if (pairedKey.includes('.v1.ticker')) {
         const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
@@ -225,6 +215,17 @@ export class WS {
             quote: [String(quote).toUpperCase()] as ECurrency[],
             rate: Number(rate),
             greeks: ['false', 'true'].indexOf(greeks) === 1
+          }
+        }]
+      } else if (pairedKey.includes('.v1.mini')) {
+        const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        return [{
+          stream: streamEndpoint,
+          stream_params: {
+            kind: [String(kind).toUpperCase()] as EKind[],
+            underlying: [String(underlying).toUpperCase()] as ECurrency[],
+            quote: [String(quote).toUpperCase()] as ECurrency[],
+            rate: Number(rate)
           }
         }]
       } else if (pairedKey.includes('.v1.orderbook')) {
@@ -264,16 +265,16 @@ export class WS {
             create_only: ['create', 'stat'].indexOf(create) === 0
           }
         }]
-      } else if (pairedKey.startsWith('rfq.v1.')) {
-        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)\./, '').split('.')
+      } else if (pairedKey.startsWith('rfq_quote.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)\./, '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
             sub_account_id: BigInt(subAccountId)
           }
         }]
-      } else if (pairedKey.startsWith('rfq_quote.v1.')) {
-        const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)\./, '').split('.')
+      } else if (pairedKey.startsWith('rfq.v1.')) {
+        const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)\./, '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
@@ -351,20 +352,20 @@ export class WS {
     n: string
     f: TEntities
   }) {
-    if (message.s.includes('.v1.mini.')) {
-      return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
-    } else if (message.s.includes('.v1.ticker.')) {
+    if (message.s.includes('.v1.ticker.')) {
       return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
+    } else if (message.s.includes('.v1.mini.')) {
+      return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
     } else if (message.s.includes('.v1.orderbook.')) {
       return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
     } else if (message.s.includes('.v1.trades.')) {
       return (Utils.schemaMap(message, WS_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSRecentTradeResponse).f
-    } else if (message.s.includes('order.v1.')) { // TDG reverse compare with MDG
+    } else if (message.s.includes('order.v1.')) {
       return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
-    } else if (message.s.includes('rfq.v1.')) { // TDG reverse compare with MDG
-      return (Utils.schemaMap(message, WS_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqResponse).f
-    } else if (message.s.includes('rfq_quote.v1.')) { // TDG reverse compare with MDG
+    } else if (message.s.includes('rfq_quote.v1.')) {
       return (Utils.schemaMap(message, WS_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqQuoteResponse).f
+    } else if (message.s.includes('rfq.v1.')) {
+      return (Utils.schemaMap(message, WS_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqResponse).f
     }
   }
 
