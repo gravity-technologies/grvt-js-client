@@ -1,6 +1,6 @@
+import { type SchemaPairMap } from './types'
 import { ASSET_MAP } from './asset'
 import { ORDERBOOK_LEVEL_MAP } from './orderbook_level'
-import { type SchemaPairMap } from './types'
 
 // Schema map for the 'ORDERBOOK_LEVELS' struct.
 export const ORDERBOOK_LEVELS_MAP: SchemaPairMap = Object.freeze({

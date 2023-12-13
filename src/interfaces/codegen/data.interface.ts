@@ -348,6 +348,16 @@ export interface IApiCreateRfqResponse {
   rfq?: IRfq
 }
 
+// This is use for testing purpose in alpha verions only. In production, we will be pulling your deposit information from chain
+export interface IApiDepositRequest {
+  // The main account to deposit into
+  to_account_id?: bigint
+  // The token currency to deposit
+  token_currency?: ECurrency
+  // The number of tokens to deposit, quoted in token_currency decimals
+  num_tokens?: bigint
+}
+
 // Fetch a single instrument by supplying the asset or instrument name
 export interface IApiGetInstrumentRequest {
   // The asset used throughout all APIs as an instrument identifier
@@ -492,6 +502,23 @@ export interface IApiTradeRfqResponse {
   rfq_id?: bigint
   // The taker order to trade against the rfq quotes
   order?: IOrder
+}
+
+export interface IApiTransferRequest {
+  // The main account to transfer from
+  from_account_id?: bigint
+  // The subaccount to transfer from (0 if transferring from main account)
+  from_sub_account_id?: bigint
+  // The main account to deposit into
+  to_account_id?: bigint
+  // The subaccount to transfer to (0 if transferring to main account)
+  to_sub_account_id?: bigint
+  // The token currency to transfer
+  token_currency?: ECurrency
+  // The number of tokens to transfer, quoted in tokenCurrency decimals
+  num_tokens?: bigint
+  // The signature of the transfer
+  signature?: ISignature
 }
 
 export interface IGreeks {
