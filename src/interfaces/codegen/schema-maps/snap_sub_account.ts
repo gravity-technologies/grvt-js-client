@@ -9,11 +9,11 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     margin_type: 'mt',
     quote_currency: 'qc',
     unrealized_pnl: 'up',
-    total_balance: 'tb',
+    total_value: 'tv',
     initial_margin: 'im',
     maintanence_margin: 'mm',
     available_margin: 'am',
-    assets: ['a', [SPOT_BALANCE_MAP.FULL_TO_LITE]],
+    spot_balances: ['sb', [SPOT_BALANCE_MAP.FULL_TO_LITE]],
     positions: ['p', [POSITIONS_MAP.FULL_TO_LITE]]
   },
   LITE_TO_FULL: {
@@ -21,11 +21,11 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     mt: 'margin_type',
     qc: 'quote_currency',
     up: 'unrealized_pnl',
-    tb: 'total_balance',
+    tv: 'total_value',
     im: 'initial_margin',
     mm: 'maintanence_margin',
     am: 'available_margin',
-    a: ['assets', [SPOT_BALANCE_MAP.LITE_TO_FULL]],
+    sb: ['spot_balances', [SPOT_BALANCE_MAP.LITE_TO_FULL]],
     p: ['positions', [POSITIONS_MAP.LITE_TO_FULL]]
   }
 })
