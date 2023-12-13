@@ -1,4 +1,7 @@
-import { API_POSITIONS_REQUEST_MAP, API_POSITIONS_RESPONSE_MAP, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP, validConfig, type IApiPositionsRequest, type IApiPositionsResponse, type IApiSubAccountSummaryRequest, type IApiSubAccountSummaryResponse, type IConfig } from '../interfaces'
+import { type TAxiosResponse } from '../../types/axios'
+import { API_POSITIONS_REQUEST_MAP, API_POSITIONS_RESPONSE_MAP, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP, validConfig, type IApiDepositRequest, type IApiPositionsRequest, type IApiPositionsResponse, type IApiSubAccountSummaryRequest, type IApiSubAccountSummaryResponse, type IApiTransferRequest, type IConfig } from '../interfaces'
+import { API_DEPOSIT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_deposit_request'
+import { API_TRANSFER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_transfer_request'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
@@ -13,19 +16,23 @@ export class TDGAccount {
   }
 
   /**
-   * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#deposit
    */
-  deposit (payload: any) {
-    return RestfulService.post(this._liteUrl + '/deposit', payload)
+  deposit (payload: IApiDepositRequest): TAxiosResponse<void> {
+    return RestfulService.post(
+      this._liteUrl + '/deposit',
+      Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true)
+    )
   }
 
   /**
-   * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
-  transfer (payload: any) {
-    return RestfulService.post(this._liteUrl + '/transfer', payload)
+  transfer (payload: IApiTransferRequest): TAxiosResponse<void> {
+    return RestfulService.post(
+      this._liteUrl + '/transfer',
+      Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true)
+    )
   }
 
   /**
