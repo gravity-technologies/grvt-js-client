@@ -707,7 +707,7 @@ export interface IPositions {
   asset?: IAsset
   // The balance of the position, expressed in underlying asset decimal units. Negative for short positions
   balance?: bigint
-  // The value of the position, expressed in quote asset decimal units
+  // The value of the position, negative for short assets, expressed in quote asset decimal units
   value?: bigint
   // The entry price of the position, expressed in quote asset decimal units
   // Whenever increasing the balance of a position, the entry price is updated to the new average entry price
@@ -934,8 +934,8 @@ export interface ISubAccount {
   quote_currency?: ECurrency
   // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units
   unrealized_pnl?: bigint
-  // The total balance across all spot assets, or in other words, the current margin
-  total_balance?: bigint
+  // The total value across all spot assets, or in other words, the current margin
+  total_value?: bigint
   // The initial margin requirement of all positions owned by this vault, denominated in quote currency decimal units
   initial_margin?: bigint
   // The maintanence margin requirement of all positions owned by this vault, denominated in quote currency decimal units
@@ -943,7 +943,7 @@ export interface ISubAccount {
   // The margin available for withdrawal, denominated in quote currency decimal units
   available_margin?: bigint
   // The list of spot assets owned by this sub account, and their balances
-  assets?: ISpotBalance[]
+  spot_balances?: ISpotBalance[]
   // The list of positions owned by this sub account
   positions?: IPositions[]
 }

@@ -1,4 +1,4 @@
-import { API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP, validConfig, type IApiSubAccountSummaryRequest, type IApiSubAccountSummaryResponse, type IConfig } from '../interfaces'
+import { API_POSITIONS_REQUEST_MAP, API_POSITIONS_RESPONSE_MAP, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP, validConfig, type IApiPositionsRequest, type IApiPositionsResponse, type IApiSubAccountSummaryRequest, type IApiSubAccountSummaryResponse, type IConfig } from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
@@ -40,11 +40,12 @@ export class TDGAccount {
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
   subAccountSummary (payload: IApiSubAccountSummaryRequest) {
-    return RestfulService.post(this._liteUrl + '/account_summary', Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)).then(
-      (response) => {
-        return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
-      }
-    )
+    return RestfulService.post(
+      this._liteUrl + '/account_summary',
+      Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
+    })
   }
 
   /**
@@ -69,5 +70,14 @@ export class TDGAccount {
    */
   transactionHistory (params: any) {
     return RestfulService.get(this._liteUrl + '/transaction_history', { params })
+  }
+
+  positions (payload: IApiPositionsRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/positions',
+      Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
+    })
   }
 }
