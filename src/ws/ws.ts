@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid'
 import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_ORDER_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_RFQ_QUOTE_RESPONSE_MAP, WS_RFQ_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EKind, type IMiniTicker, type IOrder, type IOrderbookLevels, type IPublicTrade, type IRfq, type IRfqQuote, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSRfqQuoteResponse, type IWSRfqResponse, type IWSTickerResponse, type IWsOrderResponse } from '../interfaces'
-import { Utils } from '../utils'
+import { JsonUtils, Utils } from '../utils'
 import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
 
 type TEntities = IMiniTicker | ITicker | IOrderbookLevels | IPublicTrade | IOrder | IRfq | IRfqQuote
@@ -76,8 +76,8 @@ export class WS {
     //   this.close()
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JSON.parse(e.data, Utils.jsonReviverBigInt)
-      if (['subscribe', 'unsubscribe'].includes(message.method)) {
+      const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
+      if (!message || ['subscribe', 'unsubscribe'].includes(message.method)) {
         return
       }
       const stream = message.s as string
@@ -352,6 +352,10 @@ export class WS {
     n: string
     f: TEntities
   }) {
+    if (!message.s) {
+      return
+    }
+
     if (message.s.includes('.v1.ticker.')) {
       return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
     } else if (message.s.includes('.v1.mini.')) {
@@ -396,7 +400,7 @@ export class WS {
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const params = JSON.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
+      const params = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
       if (!params) {
         return
       }
