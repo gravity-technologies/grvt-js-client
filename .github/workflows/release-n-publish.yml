@@ -8,6 +8,11 @@ on:
       - .github/workflows/release-n-publish.yml
       - src/**
 
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
 jobs:
   ReleaseAndPublish:
     runs-on: ubuntu-latest
