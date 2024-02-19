@@ -1,4 +1,3 @@
-import { type TAxiosResponse } from '../../types/axios'
 import {
   API_CANCEL_ALL_ORDERS_REQUEST_MAP,
   API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
@@ -25,13 +24,17 @@ import {
   API_OPEN_RFQS_RESPONSE_MAP,
   API_OPEN_RFQ_QUOTES_REQUEST_MAP,
   API_OPEN_RFQ_QUOTES_RESPONSE_MAP,
+  API_ORDER_HISTORY_REQUEST_MAP,
+  API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_TDG_ACK_RESPONSE_MAP,
   API_TRADE_RFQ_REQUEST_MAP,
   API_TRADE_RFQ_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
+  API_WITHDRAWAL_REQUEST_MAP,
   validConfig,
   type IApiCancelAllOrdersRequest,
   type IApiCancelAllOrdersResponse,
@@ -58,6 +61,8 @@ import {
   type IApiOpenRfqQuotesResponse,
   type IApiOpenRfqsRequest,
   type IApiOpenRfqsResponse,
+  type IApiOrderHistoryRequest,
+  type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
   type IApiSubAccountSummaryRequest,
@@ -65,6 +70,7 @@ import {
   type IApiTradeRfqRequest,
   type IApiTradeRfqResponse,
   type IApiTransferRequest,
+  type IApiWithdrawalRequest,
   type IConfig
 } from '../interfaces'
 import { RestfulService } from '../services'
@@ -81,31 +87,42 @@ export class TDG {
   }
 
   /**
+   * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#deposit
    */
-  deposit (payload: IApiDepositRequest): TAxiosResponse<void> {
+  deposit (payload: IApiDepositRequest) {
     return RestfulService.post(
       this._liteUrl + '/deposit',
       Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true)
-    )
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+    })
   }
 
   /**
+   * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
-  transfer (payload: IApiTransferRequest): TAxiosResponse<void> {
+  transfer (payload: IApiTransferRequest) {
     return RestfulService.post(
       this._liteUrl + '/transfer',
       Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true)
-    )
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+    })
   }
 
   /**
-   * TODO: missing interfaces
+   * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
    */
-  withdrawal (payload: any) {
-    return RestfulService.post(this._liteUrl + '/withdrawal', payload)
+  withdrawal (payload: IApiWithdrawalRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/withdrawal',
+      Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+    })
   }
 
   /**
@@ -128,6 +145,8 @@ export class TDG {
     return RestfulService.get(this._liteUrl + '/account_history', { params })
   }
 
+  /** ===== TRADE ===== */
+
   /**
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#trade-history
@@ -144,6 +163,9 @@ export class TDG {
     return RestfulService.get(this._liteUrl + '/transaction_history', { params })
   }
 
+  /**
+   * @see https://docs.gravitymarkets.io/trading_api/#positions
+   */
   positions (payload: IApiPositionsRequest) {
     return RestfulService.post(
       this._liteUrl + '/positions',
@@ -152,6 +174,8 @@ export class TDG {
       return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
     })
   }
+
+  /** ===== ORDER ===== */
 
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-order
@@ -190,6 +214,18 @@ export class TDG {
   }
 
   /**
+   * @see https://docs.gravitymarkets.io/trading_api/#order-history
+   */
+  orderHistory (payload: IApiOrderHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/order_history',
+      Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
+    })
+  }
+
+  /**
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-session-orders
    */
@@ -209,25 +245,7 @@ export class TDG {
     })
   }
 
-  /**
-   * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#order-history
-   */
-  history () {
-    throw new Error('Historical data is served through our DB and may not match new data in flight, see https://docs.gravitymarkets.io/trading_api/#order-history')
-  }
-
-  /**
-   * SECTION: RFQ
-   */
-
-  /**
-   * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#counterparties
-   */
-  counterparties () {
-    throw new Error('Error: missing interfaces, see https://docs.gravitymarkets.io/trading_api/#counterparties')
-  }
+  /** ===== RFQ ===== */
 
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq
@@ -297,9 +315,7 @@ export class TDG {
     throw new Error('Error: Historical data is served through our DB and may not match new data in flight, see https://docs.gravitymarkets.io/trading_api/#rfq-history')
   }
 
-  /**
-   * SECTION: QUOTE
-   */
+  /** ===== QUOTE ===== */
 
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq-quote
