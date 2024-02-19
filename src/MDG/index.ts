@@ -13,6 +13,10 @@ import {
   API_ORDERBOOK_LEVELS_RESPONSE_MAP,
   API_PUBLIC_TRADES_REQUEST_MAP,
   API_PUBLIC_TRADES_RESPONSE_MAP,
+  API_PUBLIC_TRADE_HISTORY_REQUEST_MAP,
+  API_PUBLIC_TRADE_HISTORY_RESPONSE_MAP,
+  API_SETTLEMENT_PRICE_REQUEST_MAP,
+  API_SETTLEMENT_PRICE_RESPONSE_MAP,
   API_TICKER_REQUEST_MAP,
   API_TICKER_RESPONSE_MAP,
   validConfig,
@@ -28,8 +32,12 @@ import {
   type IApiGetInstrumentsResponse,
   type IApiMiniTickerResponse,
   type IApiOrderbookLevelsResponse,
+  type IApiPublicTradeHistoryRequest,
+  type IApiPublicTradeHistoryResponse,
   type IApiPublicTradesRequest,
   type IApiPublicTradesResponse,
+  type IApiSettlementPriceRequest,
+  type IApiSettlementPriceResponse,
   type IApiTickerRequest,
   type IApiTickerResponse,
   type IConfig
@@ -89,7 +97,7 @@ export class MDG {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#ticker
    */
-  retrieve (payload: IApiTickerRequest) {
+  ticker (payload: IApiTickerRequest) {
     return RestfulService.post(
       this._liteUrl + '/ticker',
       Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
@@ -100,22 +108,22 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#candlestick
+   * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
    */
-  candlestick (payload: IApiCandlestickRequest) {
+  orderBook (payload: IAPIOrderbookLevelsRequest) {
     return RestfulService.post(
-      this._liteUrl + '/kline',
-      Utils.schemaMap(payload, API_CANDLESTICK_REQUEST_MAP.FULL_TO_LITE, true),
+      this._liteUrl + '/book',
+      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
+      return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
     })
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
+   * @see https://docs.gravitymarkets.io/market_data_api/#public-trades
    */
-  recentTrades (payload: IApiPublicTradesRequest) {
+  trades (payload: IApiPublicTradesRequest) {
     return RestfulService.post(
       this._liteUrl + '/trades',
       Utils.schemaMap(payload, API_PUBLIC_TRADES_REQUEST_MAP.FULL_TO_LITE, true),
@@ -126,10 +134,29 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#historical-trades
+   * @see https://docs.gravitymarkets.io/market_data_api/#public-trade-history
    */
-  historicalTrades () {
-    throw new Error('Error: This has been marked as a POST-LAUNCH feature, see https://docs.gravitymarkets.io/market_data_api/#historical-trades')
+  tradesHistory (payload: IApiPublicTradeHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/trade_history',
+      Utils.schemaMap(payload, API_PUBLIC_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_PUBLIC_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiPublicTradeHistoryResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#settlement-price
+   */
+  settlement (payload: IApiSettlementPriceRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/settlement',
+      Utils.schemaMap(payload, API_SETTLEMENT_PRICE_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SETTLEMENT_PRICE_RESPONSE_MAP.LITE_TO_FULL) as IApiSettlementPriceResponse
+    })
   }
 
   /**
@@ -146,15 +173,15 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
+   * @see https://docs.gravitymarkets.io/market_data_api/#candlestick
    */
-  orderBook (payload: IAPIOrderbookLevelsRequest) {
+  candlestick (payload: IApiCandlestickRequest) {
     return RestfulService.post(
-      this._liteUrl + '/book',
-      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),
+      this._liteUrl + '/kline',
+      Utils.schemaMap(payload, API_CANDLESTICK_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
+      return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
     })
   }
 }
