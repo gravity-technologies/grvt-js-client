@@ -1,3 +1,53 @@
+export enum ECandlestickInterval {
+  // 1 minute
+  CI_1_M = 'CI_1_M',
+  // 3 minutes
+  CI_3_M = 'CI_3_M',
+  // 5 minutes
+  CI_5_M = 'CI_5_M',
+  // 15 minutes
+  CI_15_M = 'CI_15_M',
+  // 30 minutes
+  CI_30_M = 'CI_30_M',
+  // 1 hour
+  CI_1_H = 'CI_1_H',
+  // 2 hour
+  CI_2_H = 'CI_2_H',
+  // 4 hour
+  CI_4_H = 'CI_4_H',
+  // 6 hour
+  CI_6_H = 'CI_6_H',
+  // 8 hour
+  CI_8_H = 'CI_8_H',
+  // 12 hour
+  CI_12_H = 'CI_12_H',
+  // 1 day
+  CI_1_D = 'CI_1_D',
+  // 3 days
+  CI_3_D = 'CI_3_D',
+  // 5 days
+  CI_5_D = 'CI_5_D',
+  // 1 week
+  CI_1_W = 'CI_1_W',
+  // 2 weeks
+  CI_2_W = 'CI_2_W',
+  // 3 weeks
+  CI_3_W = 'CI_3_W',
+  // 4 weeks
+  CI_4_W = 'CI_4_W',
+}
+
+export enum ECandlestickType {
+  // Tracks traded prices
+  TRADE = 'TRADE',
+  // Tracks mark prices
+  MARK = 'MARK',
+  // Tracks index prices
+  INDEX = 'INDEX',
+  // Tracks book mid prices
+  MID = 'MID',
+}
+
 // The list of Currencies that are supported on the GRVT exchange
 export enum ECurrency {
   // the USDC token
@@ -179,7 +229,11 @@ export enum EStrategy {
   CUSTOM = 'CUSTOM',
 }
 
-// |                       | Must Fill All | Can Fill Partial || -                     | -             | -                || Must Fill Immediately | FOK           | IOC              || Can Fill Till Time    | AON           | GTC              |
+// |                       | Must Fill All | Can Fill Partial |
+// | -                     | -             | -                |
+// | Must Fill Immediately | FOK           | IOC              |
+// | Can Fill Till Time    | AON           | GTC              |
+//
 export enum ETimeInForce {
   // GTT - Remains open until it is cancelled, or expired
   GOOD_TILL_TIME = 'GOOD_TILL_TIME',
@@ -247,7 +301,7 @@ export interface IAPIOrderbookLevelsRequest {
 }
 
 export interface IApiCancelAllOrdersRequest {
-  // The subaccount ID to filter by
+  // The subaccount ID cancelling all orders
   sub_account_id?: bigint
 }
 
@@ -277,11 +331,11 @@ export interface IApiCancelAllRfqsResponse {
 }
 
 export interface IApiCancelOrderRequest {
-  // The subaccount ID to filter by
+  // The subaccount ID cancelling the order
   sub_account_id?: bigint
-  // The order to cancel
+  // Cancel the order with this `order_id`
   order_id?: bigint
-  // The order to cancel
+  // Cancel the order with this `client_order_id`
   client_order_id?: number
 }
 
@@ -291,11 +345,11 @@ export interface IApiCancelOrderResponse {
 }
 
 export interface IApiCancelRfqQuoteRequest {
-  // The subaccount ID to filter by
+  // The subaccount ID cancelling the quote
   sub_account_id?: bigint
-  // The RFQ Quote to cancel
+  // Cancel the quote with this `order_id`
   quote_id?: bigint
-  // The RFQ Quote to cancel
+  // Cancel the quote with this `client_order_id`
   client_quote_id?: number
 }
 
@@ -305,17 +359,36 @@ export interface IApiCancelRfqQuoteResponse {
 }
 
 export interface IApiCancelRfqRequest {
-  // The subaccount ID to filter by
+  // The subaccount ID cancelling the RFQ
   sub_account_id?: bigint
-  // The RFQ to cancel
+  // Cancel the RFQ with this `rfq_id`
   rfq_id?: bigint
-  // The RFQ to cancel
-  client_quote_id?: number
 }
 
 export interface IApiCancelRfqResponse {
   // The cancelled RFQ
   rfq?: IRfq
+}
+
+// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent candlesticks are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the candlesticks starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the candlesticks ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the candlesticks between `startTime` and `endTime` are returned up to `limit`.</li></ul>
+export interface IApiCandlestickRequest {
+  // The asset used throughout all APIs as an instrument identifier
+  asset?: IAsset
+  // The interval of each candlestick
+  interval?: ECandlestickInterval
+  // The type of candlestick data to retrieve
+  type?: ECandlestickType
+  // Start time of kline data in unix nanoseconds
+  start_time?: bigint
+  // End time of kline data in unix nanoseconds
+  end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1500
+  limit?: number
+}
+
+export interface IApiCandlestickResponse {
+  // The candlestick result set for given interval
+  results?: ICandlestick[]
 }
 
 export interface IApiCreateOrderRequest {
@@ -348,7 +421,35 @@ export interface IApiCreateRfqResponse {
   rfq?: IRfq
 }
 
-// This is use for testing purpose in alpha verions only. In production, we will be pulling your deposit information from chain
+// The request to get the historical deposits of an account
+// The history is returned in reverse chronological order
+export interface IApiDepositHistoryRequest {
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: bigint
+  // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
+  token_currency?: ECurrency[]
+  // The start time to query for in unix nanoseconds
+  start_time?: bigint
+  // The end time to query for in unix nanoseconds
+  end_time?: bigint
+}
+
+export interface IApiDepositHistoryResponse {
+  // The total number of deposits matching the request account
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: bigint
+  // The deposit history matching the request account
+  results?: IDepositHistory[]
+}
+
+// GRVT runs on a ZKSync Hyperchain which settles directly onto Ethereum.
+// To Deposit funds from your L1 wallet into a GRVT SubAccount, you will be required to submit a deposit transaction directly to Ethereum.
+// GRVT's bridge verifier will scan Ethereum from time to time. Once it receives proof that your deposit has been confirmed on Ethereum, it will initiate the deposit process.
+//
+// This current payload is used for alpha testing only.
 export interface IApiDepositRequest {
   // The main account to deposit into
   to_account_id?: bigint
@@ -356,6 +457,25 @@ export interface IApiDepositRequest {
   token_currency?: ECurrency
   // The number of tokens to deposit, quoted in token_currency decimals
   num_tokens?: bigint
+}
+
+// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
+//
+// The instrument is also optional. When left empty, all perpetual instruments are returned.
+export interface IApiFundingRateRequest {
+  // The asset used throughout all APIs as an instrument identifier
+  asset?: IAsset
+  // Start time of funding rate in unix nanoseconds
+  start_time?: bigint
+  // End time of funding rate in unix nanoseconds
+  end_time?: bigint
+  // The limit to query for. Defaults to 90; Max 300
+  limit?: number
+}
+
+export interface IApiFundingRateResponse {
+  // The funding rate result set for given interval
+  results?: IFundingRate[]
 }
 
 // Fetch a single instrument by supplying the asset or instrument name
@@ -372,11 +492,11 @@ export interface IApiGetInstrumentResponse {
 }
 
 export interface IApiGetInstrumentsRequest {
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // Request for active instruments only
   is_active?: boolean
@@ -397,11 +517,11 @@ export interface IApiMiniTickerResponse {
 export interface IApiOpenOrdersRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
 
@@ -430,6 +550,30 @@ export interface IApiOpenRfqsResponse {
   rfqs?: IRfq[]
 }
 
+export interface IApiOrderHistoryRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
+  kind?: EKind[]
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
+  underlying?: ECurrency[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
+  quote?: ECurrency[]
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiOrderHistoryResponse {
+  // The total number of orders matching the request filter
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: string
+  // The Open Orders matching the request filter
+  orders?: IOrder[]
+}
+
 export interface IApiOrderbookLevelsResponse {
   // The orderbook levels objects matching the request asset
   results?: IOrderbookLevels
@@ -438,11 +582,11 @@ export interface IApiOrderbookLevelsResponse {
 export interface IApiPositionsRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
 
@@ -451,16 +595,100 @@ export interface IApiPositionsResponse {
   results?: IPositions[]
 }
 
-export interface IApiRecentTradeRequest {
+export interface IApiPrivateTradeHistoryRequest {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
+  kind?: EKind[]
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
+  underlying?: ECurrency[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
+  quote?: ECurrency[]
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiPrivateTradeHistoryResponse {
+  // The total number of private trades matching the request filter
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: string
+  // The private trades matching the request asset
+  results?: IPrivateTrade[]
+}
+
+export interface IApiPublicTradeHistoryRequest {
+  // The asset being represented
+  asset?: IAsset
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiPublicTradeHistoryResponse {
+  // The public trades matching the request asset
+  results?: IPublicTrade[]
+}
+
+export interface IApiPublicTradesRequest {
   // The asset being represented
   asset?: IAsset
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
 }
 
-export interface IApiRecentTradeResponse {
+export interface IApiPublicTradesResponse {
   // The public trades matching the request asset
   results?: IPublicTrade[]
+}
+
+// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent settlement prices are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the settlement prices starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the settlement prices ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the settlement prices between `startTime` and `endTime` are returned up to `limit`.</li></ul>
+//
+// The instrument is also optional. When left empty, all perpetual instruments are returned.
+export interface IApiSettlementPriceRequest {
+  // The underlying currency to select
+  underlying?: ECurrency
+  // The quote currency to select
+  quote?: ECurrency
+  // Start time of kline data in unix nanoseconds
+  start_time?: bigint
+  // End time of kline data in unix nanoseconds
+  end_time?: bigint
+  // The limit to query for. Defaults to 30; Max 100
+  limit?: number
+}
+
+export interface IApiSettlementPriceResponse {
+  // The funding rate result set for given interval
+  results?: ISettlementPrice[]
+}
+
+// The request to get the history of a sub account
+// SubAccount Summary values are snapshotted once every hour
+// No snapshots are taken if the sub account has no activity in the hourly window
+// The history is returned in reverse chronological order
+// History is preserved only for the last 30 days
+export interface IApiSubAccountHistoryRequest {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // Start time of sub account history in unix nanoseconds
+  start_time?: bigint
+  // End time of sub account history in unix nanoseconds
+  end_time?: bigint
+  // The cursor to indicate when to start the next query from
+  cursor?: bigint
+}
+
+export interface IApiSubAccountHistoryResponse {
+  // The total number of sub account snapshots matching the request filter
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: bigint
+  // The sub account history matching the request sub account
+  results?: ISubAccount[]
 }
 
 export interface IApiSubAccountSummaryRequest {
@@ -504,6 +732,35 @@ export interface IApiTradeRfqResponse {
   order?: IOrder
 }
 
+// The request to get the historical transfers of an account
+// The history is returned in reverse chronological order
+export interface IApiTransferHistoryRequest {
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: bigint
+  // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
+  token_currency?: ECurrency[]
+  // The start time to query for in unix nanoseconds
+  start_time?: bigint
+  // The end time to query for in unix nanoseconds
+  end_time?: bigint
+}
+
+export interface IApiTransferHistoryResponse {
+  // The total number of transfers matching the request account
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: bigint
+  // The transfer history matching the request account
+  results?: ITransferHistory[]
+}
+
+// This API allows you to transfer funds in multiple different ways<ul>
+// <li>Between SubAccounts within your Main Account</li>
+// <li>Between your MainAccount and your SubAccounts</li>
+// <li>To other MainAccounts that you have previously allowlisted</li>
+// </ul>
 export interface IApiTransferRequest {
   // The main account to transfer from
   from_account_id?: bigint
@@ -515,10 +772,100 @@ export interface IApiTransferRequest {
   to_sub_account_id?: bigint
   // The token currency to transfer
   token_currency?: ECurrency
-  // The number of tokens to transfer, quoted in tokenCurrency decimals
+  // The number of tokens to transfer, quoted in tokenCurrency decimal units
   num_tokens?: bigint
   // The signature of the transfer
   signature?: ISignature
+}
+
+// The request to get the historical withdrawals of an account
+// The history is returned in reverse chronological order
+export interface IApiWithdrawalHistoryRequest {
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: bigint
+  // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
+  token_currency?: ECurrency[]
+  // The start time to query for in unix nanoseconds
+  start_time?: bigint
+  // The end time to query for in unix nanoseconds
+  end_time?: bigint
+}
+
+export interface IApiWithdrawalHistoryResponse {
+  // The total number of withdrawals matching the request account
+  total?: number
+  // The cursor to indicate when to start the next query from
+  next?: bigint
+  // The withdrawals history matching the request account
+  results?: IWithdrawalHistory[]
+}
+
+// Leverage this API to initialize a withdrawal from GRVT's Hyperchain onto Ethereum.
+// Do take note that the bridging process does take time. The GRVT UI will help you keep track of bridging progress, and notify you once its complete.
+//
+// If not withdrawing the entirety of your balance, there is a minimum withdrawal amount. Currently that amount is 100 USDC.
+// Withdrawal fees also apply to cover the cost of the Ethereum transaction.
+// Note that your funds will always remain in self-custory throughout the withdrawal process. At no stage does GRVT gain control over your funds.
+export interface IApiWithdrawalRequest {
+  // The main account to withdraw from
+  from_account_id?: bigint
+  // The Ethereum wallet to withdraw into
+  to_eth_address?: bigint
+  // The token currency to withdraw
+  token_currency?: ECurrency
+  // The number of tokens to withdraw, quoted in tokenCurrency decimal units
+  num_tokens?: bigint
+  // The signature of the withdrawal
+  signature?: ISignature
+}
+
+export interface ICandlestick {
+  // Open time of kline bar in unix nanoseconds
+  open_time?: bigint
+  // Close time of kline bar in unix nanosecond
+  close_time?: bigint
+  // The open price, expressed in base currency resolution units
+  open?: bigint
+  // The close price, expressed in base currency resolution units
+  close?: bigint
+  // The high price, expressed in base currency resolution units
+  high?: bigint
+  // The low price, expressed in base currency resolution units
+  low?: bigint
+  // The number of contracts transacted, expressed in underlying asset decimal units
+  volume?: bigint
+  // The number of quote assets transacted, expressed in quote asset decimal units
+  quote_volume?: bigint
+  // The number of trades transacted
+  trades?: number
+}
+
+export interface IDepositHistory {
+  // The transaction ID of the deposit
+  tx_id?: bigint
+  // The ethereum address where the deposit originates
+  from_eth_address?: bigint
+  // The account to deposit into
+  to_account_id?: bigint
+  // The token currency to deposit
+  token_currency?: ECurrency
+  // The number of tokens to deposit
+  num_tokens?: bigint
+  // The signature of the deposit (supplied on L1 by the user)
+  signature?: ISignature
+  // The timestamp of the deposit in unix nanoseconds
+  event_time?: bigint
+}
+
+export interface IFundingRate {
+  // The funding rate of the instrument, expressed in underlying asset decimal units
+  funding_rate?: bigint
+  // The funding timestamp of the funding rate, expressed in unix nanoseconds
+  funding_time?: bigint
+  // The mark price of the instrument at funding timestamp, expressed in quote asset decimal units
+  mark_price?: bigint
 }
 
 export interface IGreeks {
@@ -596,6 +943,13 @@ export interface IMiniTicker {
   best_ask_num_orders?: number
 }
 
+// Order is a typed payload used throughout the GRVT platform to express all orderbook, RFQ, and liquidation orders.
+// GRVT orders are capable of expressing both single-legged, and multi-legged orders by default.
+// This increases the learning curve slightly but reduces overall integration load, since the order payload is used across all GRVT trading venues.
+// Given GRVT's trustless settlement model, the Order payload also carries the signature, required to trade the order on our ZKSync Hyperchain.
+//
+// All fields in the Order payload (except `id`, `metadata`, and `state`) are trustlessly enforced on our Hyperchain.
+// This minimizes the amount of trust users have to offer to GRVT
 export interface IOrder {
   // [Filled by GRVT Backend] A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
   order_id?: bigint
@@ -605,12 +959,12 @@ export interface IOrder {
   // Market Orders do not have a limit price, and are always executed according to the maker order price.
   // Market Orders must always be taker orders
   is_market?: boolean
-  // Four supported types of orders: GTT, IOC, AON, FOK
-  // PARTIAL EXECUTION = GTT / IOC - allows partial size execution on each leg
-  // FULL EXECUTION = AON / FOK - only allows full size execution on all legs
-  // TAKER ONLY = IOC / FOK - only allows taker orders
-  // MAKER OR TAKER = GTT / AON - allows maker or taker orders
-  // Exchange only supports (GTT, IOC, FOK)
+  // Four supported types of orders: GTT, IOC, AON, FOK:<ul>
+  // <li>PARTIAL EXECUTION = GTT / IOC - allows partial size execution on each leg</li>
+  // <li>FULL EXECUTION = AON / FOK - only allows full size execution on all legs</li>
+  // <li>TAKER ONLY = IOC / FOK - only allows taker orders</li>
+  // <li>MAKER OR TAKER = GTT / AON - allows maker or taker orders</li>
+  // </ul>Exchange only supports (GTT, IOC, FOK)
   // RFQ Maker only supports (GTT, AON), RFQ Taker only supports (FOK)
   time_in_force?: ETimeInForce
   // ONLY APPLICABLE WHEN TimeInForce = AON / FOK AND IsMarket = FALSE
@@ -730,6 +1084,10 @@ export interface IOrderbookLevels {
 }
 
 export interface IPositions {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The sub account ID that participated in the trade
+  sub_account_id?: bigint
   // The asset being represented
   asset?: IAsset
   // The balance of the position, expressed in underlying asset decimal units. Negative for short positions
@@ -763,6 +1121,8 @@ export interface IPositions {
 export interface IPrivateTrade {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
+  // The sub account ID that participated in the trade
+  sub_account_id?: bigint
   // The asset being represented
   asset?: IAsset
   // The side that the subaccount took on the trade
@@ -777,7 +1137,7 @@ export interface IPrivateTrade {
   mark_price?: bigint
   // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
   realized_pnl?: bigint
-  // The fees paid on the trade
+  // The fees paid on the trade, expressed in quote asset decimal unit (negative if maker rebate applied)
   fee?: bigint
   // The fee rate paid on the trade
   fee_rate?: number
@@ -922,6 +1282,13 @@ export interface IRfqState {
   update_time?: bigint
 }
 
+export interface ISettlementPrice {
+  // The settlement timestamp of the instrument, expressed in unix nanoseconds
+  settlement_time?: bigint
+  // The settlement price of the instrument, expressed in underlying asset decimal units
+  settlement_price?: bigint
+}
+
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
   signer?: bigint
@@ -952,6 +1319,8 @@ export interface ISpotBalance {
 export interface ISubAccount {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
+  // The sub account ID this entry refers to
+  sub_account_id?: bigint
   // The type of margin algorithm this subaccount uses
   margin_type?: EMarginType
   // The Quote Currency that this Sub Account is denominated in
@@ -1050,12 +1419,51 @@ export interface ITicker {
   greeks?: IGreeks
 }
 
+export interface ITransferHistory {
+  // The transaction ID of the transfer
+  tx_id?: bigint
+  // The account to transfer from
+  from_account_id?: bigint
+  // The subaccount to transfer from (0 if transferring from main account)
+  from_sub_account_id?: bigint
+  // The account to deposit into
+  to_account_id?: bigint
+  // The subaccount to transfer to (0 if transferring to main account)
+  to_sub_account_id?: bigint
+  // The token currency to transfer
+  token_currency?: ECurrency
+  // The number of tokens to transfer
+  num_tokens?: bigint
+  // The signature of the transfer
+  signature?: ISignature
+  // The timestamp of the transfer in unix nanoseconds
+  event_time?: bigint
+}
+
+export interface IWSCandlestickRequest {
+  // The asset used throughout all APIs as an instrument identifier
+  asset?: IAsset
+  // The interval of each candlestick
+  interval?: ECandlestickInterval
+  // The type of candlestick data to retrieve
+  type?: ECandlestickType
+}
+
+export interface IWSCandlestickResponse {
+  // Stream name
+  s?: string
+  // A running sequence number that determines global message order within the specific stream
+  n?: bigint
+  // A candlestick entry matching the request filters
+  f?: ICandlestick
+}
+
 export interface IWSMiniTickerRequest {
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The minimal rate at which we publish feeds (in milliseconds)
   // Delta (raw, 50, 100, 200, 500, 1000, 5000)
@@ -1073,11 +1481,11 @@ export interface IWSMiniTickerResponse {
 }
 
 export interface IWSOrderbookLevelsRequest {
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The minimal rate at which we publish feeds (in milliseconds)
   // Delta (100, 200, 500, 1000, 5000)
@@ -1101,11 +1509,11 @@ export interface IWSOrderbookLevelsResponse {
 export interface IWSPositionsRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
 
@@ -1121,11 +1529,11 @@ export interface IWSPositionsResponse {
 export interface IWSPrivateTradeRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
 
@@ -1138,12 +1546,12 @@ export interface IWSPrivateTradeResponse {
   f?: IPrivateTrade
 }
 
-export interface IWSRecentTradeRequest {
-  // The kind of the instrument
+export interface IWSPublicTradesRequest {
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // Filter query by venue where trade occured
   venue?: EVenue[]
@@ -1151,7 +1559,7 @@ export interface IWSRecentTradeRequest {
   limit?: number
 }
 
-export interface IWSRecentTradeResponse {
+export interface IWSPublicTradesResponse {
   // Stream name
   s?: string
   // A running sequence number that determines global message order within the specific stream
@@ -1189,11 +1597,11 @@ export interface IWSRfqResponse {
 }
 
 export interface IWSTickerRequest {
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The minimal rate at which we publish feeds (in milliseconds)
   // Delta (100, 200, 500, 1000, 5000)
@@ -1212,16 +1620,33 @@ export interface IWSTickerResponse {
   f?: ITicker
 }
 
+export interface IWithdrawalHistory {
+  // The transaction ID of the withdrawal
+  tx_id?: bigint
+  // The subaccount to withdraw from
+  from_account_id?: bigint
+  // The ethereum address to withdraw to
+  to_eth_address?: bigint
+  // The token currency to withdraw
+  token_currency?: ECurrency
+  // The number of tokens to withdraw
+  num_tokens?: bigint
+  // The signature of the withdrawal
+  signature?: ISignature
+  // The timestamp of the withdrawal in unix nanoseconds
+  event_time?: bigint
+}
+
 export interface IWsOrderRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
-  // Only streams created orders in this stream. If false, created order will also reflect here
+  // Only streams created orders in this stream. If false, updated orders will also be streamed
   create_only?: boolean
 }
 
@@ -1237,11 +1662,11 @@ export interface IWsOrderResponse {
 export interface IWsOrderStateRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind of the instrument
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying asset of the instrument
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
   underlying?: ECurrency[]
-  // The quote asset of the instrument
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // Only streams updated orders in this stream. If false, created orders will also reflect here
   update_only?: boolean

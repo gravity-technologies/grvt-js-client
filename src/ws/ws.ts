@@ -1,5 +1,29 @@
 import { customAlphabet } from 'nanoid'
-import { WS_MINI_TICKER_RESPONSE_MAP, WS_ORDERBOOK_LEVELS_RESPONSE_MAP, WS_ORDER_RESPONSE_MAP, WS_RECENT_TRADE_RESPONSE_MAP, WS_RFQ_QUOTE_RESPONSE_MAP, WS_RFQ_RESPONSE_MAP, WS_TICKER_RESPONSE_MAP, type ECurrency, type EKind, type IMiniTicker, type IOrder, type IOrderbookLevels, type IPublicTrade, type IRfq, type IRfqQuote, type ITicker, type IWSMiniTickerResponse, type IWSOrderbookLevelsResponse, type IWSRecentTradeResponse, type IWSRfqQuoteResponse, type IWSRfqResponse, type IWSTickerResponse, type IWsOrderResponse } from '../interfaces'
+import {
+  WS_MINI_TICKER_RESPONSE_MAP,
+  WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
+  WS_ORDER_RESPONSE_MAP,
+  WS_PUBLIC_TRADES_RESPONSE_MAP,
+  WS_RFQ_QUOTE_RESPONSE_MAP,
+  WS_RFQ_RESPONSE_MAP,
+  WS_TICKER_RESPONSE_MAP,
+  type ECurrency,
+  type EKind,
+  type IMiniTicker,
+  type IOrder,
+  type IOrderbookLevels,
+  type IPublicTrade,
+  type IRfq,
+  type IRfqQuote,
+  type ITicker,
+  type IWSMiniTickerResponse,
+  type IWSOrderbookLevelsResponse,
+  type IWSPublicTradesResponse,
+  type IWSRfqQuoteResponse,
+  type IWSRfqResponse,
+  type IWSTickerResponse,
+  type IWsOrderResponse
+} from '../interfaces'
 import { JsonUtils, Utils } from '../utils'
 import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
 
@@ -363,7 +387,7 @@ export class WS {
     } else if (message.s.includes('.v1.orderbook.')) {
       return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
     } else if (message.s.includes('.v1.trades.')) {
-      return (Utils.schemaMap(message, WS_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSRecentTradeResponse).f
+      return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
     } else if (message.s.includes('order.v1.')) {
       return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
     } else if (message.s.includes('rfq_quote.v1.')) {

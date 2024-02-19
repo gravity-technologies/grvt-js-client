@@ -1,4 +1,11 @@
-import { API_RECENT_TRADE_REQUEST_MAP, API_RECENT_TRADE_RESPONSE_MAP, validConfig, type IApiRecentTradeRequest, type IApiRecentTradeResponse, type IConfig } from '../interfaces'
+import {
+  API_PUBLIC_TRADES_REQUEST_MAP,
+  API_PUBLIC_TRADES_RESPONSE_MAP,
+  validConfig,
+  type IApiPublicTradesRequest,
+  type IApiPublicTradesResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
@@ -21,13 +28,13 @@ export class MDGTrade {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
    */
-  recentTrades (payload: IApiRecentTradeRequest) {
+  recentTrades (payload: IApiPublicTradesRequest) {
     return RestfulService.post(
       this._liteUrl + '/trades',
-      Utils.schemaMap(payload, API_RECENT_TRADE_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_PUBLIC_TRADES_REQUEST_MAP.FULL_TO_LITE, true),
       { withCredentials: false }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_RECENT_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiRecentTradeResponse
+      return Utils.schemaMap(response.data, API_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IApiPublicTradesResponse
     })
   }
 

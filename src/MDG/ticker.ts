@@ -1,4 +1,15 @@
-import { API_MINI_TICKER_REQUEST_MAP, API_MINI_TICKER_RESPONSE_MAP, API_TICKER_REQUEST_MAP, API_TICKER_RESPONSE_MAP, validConfig, type IAPIMiniTickerRequest, type IApiMiniTickerResponse, type IApiTickerRequest, type IApiTickerResponse, type IConfig } from '../interfaces'
+import {
+  API_MINI_TICKER_REQUEST_MAP,
+  API_MINI_TICKER_RESPONSE_MAP,
+  API_TICKER_REQUEST_MAP,
+  API_TICKER_RESPONSE_MAP,
+  validConfig,
+  type IAPIMiniTickerRequest,
+  type IApiMiniTickerResponse,
+  type IApiTickerRequest,
+  type IApiTickerResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 

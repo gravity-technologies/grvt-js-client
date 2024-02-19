@@ -1,4 +1,18 @@
-import { type ECurrency, type EKind, type EVenue, type IWSMiniTickerRequest, type IWSOrderbookLevelsRequest, type IWSPositionsRequest, type IWSPrivateTradeRequest, type IWSRecentTradeRequest, type IWSRfqQuoteRequest, type IWSRfqRequest, type IWSTickerRequest, type IWsOrderRequest, type IWsOrderStateRequest } from '../interfaces'
+import {
+  type ECurrency,
+  type EKind,
+  type EVenue,
+  type IWSMiniTickerRequest,
+  type IWSOrderbookLevelsRequest,
+  type IWSPositionsRequest,
+  type IWSPrivateTradeRequest,
+  type IWSPublicTradesRequest,
+  type IWSRfqQuoteRequest,
+  type IWSRfqRequest,
+  type IWSTickerRequest,
+  type IWsOrderRequest,
+  type IWsOrderStateRequest
+} from '../interfaces'
 
 export enum EWsMethod {
   SUBSCRIBE = 'subscribe',
@@ -38,7 +52,7 @@ export enum EStreamEndpoints {
   // LITE_TRANSACTION_V1 = 'lite.v1.transaction', // TODO: not implement
 }
 
-type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSRecentTradeRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest
+type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSPublicTradesRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest
 export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue'> {
   kind?: `${EKind}`
   underlying?: `${ECurrency}`

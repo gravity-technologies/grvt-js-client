@@ -5,6 +5,7 @@
     "es2021": true
   },
   "extends": "standard-with-typescript",
+  "plugins": ["import-newlines"],
   "overrides": [
     {
       "env": {
@@ -23,6 +24,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "import-newlines/enforce": "error",
     "no-return-await": "error",
     "@typescript-eslint/return-await": "off",
     "@typescript-eslint/promise-function-async": "off",

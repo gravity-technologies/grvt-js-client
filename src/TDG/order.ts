@@ -1,4 +1,23 @@
-import { API_CANCEL_ALL_ORDERS_REQUEST_MAP, API_CANCEL_ALL_ORDERS_RESPONSE_MAP, API_CANCEL_ORDER_REQUEST_MAP, API_CANCEL_ORDER_RESPONSE_MAP, API_CREATE_ORDER_REQUEST_MAP, API_CREATE_ORDER_RESPONSE_MAP, API_OPEN_ORDERS_REQUEST_MAP, API_OPEN_ORDERS_RESPONSE_MAP, validConfig, type IApiCancelAllOrdersRequest, type IApiCancelAllOrdersResponse, type IApiCancelOrderRequest, type IApiCancelOrderResponse, type IApiCreateOrderRequest, type IApiCreateOrderResponse, type IApiOpenOrdersRequest, type IApiOpenOrdersResponse, type IConfig } from '../interfaces'
+import {
+  API_CANCEL_ALL_ORDERS_REQUEST_MAP,
+  API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
+  API_CANCEL_ORDER_REQUEST_MAP,
+  API_CANCEL_ORDER_RESPONSE_MAP,
+  API_CREATE_ORDER_REQUEST_MAP,
+  API_CREATE_ORDER_RESPONSE_MAP,
+  API_OPEN_ORDERS_REQUEST_MAP,
+  API_OPEN_ORDERS_RESPONSE_MAP,
+  validConfig,
+  type IApiCancelAllOrdersRequest,
+  type IApiCancelAllOrdersResponse,
+  type IApiCancelOrderRequest,
+  type IApiCancelOrderResponse,
+  type IApiCreateOrderRequest,
+  type IApiCreateOrderResponse,
+  type IApiOpenOrdersRequest,
+  type IApiOpenOrdersResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 

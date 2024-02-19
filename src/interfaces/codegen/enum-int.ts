@@ -1,4 +1,6 @@
 import {
+  ECandlestickInterval,
+  ECandlestickType,
   ECurrency,
   EInstrumentSettlementPeriod,
   EKind,
@@ -12,6 +14,34 @@ import {
   ETriggerCondition,
   EVenue
 } from './data.interface'
+
+export const ECandlestickIntervalInt: Record<ECandlestickInterval, number> = Object.freeze({
+  [ECandlestickInterval.CI_1_M]: 1,
+  [ECandlestickInterval.CI_3_M]: 2,
+  [ECandlestickInterval.CI_5_M]: 3,
+  [ECandlestickInterval.CI_15_M]: 4,
+  [ECandlestickInterval.CI_30_M]: 5,
+  [ECandlestickInterval.CI_1_H]: 6,
+  [ECandlestickInterval.CI_2_H]: 7,
+  [ECandlestickInterval.CI_4_H]: 8,
+  [ECandlestickInterval.CI_6_H]: 9,
+  [ECandlestickInterval.CI_8_H]: 10,
+  [ECandlestickInterval.CI_12_H]: 11,
+  [ECandlestickInterval.CI_1_D]: 12,
+  [ECandlestickInterval.CI_3_D]: 13,
+  [ECandlestickInterval.CI_5_D]: 14,
+  [ECandlestickInterval.CI_1_W]: 15,
+  [ECandlestickInterval.CI_2_W]: 16,
+  [ECandlestickInterval.CI_3_W]: 17,
+  [ECandlestickInterval.CI_4_W]: 18
+})
+
+export const ECandlestickTypeInt: Record<ECandlestickType, number> = Object.freeze({
+  [ECandlestickType.TRADE]: 1,
+  [ECandlestickType.MARK]: 2,
+  [ECandlestickType.INDEX]: 3,
+  [ECandlestickType.MID]: 4
+})
 
 export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.USDC]: 2,

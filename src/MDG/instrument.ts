@@ -1,4 +1,15 @@
-import { API_GET_INSTRUMENTS_REQUEST_MAP, API_GET_INSTRUMENTS_RESPONSE_MAP, API_GET_INSTRUMENT_REQUEST_MAP, API_GET_INSTRUMENT_RESPONSE_MAP, validConfig, type IApiGetInstrumentRequest, type IApiGetInstrumentResponse, type IApiGetInstrumentsRequest, type IApiGetInstrumentsResponse, type IConfig } from '../interfaces'
+import {
+  API_GET_INSTRUMENTS_REQUEST_MAP,
+  API_GET_INSTRUMENTS_RESPONSE_MAP,
+  API_GET_INSTRUMENT_REQUEST_MAP,
+  API_GET_INSTRUMENT_RESPONSE_MAP,
+  validConfig,
+  type IApiGetInstrumentRequest,
+  type IApiGetInstrumentResponse,
+  type IApiGetInstrumentsRequest,
+  type IApiGetInstrumentsResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 

@@ -1,4 +1,11 @@
-import { API_ORDERBOOK_LEVELS_REQUEST_MAP, API_ORDERBOOK_LEVELS_RESPONSE_MAP, validConfig, type IAPIOrderbookLevelsRequest, type IApiOrderbookLevelsResponse, type IConfig } from '../interfaces'
+import {
+  API_ORDERBOOK_LEVELS_REQUEST_MAP,
+  API_ORDERBOOK_LEVELS_RESPONSE_MAP,
+  validConfig,
+  type IAPIOrderbookLevelsRequest,
+  type IApiOrderbookLevelsResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 

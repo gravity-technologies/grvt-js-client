@@ -1,5 +1,5 @@
-import { type SchemaPairMap } from './types'
 import { ORDERBOOK_LEVELS_MAP } from './snap_orderbook_levels'
+import { type SchemaPairMap } from './types'
 
 // Schema map for the 'WS_ORDERBOOK_LEVELS_RESPONSE' struct.
 export const WS_ORDERBOOK_LEVELS_RESPONSE_MAP: SchemaPairMap = Object.freeze({
