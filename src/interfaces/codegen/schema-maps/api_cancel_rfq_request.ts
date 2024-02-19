@@ -4,12 +4,10 @@ import { type SchemaPairMap } from './types'
 export const API_CANCEL_RFQ_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
-    rfq_id: 'ri',
-    client_quote_id: 'cq'
+    rfq_id: 'ri'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
-    ri: 'rfq_id',
-    cq: 'client_quote_id'
+    ri: 'rfq_id'
   }
 })

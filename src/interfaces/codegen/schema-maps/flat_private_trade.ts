@@ -6,6 +6,7 @@ import { GREEKS_MAP } from './greeks'
 export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
+    sub_account_id: 'sa',
     asset: ['a', ASSET_MAP.FULL_TO_LITE],
     is_buyer: 'ib',
     is_taker: 'it',
@@ -22,6 +23,7 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
+    sa: 'sub_account_id',
     a: ['asset', ASSET_MAP.LITE_TO_FULL],
     ib: 'is_buyer',
     it: 'is_taker',

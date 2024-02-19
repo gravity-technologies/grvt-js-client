@@ -6,6 +6,7 @@ import { POSITIONS_MAP } from './api_position'
 export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
+    sub_account_id: 'sa',
     margin_type: 'mt',
     quote_currency: 'qc',
     unrealized_pnl: 'up',
@@ -18,6 +19,7 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
+    sa: 'sub_account_id',
     mt: 'margin_type',
     qc: 'quote_currency',
     up: 'unrealized_pnl',
