@@ -28,6 +28,8 @@ import {
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
+  API_PRIVATE_TRADE_HISTORY_REQUEST_MAP,
+  API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_TDG_ACK_RESPONSE_MAP,
@@ -65,6 +67,8 @@ import {
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
+  type IApiPrivateTradeHistoryRequest,
+  type IApiPrivateTradeHistoryResponse,
   type IApiSubAccountSummaryRequest,
   type IApiSubAccountSummaryResponse,
   type IApiTradeRfqRequest,
@@ -85,6 +89,8 @@ export class TDG {
     this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
     this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
   }
+
+  /** ===== TRANSFER ===== */
 
   /**
    * TODO: missing response interface
@@ -125,6 +131,20 @@ export class TDG {
     })
   }
 
+  /** ===== ACCOUNT ===== */
+
+  /**
+   * @see https://docs.gravitymarkets.io/trading_api/#positions
+   */
+  positions (payload: IApiPositionsRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/positions',
+      Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
+    })
+  }
+
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
@@ -145,33 +165,15 @@ export class TDG {
     return RestfulService.get(this._liteUrl + '/account_history', { params })
   }
 
-  /** ===== TRADE ===== */
-
   /**
-   * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#trade-history
    */
-  tradeHistory (params: any) {
-    return RestfulService.get(this._liteUrl + '/trade_history', { params })
-  }
-
-  /**
-   * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#transaction-history
-   */
-  transactionHistory (params: any) {
-    return RestfulService.get(this._liteUrl + '/transaction_history', { params })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#positions
-   */
-  positions (payload: IApiPositionsRequest) {
+  tradeHistory (payload: IApiPrivateTradeHistoryRequest) {
     return RestfulService.post(
-      this._liteUrl + '/positions',
-      Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true)
+      this._liteUrl + '/trade_history',
+      Utils.schemaMap(payload, API_PRIVATE_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
+      return Utils.schemaMap(response.data, API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiPrivateTradeHistoryResponse
     })
   }
 
@@ -214,18 +216,6 @@ export class TDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#order-history
-   */
-  orderHistory (payload: IApiOrderHistoryRequest) {
-    return RestfulService.post(
-      this._liteUrl + '/order_history',
-      Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
-    })
-  }
-
-  /**
    * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-session-orders
    */
@@ -242,6 +232,18 @@ export class TDG {
       Utils.schemaMap(payload, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenOrdersResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/trading_api/#order-history
+   */
+  orderHistory (payload: IApiOrderHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/order_history',
+      Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
     })
   }
 
