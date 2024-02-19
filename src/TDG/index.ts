@@ -32,6 +32,8 @@ import {
   API_POSITIONS_RESPONSE_MAP,
   API_PRIVATE_TRADE_HISTORY_REQUEST_MAP,
   API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP,
+  API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
+  API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_TDG_ACK_RESPONSE_MAP,
@@ -77,6 +79,8 @@ import {
   type IApiPositionsResponse,
   type IApiPrivateTradeHistoryRequest,
   type IApiPrivateTradeHistoryResponse,
+  type IApiSubAccountHistoryRequest,
+  type IApiSubAccountHistoryResponse,
   type IApiSubAccountSummaryRequest,
   type IApiSubAccountSummaryResponse,
   type IApiTradeRfqRequest,
@@ -206,11 +210,15 @@ export class TDG {
   }
 
   /**
-   * TODO: missing interfaces
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-history
    */
-  subAccountHistory (params: any) {
-    return RestfulService.get(this._liteUrl + '/account_history', { params })
+  subAccountHistory (payload: IApiSubAccountHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/account_history',
+      Utils.schemaMap(payload, API_SUB_ACCOUNT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountHistoryResponse
+    })
   }
 
   /**
