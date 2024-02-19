@@ -1,5 +1,13 @@
-import { validConfig, type IConfig } from '../interfaces'
+import {
+  API_CANDLESTICK_REQUEST_MAP,
+  API_CANDLESTICK_RESPONSE_MAP,
+  validConfig,
+  type IApiCandlestickRequest,
+  type IApiCandlestickResponse,
+  type IConfig
+} from '../interfaces'
 import { RestfulService } from '../services'
+import { Utils } from '../utils'
 
 export class MDGCandlestick {
   private readonly _fullUrl: string
@@ -12,30 +20,15 @@ export class MDGCandlestick {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#trade-candlestick
+   * @see https://docs.gravitymarkets.io/market_data_api/#candlestick
    */
-  tradeCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/trade_kline', payload, { withCredentials: false })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#mark-candlestick
-   */
-  markCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/mark_kline', payload, { withCredentials: false })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#index-candlestick
-   */
-  indexCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/index_kline', payload, { withCredentials: false })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#mid-candlestick
-   */
-  midCandlestick (payload: any) {
-    return RestfulService.post(this._fullUrl + '/mid_kline', payload, { withCredentials: false })
+  kline (payload: IApiCandlestickRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/kline',
+      Utils.schemaMap(payload, API_CANDLESTICK_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
+    })
   }
 }
