@@ -17,6 +17,8 @@ import {
   API_CREATE_RFQ_QUOTE_RESPONSE_MAP,
   API_CREATE_RFQ_REQUEST_MAP,
   API_CREATE_RFQ_RESPONSE_MAP,
+  API_DEPOSIT_HISTORY_REQUEST_MAP,
+  API_DEPOSIT_HISTORY_RESPONSE_MAP,
   API_DEPOSIT_REQUEST_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
   API_OPEN_ORDERS_RESPONSE_MAP,
@@ -35,7 +37,11 @@ import {
   API_TDG_ACK_RESPONSE_MAP,
   API_TRADE_RFQ_REQUEST_MAP,
   API_TRADE_RFQ_RESPONSE_MAP,
+  API_TRANSFER_HISTORY_REQUEST_MAP,
+  API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
+  API_WITHDRAWAL_HISTORY_REQUEST_MAP,
+  API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
   API_WITHDRAWAL_REQUEST_MAP,
   validConfig,
   type IApiCancelAllOrdersRequest,
@@ -56,6 +62,8 @@ import {
   type IApiCreateRfqQuoteResponse,
   type IApiCreateRfqRequest,
   type IApiCreateRfqResponse,
+  type IApiDepositHistoryRequest,
+  type IApiDepositHistoryResponse,
   type IApiDepositRequest,
   type IApiOpenOrdersRequest,
   type IApiOpenOrdersResponse,
@@ -73,7 +81,11 @@ import {
   type IApiSubAccountSummaryResponse,
   type IApiTradeRfqRequest,
   type IApiTradeRfqResponse,
+  type IApiTransferHistoryRequest,
+  type IApiTransferHistoryResponse,
   type IApiTransferRequest,
+  type IApiWithdrawalHistoryRequest,
+  type IApiWithdrawalHistoryResponse,
   type IApiWithdrawalRequest,
   type IConfig
 } from '../interfaces'
@@ -106,6 +118,18 @@ export class TDG {
   }
 
   /**
+   * @see https://docs.gravitymarkets.io/trading_api/#deposit-history
+   */
+  depositHistory (payload: IApiDepositHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/deposit_history',
+      Utils.schemaMap(payload, API_DEPOSIT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_DEPOSIT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiDepositHistoryResponse
+    })
+  }
+
+  /**
    * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
@@ -119,6 +143,18 @@ export class TDG {
   }
 
   /**
+   * @see https://docs.gravitymarkets.io/trading_api/#transfer-history
+   */
+  transferHistory (payload: IApiTransferHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/transfer_history',
+      Utils.schemaMap(payload, API_TRANSFER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TRANSFER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiTransferHistoryResponse
+    })
+  }
+
+  /**
    * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
    */
@@ -128,6 +164,18 @@ export class TDG {
       Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true)
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/trading_api/#withdrawal-history
+   */
+  withdrawalHistory (payload: IApiWithdrawalHistoryRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/withdrawal_history',
+      Utils.schemaMap(payload, API_WITHDRAWAL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_WITHDRAWAL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiWithdrawalHistoryResponse
     })
   }
 
