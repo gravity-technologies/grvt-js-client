@@ -1,11 +1,4 @@
-import {
-  MDG,
-  MDGCandlestick,
-  MDGInstrument,
-  MDGOrderbook,
-  MDGTicker,
-  MDGTrade
-} from './MDG'
+import { MDG } from './MDG'
 import {
   TDG,
   TDGAccount,
@@ -19,11 +12,6 @@ export * from './interfaces'
 
 export default {
   MDG,
-  MDGTicker,
-  MDGCandlestick,
-  MDGTrade,
-  MDGInstrument,
-  MDGOrderbook,
 
   TDG,
   TDGAccount,

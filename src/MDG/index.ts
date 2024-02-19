@@ -1,6 +1,160 @@
-export * from './MDG'
-export * from './candlestick'
-export * from './instrument'
-export * from './orderbook'
-export * from './ticker'
-export * from './trade'
+import {
+  API_CANDLESTICK_REQUEST_MAP,
+  API_CANDLESTICK_RESPONSE_MAP,
+  API_FUNDING_RATE_REQUEST_MAP,
+  API_FUNDING_RATE_RESPONSE_MAP,
+  API_GET_INSTRUMENTS_REQUEST_MAP,
+  API_GET_INSTRUMENTS_RESPONSE_MAP,
+  API_GET_INSTRUMENT_REQUEST_MAP,
+  API_GET_INSTRUMENT_RESPONSE_MAP,
+  API_MINI_TICKER_REQUEST_MAP,
+  API_MINI_TICKER_RESPONSE_MAP,
+  API_ORDERBOOK_LEVELS_REQUEST_MAP,
+  API_ORDERBOOK_LEVELS_RESPONSE_MAP,
+  API_PUBLIC_TRADES_REQUEST_MAP,
+  API_PUBLIC_TRADES_RESPONSE_MAP,
+  API_TICKER_REQUEST_MAP,
+  API_TICKER_RESPONSE_MAP,
+  validConfig,
+  type IAPIMiniTickerRequest,
+  type IAPIOrderbookLevelsRequest,
+  type IApiCandlestickRequest,
+  type IApiCandlestickResponse,
+  type IApiFundingRateRequest,
+  type IApiFundingRateResponse,
+  type IApiGetInstrumentRequest,
+  type IApiGetInstrumentResponse,
+  type IApiGetInstrumentsRequest,
+  type IApiGetInstrumentsResponse,
+  type IApiMiniTickerResponse,
+  type IApiOrderbookLevelsResponse,
+  type IApiPublicTradesRequest,
+  type IApiPublicTradesResponse,
+  type IApiTickerRequest,
+  type IApiTickerResponse,
+  type IConfig
+} from '../interfaces'
+import { RestfulService } from '../services'
+import { Utils } from '../utils'
+
+export class MDG {
+  private readonly _fullUrl: string
+  private readonly _liteUrl: string
+
+  constructor (config: IConfig) {
+    const parseConfig = validConfig(config)
+    this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
+    this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#get-instrument
+   */
+  instrument (payload: IApiGetInstrumentRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/instrument',
+      Utils.schemaMap(payload, API_GET_INSTRUMENT_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_INSTRUMENT_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#get-instruments
+   */
+  instruments (payload: IApiGetInstrumentsRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/instruments',
+      Utils.schemaMap(payload, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentsResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#mini-ticker
+   */
+  miniTicker (payload: IAPIMiniTickerRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/mini',
+      Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiMiniTickerResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#ticker
+   */
+  retrieve (payload: IApiTickerRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/ticker',
+      Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiTickerResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#candlestick
+   */
+  candlestick (payload: IApiCandlestickRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/kline',
+      Utils.schemaMap(payload, API_CANDLESTICK_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#recent-trades
+   */
+  recentTrades (payload: IApiPublicTradesRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/trades',
+      Utils.schemaMap(payload, API_PUBLIC_TRADES_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IApiPublicTradesResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#historical-trades
+   */
+  historicalTrades () {
+    throw new Error('Error: This has been marked as a POST-LAUNCH feature, see https://docs.gravitymarkets.io/market_data_api/#historical-trades')
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#funding-rate
+   */
+  funding (payload: IApiFundingRateRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/funding',
+      Utils.schemaMap(payload, API_FUNDING_RATE_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_FUNDING_RATE_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingRateResponse
+    })
+  }
+
+  /**
+   * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
+   */
+  orderBook (payload: IAPIOrderbookLevelsRequest) {
+    return RestfulService.post(
+      this._liteUrl + '/book',
+      Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),
+      { withCredentials: false }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
+    })
+  }
+}
