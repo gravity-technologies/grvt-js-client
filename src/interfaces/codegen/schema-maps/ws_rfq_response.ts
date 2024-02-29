@@ -1,5 +1,5 @@
-import { RFQ_MAP } from './rfq'
 import { type SchemaPairMap } from './types'
+import { RFQ_MAP } from './rfq'
 
 // Schema map for the 'WS_RFQ_RESPONSE' struct.
 export const WS_RFQ_RESPONSE_MAP: SchemaPairMap = Object.freeze({

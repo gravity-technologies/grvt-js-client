@@ -860,8 +860,10 @@ export interface IDepositHistory {
 }
 
 export interface IFundingRate {
-  // The funding rate of the instrument, expressed in underlying asset decimal units
-  funding_rate?: bigint
+  // The asset used throughout all APIs as an instrument identifier
+  asset?: IAsset
+  // The funding rate of the instrument, expressed in centibeeps
+  funding_rate?: number
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in quote asset decimal units
@@ -967,17 +969,10 @@ export interface IOrder {
   // </ul>Exchange only supports (GTT, IOC, FOK)
   // RFQ Maker only supports (GTT, AON), RFQ Taker only supports (FOK)
   time_in_force?: ETimeInForce
-  // ONLY APPLICABLE WHEN TimeInForce = AON / FOK AND IsMarket = FALSE
-  // The limit price of the full order, expressed in quote asset decimal units.
-  // This is the total amount of base currency to pay/receive for all legs.
-  limit_price?: bigint
-  // ONLY APPLICABLE WHEN TimeInForce = AON / FOK AND IsMarket = FALSE AND IsOCO = TRUE
-  // If a OCO order is specified, this must contain the other limit price
-  // User must sign both limit prices, and GRVT Backend is free to swap them depending on which trigger is activated
-  // The smart contract will always validate both limit prices, by arranging them in ascending order
-  oco_limit_price?: bigint
   // The taker fee percentage cap signed by the order.
   // This is the maximum taker fee percentage the order sender is willing to pay for the order.
+  // Expressed in 1/100th of a basis point. Eg. 100 = 1bps, 10,000 = 1%
+  //
   taker_fee_percentage_cap?: number
   // Same as TakerFeePercentageCap, but for the maker fee. Negative for maker rebates
   maker_fee_percentage_cap?: number
@@ -993,9 +988,6 @@ export interface IOrder {
   post_only?: boolean
   // If True, Order must reduce the position size, or be cancelled
   reduce_only?: boolean
-  // ONLY APPLICABLE WHEN TimeInForce = AON / FOK
-  // A flag to indicate whether the full order is paying base currency or receiving base currency.
-  is_paying_base_currency?: boolean
   // The legs present in this order
   // The legs must be sorted by Asset.Instrument/Underlying/Quote/Expiration/StrikePrice
   legs?: IOrderLeg[]
@@ -1012,13 +1004,11 @@ export interface IOrderLeg {
   asset?: IAsset
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
   size?: bigint
-  // ONLY APPLICABLE WHEN TimeInForce = GTT / IOC AND IsMarket = FALSE
   // The limit price of the order leg, expressed in quote asset decimal units.
   // This is the total amount of base currency to pay/receive for all legs.
   limit_price?: bigint
-  // ONLY APPLICABLE WHEN TimeInForce = GTT / IOC AND IsMarket = FALSE AND IsOCO = TRUE
   // If a OCO order is specified, this must contain the other limit price
-  // User must sign both limit prices, and activator is free to swap them depending on which trigger is activated
+  // User must sign both limit prices. Depending on which trigger condition is activated, a different limit price is used
   // The smart contract will always validate both limit prices, by arranging them in ascending order
   oco_limit_price?: bigint
   // Specifies if the order leg is a buy or sell
@@ -1283,6 +1273,8 @@ export interface IRfqState {
 }
 
 export interface ISettlementPrice {
+  // The asset used throughout all APIs as an instrument identifier
+  asset?: IAsset
   // The settlement timestamp of the instrument, expressed in unix nanoseconds
   settlement_time?: bigint
   // The settlement price of the instrument, expressed in underlying asset decimal units
@@ -1393,10 +1385,10 @@ export interface ITicker {
   high_price?: bigint
   // The 24 hour lowest traded price of the instrument, expressed in underlying asset decimal units
   low_price?: bigint
-  // The next funding rate of the instrument, expressed in underlying asset decimal units
-  next_funding_rate?: bigint
-  // The next funding timestamp of the instrument, expressed in unix nanoseconds
-  next_funding_at?: bigint
+  // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
+  current_funding_rate?: number
+  // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
+  avg_funding_rate?: number
   // The open interest in the instrument, expressed in underlying asset decimal units
   open_interest?: bigint
   // The 24 hour number of trades in the instrument (takerBuyTrades + makerBuyTrades)
