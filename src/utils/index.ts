@@ -1,4 +1,4 @@
-import { type SchemaMap } from '../interfaces'
+import { HexStringMap, type SchemaMap } from '../interfaces'
 
 export * from './json.utils'
 
@@ -19,7 +19,10 @@ export class Utils {
 
   static coverBigInt (field: string, value: any) {
     if (typeof value === 'bigint') {
-      return value.toString()
+      const hexStr = value.toString(16)
+      return HexStringMap.includes(field)
+        ? `0x${hexStr.length % 2 === 0 ? '' : '0'}${hexStr}`
+        : value.toString()
     }
     return value
   }
