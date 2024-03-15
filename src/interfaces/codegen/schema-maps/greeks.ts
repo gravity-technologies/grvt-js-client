@@ -3,7 +3,7 @@ import { type SchemaPairMap } from './types'
 // Schema map for the 'GREEKS' struct.
 export const GREEKS_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    underlying_price: 'up',
+    index_price: 'ip',
     risk_free_rate: 'rf',
     delta: 'd',
     gamma: 'g',
@@ -15,7 +15,7 @@ export const GREEKS_MAP: SchemaPairMap = Object.freeze({
     rho: 'r'
   },
   LITE_TO_FULL: {
-    up: 'underlying_price',
+    ip: 'index_price',
     rf: 'risk_free_rate',
     d: 'delta',
     g: 'gamma',
