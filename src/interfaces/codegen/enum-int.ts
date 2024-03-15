@@ -92,7 +92,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.RFQ_EXPIRED]: 19,
   [EOrderRejectReason.AXE_EXPIRED]: 20,
   [EOrderRejectReason.FAIL_FOK]: 21,
-  [EOrderRejectReason.FAIL_AON]: 22
+  [EOrderRejectReason.FAIL_AON]: 22,
+  [EOrderRejectReason.SELF_MATCHED_SUBACCOUNT]: 23
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({

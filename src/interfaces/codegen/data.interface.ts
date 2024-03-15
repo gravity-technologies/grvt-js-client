@@ -137,6 +137,8 @@ export enum EOrderRejectReason {
   FAIL_FOK = 'FAIL_FOK',
   // the AON order could not be fully matched
   FAIL_AON = 'FAIL_AON',
+  // the order matched with another order from the same sub account
+  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
 }
 
 export enum EOrderStatus {
@@ -871,9 +873,9 @@ export interface IFundingRate {
 }
 
 export interface IGreeks {
-  // UnderlyingPrice is the underlying asset price used to calculate the greeks, expressed in underlying asset decimal units
-  underlying_price?: bigint
-  // RiskFreeRate used to calculate the greeks, expressed in underlying asset decimal units
+  // The index price used to calculate the greeks, expressed in quote asset decimal units
+  index_price?: bigint
+  // The risk free rate used to calculate the greeks, expressed in centibeeps (1/100th of a basis point)
   risk_free_rate?: number
   // Delta is the sensitivity of the option price to the underlying asset price
   delta?: number
