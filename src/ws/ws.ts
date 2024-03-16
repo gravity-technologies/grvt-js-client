@@ -154,7 +154,6 @@ export class WS {
                 underlying,
                 quote,
                 streamParams.rate ?? 1000,
-                streamParams.greeks ?? false
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.mini')) {
@@ -238,7 +237,6 @@ export class WS {
             underlying: [String(underlying).toUpperCase()] as ECurrency[],
             quote: [String(quote).toUpperCase()] as ECurrency[],
             rate: Number(rate),
-            greeks: ['false', 'true'].indexOf(greeks) === 1
           }
         }]
       } else if (pairedKey.includes('.v1.mini')) {
