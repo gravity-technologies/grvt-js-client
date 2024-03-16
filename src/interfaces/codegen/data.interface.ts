@@ -34,7 +34,7 @@ export enum ECandlestickInterval {
   // 3 weeks
   CI_3_W = 'CI_3_W',
   // 4 weeks
-  CI_4_W = 'CI_4_W',
+  CI_4_W = 'CI_4_W'
 }
 
 export enum ECandlestickType {
@@ -45,7 +45,7 @@ export enum ECandlestickType {
   // Tracks index prices
   INDEX = 'INDEX',
   // Tracks book mid prices
-  MID = 'MID',
+  MID = 'MID'
 }
 
 // The list of Currencies that are supported on the GRVT exchange
@@ -57,7 +57,7 @@ export enum ECurrency {
   // the ETH token
   ETH = 'ETH',
   // the BTC token
-  BTC = 'BTC',
+  BTC = 'BTC'
 }
 
 export enum EInstrumentSettlementPeriod {
@@ -70,7 +70,7 @@ export enum EInstrumentSettlementPeriod {
   // Instrument settles at an expiry date, marked as a monthly instrument
   MONTHLY = 'MONTHLY',
   // Instrument settles at an expiry date, marked as a quarterly instrument
-  QUARTERLY = 'QUARTERLY',
+  QUARTERLY = 'QUARTERLY'
 }
 
 // The list of asset kinds that are supported on the GRVT exchange
@@ -82,14 +82,14 @@ export enum EKind {
   // the call option asset kind
   CALL = 'CALL',
   // the put option asset kind
-  PUT = 'PUT',
+  PUT = 'PUT'
 }
 
 export enum EMarginType {
   // Simple Cross Margin Mode: all assets have a predictable margin impact, the whole subaccount shares a single margin
   SIMPLE_CROSS_MARGIN = 'SIMPLE_CROSS_MARGIN',
   // Portfolio Cross Margin Mode: asset margin impact is analysed on portfolio level, the whole subaccount shares a single margin
-  PORTFOLIO_CROSS_MARGIN = 'PORTFOLIO_CROSS_MARGIN',
+  PORTFOLIO_CROSS_MARGIN = 'PORTFOLIO_CROSS_MARGIN'
 }
 
 export enum EOrderRejectReason {
@@ -138,7 +138,7 @@ export enum EOrderRejectReason {
   // the AON order could not be fully matched
   FAIL_AON = 'FAIL_AON',
   // the order matched with another order from the same sub account
-  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
+  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT'
 }
 
 export enum EOrderStatus {
@@ -151,7 +151,7 @@ export enum EOrderStatus {
   // Order is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
   REJECTED = 'REJECTED',
   // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason)
-  CANCELLED = 'CANCELLED',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum ERfqRejectReason {
@@ -176,7 +176,7 @@ export enum ERfqRejectReason {
   // the RFQ payload contains one or more validation error (Trading Server will reply with a more specific error)
   INVALID_RFQ = 'INVALID_RFQ',
   // the credentials used (userSession/apiKeySession/walletSignature) is not authorised to perform the action
-  UNAUTHORISED = 'UNAUTHORISED',
+  UNAUTHORISED = 'UNAUTHORISED'
 }
 
 export enum ERfqStatus {
@@ -185,7 +185,7 @@ export enum ERfqStatus {
   // RFQ is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
   REJECTED = 'REJECTED',
   // RFQ is cancelled by the user using one of the supported APIs (See OrderRejectReason)
-  CANCELLED = 'CANCELLED',
+  CANCELLED = 'CANCELLED'
 }
 
 export enum EStrategy {
@@ -228,7 +228,7 @@ export enum EStrategy {
   // ICon, [Long Put , Short Put, Short Call , Long Call] (_/ ̅\_)
   IRON_CONDOR = 'IRON_CONDOR',
   // Cstm - Everything Else
-  CUSTOM = 'CUSTOM',
+  CUSTOM = 'CUSTOM'
 }
 
 // |                       | Must Fill All | Can Fill Partial |
@@ -244,24 +244,7 @@ export enum ETimeInForce {
   // IOC - Fill the order as much as possible, when hitting the orderbook. Then cancel it
   IMMEDIATE_OR_CANCEL = 'IMMEDIATE_OR_CANCEL',
   // FOK - Both AoN and IoC. Either fill the full order when hitting the orderbook, or cancel it
-  FILL_OR_KILL = 'FILL_OR_KILL',
-}
-
-// The condition that triggers a take profit or stop loss order
-// AT LAUNCH, ONLY INDEX WILL BE SUPPORTED
-export enum ETriggerCondition {
-  // INDEX - Order is activated when the index price reaches the trigger price
-  INDEX = 'INDEX',
-  // LAST - Order is activated when the last trade price reaches the trigger price
-  LAST = 'LAST',
-  // MID - Order is activated when the mid price reaches the trigger price
-  MARKET = 'MARKET',
-  // MARK - Order is activated when the mark price reaches the trigger price
-  MARK = 'MARK',
-  // TRAILING - Order is activated when the mid price trails the peak mid price after order placement by a certain USD value
-  TRAILING = 'TRAILING',
-  // TRAILING_PERCENT - Order is activated when the mid price trails the peak mid price after order placement by a certain percentage
-  TRAILING_PERCENT = 'TRAILING_PERCENT',
+  FILL_OR_KILL = 'FILL_OR_KILL'
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -271,7 +254,7 @@ export enum EVenue {
   // the trade is cleared on the RFQ venue
   RFQ = 'RFQ',
   // the trade is cleared on the AXE venue
-  AXE = 'AXE',
+  AXE = 'AXE'
 }
 
 // A Tradeable (or previously tradeable) instrument in GRVT. Currently supports options/futures/perpetuals of various expiries and strikes.
@@ -300,6 +283,17 @@ export interface IAPIOrderbookLevelsRequest {
   depth?: number
   // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
   aggregate?: number
+}
+
+export interface IAPISettlementPrice {
+  // The underlying currency of the settlement price
+  underlying?: ECurrency
+  // The quote currency of the settlement price
+  quote?: ECurrency
+  // The settlement timestamp of the settlement price, expressed in unix nanoseconds
+  settlement_time?: bigint
+  // The settlement price, expressed in quote asset decimal units
+  settlement_price?: bigint
 }
 
 export interface IApiCancelAllOrdersRequest {
@@ -665,7 +659,7 @@ export interface IApiSettlementPriceRequest {
 
 export interface IApiSettlementPriceResponse {
   // The funding rate result set for given interval
-  results?: ISettlementPrice[]
+  results?: IAPISettlementPrice[]
 }
 
 // The request to get the history of a sub account
@@ -711,8 +705,6 @@ export interface IApiTDGAckResponse {
 export interface IApiTickerRequest {
   // The asset being represented
   asset?: IAsset
-  // Boolean flag to specify if Greeks are required
-  greeks?: boolean
 }
 
 export interface IApiTickerResponse {
@@ -836,10 +828,10 @@ export interface ICandlestick {
   high?: bigint
   // The low price, expressed in base currency resolution units
   low?: bigint
-  // The number of contracts transacted, expressed in underlying asset decimal units
-  volume?: bigint
-  // The number of quote assets transacted, expressed in quote asset decimal units
-  quote_volume?: bigint
+  // The underlying volume transacted, expressed in underlying asset decimal units
+  volume_u?: bigint
+  // The quote volume transacted, expressed in quote asset decimal units
+  volume_q?: bigint
   // The number of trades transacted
   trades?: number
 }
@@ -870,29 +862,6 @@ export interface IFundingRate {
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in quote asset decimal units
   mark_price?: bigint
-}
-
-export interface IGreeks {
-  // The index price used to calculate the greeks, expressed in quote asset decimal units
-  index_price?: bigint
-  // The risk free rate used to calculate the greeks, expressed in centibeeps (1/100th of a basis point)
-  risk_free_rate?: number
-  // Delta is the sensitivity of the option price to the underlying asset price
-  delta?: number
-  // Gamma is the sensitivity of the option delta to the underlying asset price
-  gamma?: number
-  // IV is the underlying asset implied volatility
-  iv?: number
-  // Vega is the sensitivity of the option price to the underlying asset implied volatility
-  vega?: number
-  // Volga is the sensitivity of the option vega to the underlying asset implied volatility
-  volga?: number
-  // Vanna is the sensitivity of the option delta to the underlying asset implied volatility
-  vanna?: number
-  // Theta is the sensitivity of the option price to the time to expiration
-  theta?: number
-  // Rho is the sensitivity of the option price to the risk free rate
-  rho?: number
 }
 
 export interface IInstrument {
@@ -927,7 +896,7 @@ export interface IMiniTicker {
   mark_price?: bigint
   // The index price of the instrument, expressed in quote asset decimal units
   index_price?: bigint
-  // The last traded price of the instrument, expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
@@ -937,14 +906,10 @@ export interface IMiniTicker {
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The number of open orders at the best bid level
-  best_bid_num_orders?: number
   // The best ask price of the instrument, expressed in quote asset decimal units
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
-  // The number of open orders at the best ask level
-  best_ask_num_orders?: number
 }
 
 // Order is a typed payload used throughout the GRVT platform to express all orderbook, RFQ, and liquidation orders.
@@ -1030,14 +995,6 @@ export interface IOrderMetadata {
   //
   // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
   client_order_id?: number
-  // The type of take profit order to place. Both can be used at once to specify a TPSL (OCO) order
-  take_profit_trigger_condition?: ETriggerCondition
-  // The type of stop loss order to place. Both can be used at once to specify a TPSL (OCO) order
-  stop_loss_trigger_condition?: ETriggerCondition
-  // The Take Profit Trigger Price of the order, expressed in quote asset decimal units.If takeProfitTriggerCondition is percentage based, this will be interpreted as 0.01 bps, eg. 100 = 1bps
-  take_profit_trigger_price?: bigint
-  // The Stop Loss Trigger Price of the order, expressed in quote asset decimal units.If stopLossTriggerCondition is percentage based, this will be interpreted as 0.01 bps, eg. 100 = 1bps
-  stop_loss_trigger_price?: bigint
   // [Filled by GRVT Backend] Time at which the order was received by GRVT in unix nanoseconds
   create_time?: bigint
 }
@@ -1127,6 +1084,12 @@ export interface IPrivateTrade {
   price?: bigint
   // The mark price of the instrument at point of trade, expressed in quote asset decimal units
   mark_price?: bigint
+  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  index_price?: bigint
+  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
+  interest_rate?: number
+  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  forward_price?: bigint
   // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
   realized_pnl?: bigint
   // The fees paid on the trade, expressed in quote asset decimal unit (negative if maker rebate applied)
@@ -1139,8 +1102,6 @@ export interface IPrivateTrade {
   order_id?: bigint
   // The venue where the trade occurred
   venue?: EVenue
-  // Options Greeks at point of trade
-  greeks?: IGreeks
 }
 
 // All private RFQs and Private AXEs will be filtered out from the responses
@@ -1157,12 +1118,16 @@ export interface IPublicTrade {
   price?: bigint
   // The mark price of the instrument at point of trade, expressed in quote asset decimal units
   mark_price?: bigint
+  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  index_price?: bigint
+  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
+  interest_rate?: number
+  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  forward_price?: bigint
   // A trade identifier
   trade_id?: bigint
   // The venue where the trade occurred
   venue?: EVenue
-  // Options Greeks at point of trade
-  greeks?: IGreeks
 }
 
 export interface IRFQBook {
@@ -1274,15 +1239,6 @@ export interface IRfqState {
   update_time?: bigint
 }
 
-export interface ISettlementPrice {
-  // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
-  // The settlement timestamp of the instrument, expressed in unix nanoseconds
-  settlement_time?: bigint
-  // The settlement price of the instrument, expressed in underlying asset decimal units
-  settlement_price?: bigint
-}
-
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
   signer?: bigint
@@ -1338,8 +1294,18 @@ export interface ISubAccount {
   positions?: IPositions[]
 }
 
-// hello world
-// good day
+// Derived data such as the below, will not be included by default:
+//   - 24 hour volume (`buyVolume + sellVolume`)
+//   - 24 hour taker buy/sell ratio (`buyVolume / sellVolume`)
+//   - 24 hour average trade price (`volumeQ / volumeU`)
+//   - 24 hour average trade volume (`volume / trades`)
+//   - 24 hour percentage change (`24hStatChange / 24hStat`)
+//   - 48 hour statistics (`2 * 24hStat - 24hStatChange`)
+//
+// To query for an extended ticker payload, leverage the `greeks` and the `derived` flags.
+// Ticker extensions are currently under design to offer you more convenience.
+// These flags are only supported on the `Ticker Snapshot` WS endpoint, and on the `Ticker` API endpoint.
+//
 export interface ITicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
@@ -1349,7 +1315,7 @@ export interface ITicker {
   mark_price?: bigint
   // The index price of the instrument, expressed in quote asset decimal units
   index_price?: bigint
-  // The last traded price of the instrument, expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
@@ -1359,58 +1325,36 @@ export interface ITicker {
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The number of open orders at the best bid level
-  best_bid_num_orders?: number
   // The best ask price of the instrument, expressed in quote asset decimal units
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
-  // The number of open orders at the best ask level
-  best_ask_num_orders?: number
-  // The 24 hour volume of the instrument, expressed in underlying asset decimal units
-  volume?: bigint
-  // The 24 hour volume change of the instrument
-  volume_change?: number
-  // The 24 hour quote volume of the instrument, expressed in quote asset decimal units
-  quote_volume?: bigint
-  // The 24 hour quote volume change of the instrument
-  quote_volume_change?: number
-  // The number of taker buy trades in the last 24 hours
-  taker_buy_trades?: number
-  // The number of taker buy trades change in the last 24 hours
-  taker_buy_trades_change?: number
-  // The number of maker buy trades in the last 24 hours
-  maker_buy_trades?: number
-  // The number of maker buy trades change in the last 24 hours
-  maker_buy_trades_change?: number
-  // The 24 hour highest traded price of the instrument, expressed in underlying asset decimal units
-  high_price?: bigint
-  // The 24 hour lowest traded price of the instrument, expressed in underlying asset decimal units
-  low_price?: bigint
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  current_funding_rate?: number
+  funding_rate_curr?: number
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
-  avg_funding_rate?: number
+  funding_rate_avg?: number
+  // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
+  interest_rate?: number
+  // [Options] The forward price of the option, expressed in quote asset decimal units
+  forward_price?: bigint
+  // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
+  buy_volume_u?: bigint
+  // The 24 hour taker sell volume of the instrument, expressed in underlying asset decimal units
+  sell_volume_u?: bigint
+  // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
+  buy_volume_q?: bigint
+  // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
+  sell_volume_q?: bigint
+  // The 24 hour highest traded price of the instrument, expressed in quote asset decimal units
+  high_price?: bigint
+  // The 24 hour lowest traded price of the instrument, expressed in quote asset decimal units
+  low_price?: bigint
+  // The 24 hour first traded price of the instrument, expressed in quote asset decimal units
+  open_price?: bigint
   // The open interest in the instrument, expressed in underlying asset decimal units
   open_interest?: bigint
-  // The 24 hour number of trades in the instrument (takerBuyTrades + makerBuyTrades)
-  num_trades?: number
-  // The 24 hour number of trades change in the instrument
-  num_trades_change?: number
-  // The 24 hour taker buy/sell ratio in the instrument (takerBuyTrades / (takerBuyTrades + makerBuyTrades))
-  taker_buy_sell_ratio?: number
-  // The 24 hour taker buy/sell ratio change in the instrument
-  taker_buy_sell_ratio_change?: number
-  // The average trade price in the instrument, expressed in quote asset decimal units (quoteVolume / volume)
-  avg_price?: bigint
-  // The average trade price change in the instrument
-  avg_price_change?: number
-  // The average trade volume in the instrument, expressed in underlying asset decimal units (volume / numTrades)
-  avg_volume?: bigint
-  // The average trade volume change in the instrument, expressed in underlying asset decimal units
-  avg_volume_change?: number
-  // Options Greeks
-  greeks?: IGreeks
+  // The ratio of accounts that are net long vs net short on this instrument
+  long_short_ratio?: number
 }
 
 export interface ITransferHistory {
@@ -1601,8 +1545,6 @@ export interface IWSTickerRequest {
   // Delta (100, 200, 500, 1000, 5000)
   // Snapshot (500, 1000, 5000)
   rate?: number
-  // Boolean flag to specify if Greeks are required
-  greeks?: boolean
 }
 
 export interface IWSTickerResponse {

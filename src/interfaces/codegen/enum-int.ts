@@ -11,7 +11,6 @@ import {
   ERfqStatus,
   EStrategy,
   ETimeInForce,
-  ETriggerCondition,
   EVenue
 } from './data.interface'
 
@@ -152,15 +151,6 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
   [ETimeInForce.ALL_OR_NONE]: 2,
   [ETimeInForce.IMMEDIATE_OR_CANCEL]: 3,
   [ETimeInForce.FILL_OR_KILL]: 4
-})
-
-export const ETriggerConditionInt: Record<ETriggerCondition, number> = Object.freeze({
-  [ETriggerCondition.INDEX]: 1,
-  [ETriggerCondition.LAST]: 2,
-  [ETriggerCondition.MARKET]: 3,
-  [ETriggerCondition.MARK]: 4,
-  [ETriggerCondition.TRAILING]: 5,
-  [ETriggerCondition.TRAILING_PERCENT]: 6
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({
