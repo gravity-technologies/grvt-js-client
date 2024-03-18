@@ -1,5 +1,6 @@
 import { customAlphabet } from 'nanoid'
 import {
+  EKind,
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
   WS_ORDER_RESPONSE_MAP,
@@ -8,7 +9,6 @@ import {
   WS_RFQ_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
   type ECurrency,
-  type EKind,
   type IMiniTicker,
   type IOrder,
   type IOrderbookLevels,
@@ -150,49 +150,69 @@ export class WS {
             if (stream.includes('.v1.ticker')) {
               merged.push([
                 stream,
-                kind,
-                underlying,
-                quote,
-                streamParams.rate ?? 1000
+                [
+                  kind,
+                  underlying,
+                  quote,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
+                  streamParams.rate ?? 1000
+                ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.mini')) {
               merged.push([
                 stream,
-                kind,
-                underlying,
-                quote,
-                streamParams.rate ?? 1000
+                [
+                  kind,
+                  underlying,
+                  quote,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
+                  streamParams.rate ?? 1000
+                ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.orderbook')) {
               merged.push([
                 stream,
-                kind,
-                underlying,
-                quote,
-                streamParams.rate ?? 1000,
-                streamParams.depth ?? 10,
-                streamParams.aggregate ?? 1
+                [
+                  kind,
+                  underlying,
+                  quote,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
+                  streamParams.rate ?? 1000,
+                  streamParams.depth ?? 10,
+                  streamParams.aggregate ?? 1
+                ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.trades')) {
               merged.push([
                 stream,
-                kind,
-                underlying,
-                quote,
-                0
+                [
+                  kind,
+                  underlying,
+                  quote,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
+                  '0'
+                ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.order')) {
               merged.push([
                 stream.split('.').reverse().join('.'),
-                BigInt(streamParams.sub_account_id ?? 0).toString(),
-                kind,
-                underlying,
-                quote,
-                streamParams.create_only ? 'create' : 'stat'
+                [
+                  BigInt(streamParams.sub_account_id ?? 0).toString(),
+                  kind,
+                  underlying,
+                  quote,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
+                  streamParams.create_only ? 'create' : 'stat'
+                ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.rfq_quote')) {
@@ -377,6 +397,10 @@ export class WS {
   }) {
     if (!message.s) {
       return
+    }
+
+    if (message.s.startsWith('full.')) {
+      return message.f
     }
 
     if (message.s.includes('.v1.ticker.')) {

@@ -555,6 +555,10 @@ export interface IApiOrderHistoryRequest {
   underlying?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
+  // The expiration time to apply in nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
+  expiration?: bigint[]
+  // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
+  strike_price?: bigint[]
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -600,6 +604,10 @@ export interface IApiPrivateTradeHistoryRequest {
   underlying?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
+  // The expiration time to apply in unix nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
+  expiration?: bigint
+  // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
+  strike_price?: bigint
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -653,6 +661,10 @@ export interface IApiSettlementPriceRequest {
   start_time?: bigint
   // End time of kline data in unix nanoseconds
   end_time?: bigint
+  // The expiration time to select in unix nanoseconds
+  expiration?: bigint
+  // The strike price to select
+  strike_price?: bigint
   // The limit to query for. Defaults to 30; Max 100
   limit?: number
 }
@@ -1407,6 +1419,10 @@ export interface IWSMiniTickerRequest {
   // Delta (raw, 50, 100, 200, 500, 1000, 5000)
   // Snapshot (200, 500, 1000, 5000)
   rate?: number
+  // The expiration time to select in unix nanoseconds
+  expiration?: bigint[]
+  // The strike price to select
+  strike_price?: bigint[]
 }
 
 export interface IWSMiniTickerResponse {
@@ -1433,6 +1449,10 @@ export interface IWSOrderbookLevelsRequest {
   depth?: number
   // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
   aggregate?: number
+  // The expiration time to select in unix nanoseconds
+  expiration?: bigint[]
+  // The strike price to select
+  strike_price?: bigint[]
 }
 
 export interface IWSOrderbookLevelsResponse {
@@ -1495,6 +1515,10 @@ export interface IWSPublicTradesRequest {
   venue?: EVenue[]
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
+  // The expiration time to select in unix nanoseconds
+  expiration?: bigint[]
+  // The strike price to select
+  strike_price?: bigint[]
 }
 
 export interface IWSPublicTradesResponse {
@@ -1545,6 +1569,10 @@ export interface IWSTickerRequest {
   // Delta (100, 200, 500, 1000, 5000)
   // Snapshot (500, 1000, 5000)
   rate?: number
+  // The expiration time to select in unix nanoseconds
+  expiration?: bigint[]
+  // The strike price to select
+  strike_price?: bigint[]
 }
 
 export interface IWSTickerResponse {
