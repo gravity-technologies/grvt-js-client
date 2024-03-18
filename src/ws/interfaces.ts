@@ -2,6 +2,7 @@ import {
   type ECurrency,
   type EKind,
   type EVenue,
+  type IWSCandlestickRequest,
   type IWSMiniTickerRequest,
   type IWSOrderbookLevelsRequest,
   type IWSPositionsRequest,
@@ -34,6 +35,8 @@ export enum EStreamEndpoints {
   FULL_ORDERBOOK_DELTA_V1 = 'full.v1.orderbook.delta',
   LITE_TRADES_V1 = 'lite.v1.trades',
   FULL_TRADES_V1 = 'full.v1.trades',
+  LITE_KLINE_TRADE_V1 = 'lite.v1.kline.trade',
+  FULL_KLINE_TRADE_V1 = 'full.v1.kline.trade',
 
   // TDG
   LITE_ORDER_V1 = 'lite.v1.order',
@@ -52,10 +55,12 @@ export enum EStreamEndpoints {
   // LITE_TRANSACTION_V1 = 'lite.v1.transaction', // TODO: not implement
 }
 
-type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSPublicTradesRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest
-export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue'> {
+type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSPublicTradesRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest & IWSCandlestickRequest
+export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue' | 'expiration' | 'strike_price'> {
   kind?: `${EKind}`
   underlying?: `${ECurrency}`
   quote?: `${ECurrency}`
   venue?: Array<`${EVenue}`>
+  expiration?: bigint
+  strike_price?: bigint
 }
