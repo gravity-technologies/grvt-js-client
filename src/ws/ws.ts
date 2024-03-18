@@ -172,7 +172,8 @@ export class WS {
                 underlying,
                 quote,
                 streamParams.rate ?? 1000,
-                streamParams.depth ?? 0
+                streamParams.depth ?? 10,
+                streamParams.aggregate ?? 1
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.trades')) {
