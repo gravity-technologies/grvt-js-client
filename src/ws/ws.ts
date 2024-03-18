@@ -153,7 +153,7 @@ export class WS {
                 kind,
                 underlying,
                 quote,
-                streamParams.rate ?? 1000,
+                streamParams.rate ?? 1000
               ].join('.').toLowerCase())
               continue
             } else if (stream.includes('.v1.mini')) {
@@ -229,14 +229,14 @@ export class WS {
         continue
       }
       if (pairedKey.includes('.v1.ticker')) {
-        const [kind, underlying, quote, rate, greeks] = pairedKey.replace(streamEndpoint + '.', '').split('.')
+        const [kind, underlying, quote, rate/** , greeks */] = pairedKey.replace(streamEndpoint + '.', '').split('.')
         return [{
           stream: streamEndpoint,
           stream_params: {
             kind: [String(kind).toUpperCase()] as EKind[],
             underlying: [String(underlying).toUpperCase()] as ECurrency[],
             quote: [String(quote).toUpperCase()] as ECurrency[],
-            rate: Number(rate),
+            rate: Number(rate)
           }
         }]
       } else if (pairedKey.includes('.v1.mini')) {
@@ -453,7 +453,8 @@ export class WS {
     onError?: (error: Error) => void
   ) {
     const subscribeParams: TSubscribeParams = [{
-      stream: this._parseStream(options.stream).replace(/^full\./, 'lite.'),
+      // stream: this._parseStream(options.stream).replace(/^full\./, 'lite.'), // TODO: force all to lite
+      stream: this._parseStream(options.stream).replace(/^lite\./, 'full.'),
       stream_params: this._parseParams(options.params)
     }]
     const [pair] = this._paramsToKeyPairs(subscribeParams) // only allow one pair for now
