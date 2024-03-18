@@ -109,6 +109,9 @@ export class WS {
       const stream = message.s as string
       const result = this._messageLiteToFull(message)
       const consumers = Object.values(this._pairs[stream] || {})
+      if (!consumers?.length) {
+        console.log('TODO: send unsubscribe with stream'); return
+      }
       if (result && consumers?.length) {
         for (const consumer of consumers) {
           typeof consumer === 'function' && consumer(result)
@@ -242,7 +245,7 @@ export class WS {
    * Revert of _paramsToKeyPairs
    */
   private _getPairedParams (pairedKey: string): TSubscribeParams | undefined {
-    return this._pairsParams[pairedKey]
+    return this._pairedParams[pairedKey]
 
     // for (const streamEndpoint of Object.values(EStreamEndpoints)) {
     //   if (
@@ -360,7 +363,7 @@ export class WS {
    */
 
   private readonly _pairs: Record<string, Record<string, TMessageHandler>> = {}
-  private readonly _pairsParams: Record<string, TSubscribeParams> = {}
+  private _pairedParams: Record<string, TSubscribeParams | undefined> = {}
 
   private _addConsumer (pair: string, onMessage: TMessageHandler) {
     if (!this._pairs[pair]) {
@@ -388,6 +391,8 @@ export class WS {
       const unsubscribeParams = this._getPairedParams(pair)
       if (unsubscribeParams) {
         this._sendUnSubscribe(unsubscribeParams)
+        const { [pair]: _, ...keep } = this._pairedParams
+        this._pairedParams = keep
       }
     }
   }
@@ -494,8 +499,8 @@ export class WS {
       30000,
       new Error('Connect Timeout')
     ).catch(onError)
-    if (!this._pairsParams[pair]) {
-      this._pairsParams[pair] = subscribeParams
+    if (!this._pairedParams[pair]) {
+      this._pairedParams[pair] = subscribeParams
     }
     return this._addConsumer(pair, onMessage)
   }
