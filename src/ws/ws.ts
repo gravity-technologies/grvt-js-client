@@ -154,7 +154,7 @@ export class WS {
                   kind,
                   underlying,
                   quote,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
                   [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
                   streamParams.rate ?? 1000
                 ].filter(Boolean).join('-')
@@ -167,7 +167,7 @@ export class WS {
                   kind,
                   underlying,
                   quote,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
                   [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
                   streamParams.rate ?? 1000
                 ].filter(Boolean).join('-')
@@ -180,7 +180,7 @@ export class WS {
                   kind,
                   underlying,
                   quote,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
                   [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
                   streamParams.rate ?? 1000,
                   streamParams.depth ?? 10,
@@ -195,7 +195,7 @@ export class WS {
                   kind,
                   underlying,
                   quote,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
                   [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
                   '0'
                 ].filter(Boolean).join('-')
@@ -209,7 +209,7 @@ export class WS {
                   kind,
                   underlying,
                   quote,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.expiration,
+                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
                   [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
                   streamParams.create_only ? 'create' : 'stat'
                 ].filter(Boolean).join('-')
