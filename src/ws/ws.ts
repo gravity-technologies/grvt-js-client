@@ -202,8 +202,7 @@ export class WS {
                   underlying,
                   quote,
                   [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
-                  '0'
+                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price
                 ].filter(Boolean).join('-')
               ].join('.').toLowerCase())
               continue
