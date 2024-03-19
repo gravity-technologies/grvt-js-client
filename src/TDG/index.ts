@@ -1,3 +1,4 @@
+import { type AxiosRequestConfig } from 'axios'
 import {
   API_CANCEL_ALL_ORDERS_REQUEST_MAP,
   API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
@@ -112,10 +113,11 @@ export class TDG {
    * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#deposit
    */
-  deposit (payload: IApiDepositRequest) {
+  deposit (payload: IApiDepositRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/deposit',
-      Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
@@ -124,10 +126,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#deposit-history
    */
-  depositHistory (payload: IApiDepositHistoryRequest) {
+  depositHistory (payload: IApiDepositHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/deposit_history',
-      Utils.schemaMap(payload, API_DEPOSIT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_DEPOSIT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_DEPOSIT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiDepositHistoryResponse
     })
@@ -137,10 +140,11 @@ export class TDG {
    * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#transfer
    */
-  transfer (payload: IApiTransferRequest) {
+  transfer (payload: IApiTransferRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/transfer',
-      Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
@@ -149,10 +153,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#transfer-history
    */
-  transferHistory (payload: IApiTransferHistoryRequest) {
+  transferHistory (payload: IApiTransferHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/transfer_history',
-      Utils.schemaMap(payload, API_TRANSFER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_TRANSFER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TRANSFER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiTransferHistoryResponse
     })
@@ -162,10 +167,11 @@ export class TDG {
    * TODO: missing response interface
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
    */
-  withdrawal (payload: IApiWithdrawalRequest) {
+  withdrawal (payload: IApiWithdrawalRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/withdrawal',
-      Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
@@ -174,10 +180,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#withdrawal-history
    */
-  withdrawalHistory (payload: IApiWithdrawalHistoryRequest) {
+  withdrawalHistory (payload: IApiWithdrawalHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/withdrawal_history',
-      Utils.schemaMap(payload, API_WITHDRAWAL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_WITHDRAWAL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_WITHDRAWAL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiWithdrawalHistoryResponse
     })
@@ -188,10 +195,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#positions
    */
-  positions (payload: IApiPositionsRequest) {
+  positions (payload: IApiPositionsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/positions',
-      Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
     })
@@ -200,10 +208,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
    */
-  subAccountSummary (payload: IApiSubAccountSummaryRequest) {
+  subAccountSummary (payload: IApiSubAccountSummaryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/account_summary',
-      Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
     })
@@ -212,10 +221,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#sub-account-history
    */
-  subAccountHistory (payload: IApiSubAccountHistoryRequest) {
+  subAccountHistory (payload: IApiSubAccountHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/account_history',
-      Utils.schemaMap(payload, API_SUB_ACCOUNT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_SUB_ACCOUNT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountHistoryResponse
     })
@@ -224,10 +234,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#trade-history
    */
-  tradeHistory (payload: IApiPrivateTradeHistoryRequest) {
+  tradeHistory (payload: IApiPrivateTradeHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/trade_history',
-      Utils.schemaMap(payload, API_PRIVATE_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_PRIVATE_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiPrivateTradeHistoryResponse
     })
@@ -238,10 +249,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-order
    */
-  createOrder (payload: IApiCreateOrderRequest) {
+  createOrder (payload: IApiCreateOrderRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/create_order',
-      Utils.schemaMap(payload, API_CREATE_ORDER_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CREATE_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateOrderResponse
     })
@@ -250,10 +262,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-order
    */
-  cancelOrder (payload: IApiCancelOrderRequest) {
+  cancelOrder (payload: IApiCancelOrderRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_order',
-      Utils.schemaMap(payload, API_CANCEL_ORDER_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelOrderResponse
     })
@@ -262,10 +275,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-orders
    */
-  cancelAllOrders (payload: IApiCancelAllOrdersRequest) {
+  cancelAllOrders (payload: IApiCancelAllOrdersRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_all_orders',
-      Utils.schemaMap(payload, API_CANCEL_ALL_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_ALL_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ALL_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllOrdersResponse
     })
@@ -282,10 +296,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-orders
    */
-  openOrders (payload: IApiOpenOrdersRequest) {
+  openOrders (payload: IApiOpenOrdersRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/open_orders',
-      Utils.schemaMap(payload, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenOrdersResponse
     })
@@ -294,10 +309,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#order-history
    */
-  orderHistory (payload: IApiOrderHistoryRequest) {
+  orderHistory (payload: IApiOrderHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/order_history',
-      Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
     })
@@ -308,10 +324,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq
    */
-  createRfq (payload: IApiCreateRfqRequest) {
+  createRfq (payload: IApiCreateRfqRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/create_rfq',
-      Utils.schemaMap(payload, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqResponse
     })
@@ -320,10 +337,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq
    */
-  cancelRfq (payload: IApiCancelRfqRequest) {
+  cancelRfq (payload: IApiCancelRfqRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_rfq',
-      Utils.schemaMap(payload, API_CANCEL_RFQ_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqResponse
     })
@@ -332,10 +350,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfqs
    */
-  cancelAllRfqs (payload: IApiCancelAllRfqsRequest) {
+  cancelAllRfqs (payload: IApiCancelAllRfqsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_all_rfqs',
-      Utils.schemaMap(payload, API_CANCEL_ALL_RFQS_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_ALL_RFQS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqsResponse
     })
@@ -344,10 +363,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#trade-rfq
    */
-  tradeRfq (payload: IApiTradeRfqRequest) {
+  tradeRfq (payload: IApiTradeRfqRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/trade_rfq',
-      Utils.schemaMap(payload, API_TRADE_RFQ_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_TRADE_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TRADE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeRfqResponse
     })
@@ -356,10 +376,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-rfqs
    */
-  openRfqs (payload: IApiOpenRfqsRequest) {
+  openRfqs (payload: IApiOpenRfqsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/open_rfqs',
-      Utils.schemaMap(payload, API_OPEN_RFQS_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_OPEN_RFQS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqsResponse
     })
@@ -378,10 +399,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#create-rfq-quote
    */
-  createQuote (payload: IApiCreateRfqQuoteRequest) {
+  createQuote (payload: IApiCreateRfqQuoteRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/quote_rfq',
-      Utils.schemaMap(payload, API_CREATE_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CREATE_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqQuoteResponse
     })
@@ -390,10 +412,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq-quote
    */
-  cancelQuote (payload: IApiCancelRfqQuoteRequest) {
+  cancelQuote (payload: IApiCancelRfqQuoteRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_rfq_quote',
-      Utils.schemaMap(payload, API_CANCEL_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqQuoteResponse
     })
@@ -402,10 +425,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfq-quotes
    */
-  cancelAllQuotes (payload: IApiCancelAllRfqQuotesRequest) {
+  cancelAllQuotes (payload: IApiCancelAllRfqQuotesRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/cancel_all_rfq_quotes',
-      Utils.schemaMap(payload, API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqQuotesResponse
     })
@@ -414,10 +438,11 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#open-rfq-quotes
    */
-  openQuotes (payload: IApiOpenRfqQuotesRequest) {
+  openQuotes (payload: IApiOpenRfqQuotesRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/open_rfq_quotes',
-      Utils.schemaMap(payload, API_OPEN_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true)
+      Utils.schemaMap(payload, API_OPEN_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true),
+      config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqQuotesResponse
     })
