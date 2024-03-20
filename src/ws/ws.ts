@@ -1,6 +1,8 @@
 import { customAlphabet } from 'nanoid'
 import {
+  ECurrencyInt,
   EKind,
+  EKindInt,
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
   WS_ORDER_RESPONSE_MAP,
@@ -50,6 +52,8 @@ type TMessageHandler = (data: TEntities) => void
 interface IOptions {
   url: string | URL
   protocols?: string | string[]
+  // timeout in ms
+  timeout?: number
   reconnectStrategy?: ((retries: number) => number | Error)
 }
 
@@ -150,9 +154,19 @@ export class WS {
    */
   private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
     return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
-      for (const kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
-        for (const underlying of (streamParams.underlying?.length ? streamParams.underlying : [undefined])) {
-          for (const quote of (streamParams.quote?.length ? streamParams.quote : [undefined])) {
+      for (const _kind of (streamParams.kind?.length ? streamParams.kind : [undefined])) {
+        for (const _underlying of (streamParams.underlying?.length ? streamParams.underlying : [undefined])) {
+          for (const _quote of (streamParams.quote?.length ? streamParams.quote : [undefined])) {
+            const kind = typeof _kind === 'string'
+              ? _kind
+              : Utils.getKeyByValue(EKindInt, _kind) as string
+            const underlying = typeof _underlying === 'string'
+              ? _underlying
+              : Utils.getKeyByValue(ECurrencyInt, _underlying) as string
+            const quote = typeof _quote === 'string'
+              ? _quote
+              : Utils.getKeyByValue(ECurrencyInt, _quote) as string
+
             if (stream.includes('.v1.ticker')) {
               merged.push([
                 stream,
@@ -362,6 +376,7 @@ export class WS {
    */
 
   private readonly _pairs: Record<string, Record<string, TMessageHandler>> = {}
+  // use for unsubscribe
   private _pairedParams: Record<string, TSubscribeParams | undefined> = {}
 
   private _addConsumer (pair: string, onMessage: TMessageHandler) {
@@ -457,10 +472,11 @@ export class WS {
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const params = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
-      if (!params) {
+      const _params = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
+      if (!_params) {
         return
       }
+      const params = Utils.pascalToSnake(_params)
       const [responsePair] = this._paramsToKeyPairs(params)
       if (responsePair === pair) {
         _resolve()
@@ -471,7 +487,11 @@ export class WS {
       this._ws.addEventListener('message', onPaired)
     })
     this._sendSubscribe(subscribeParams)
-    return Utils.timeout(promise, 30000, new Error('Connect Timeout')).finally(() => {
+    return Utils.timeout(
+      promise,
+      this._options.timeout ?? 30000,
+      new Error('Subscribe Timeout: ' + pair)
+    ).finally(() => {
       this._ws.removeEventListener('message', onPaired)
     })
   }
@@ -493,11 +513,7 @@ export class WS {
       stream_params: this._parseParams(options.params)
     }]
     const [pair] = this._paramsToKeyPairs(subscribeParams) // only allow one pair for now
-    void Utils.timeout(
-      this._subscribe(pair, subscribeParams),
-      30000,
-      new Error('Connect Timeout')
-    ).catch(onError)
+    void this._subscribe(pair, subscribeParams).catch(onError)
     if (!this._pairedParams[pair]) {
       this._pairedParams[pair] = subscribeParams
     }
