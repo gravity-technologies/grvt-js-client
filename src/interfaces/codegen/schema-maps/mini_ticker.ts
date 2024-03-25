@@ -13,10 +13,8 @@ export const MINI_TICKER_MAP: SchemaPairMap = Object.freeze({
     mid_price: 'mp1',
     best_bid_price: 'bb',
     best_bid_size: 'bb1',
-    best_bid_num_orders: 'bb2',
     best_ask_price: 'ba',
-    best_ask_size: 'ba1',
-    best_ask_num_orders: 'ba2'
+    best_ask_size: 'ba1'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -28,9 +26,7 @@ export const MINI_TICKER_MAP: SchemaPairMap = Object.freeze({
     mp1: 'mid_price',
     bb: 'best_bid_price',
     bb1: 'best_bid_size',
-    bb2: 'best_bid_num_orders',
     ba: 'best_ask_price',
-    ba1: 'best_ask_size',
-    ba2: 'best_ask_num_orders'
+    ba1: 'best_ask_size'
   }
 })

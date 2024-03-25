@@ -34,7 +34,7 @@ export enum ECandlestickInterval {
   // 3 weeks
   CI_3_W = 'CI_3_W',
   // 4 weeks
-  CI_4_W = 'CI_4_W'
+  CI_4_W = 'CI_4_W',
 }
 
 export enum ECandlestickType {
@@ -45,7 +45,7 @@ export enum ECandlestickType {
   // Tracks index prices
   INDEX = 'INDEX',
   // Tracks book mid prices
-  MID = 'MID'
+  MID = 'MID',
 }
 
 // The list of Currencies that are supported on the GRVT exchange
@@ -57,7 +57,7 @@ export enum ECurrency {
   // the ETH token
   ETH = 'ETH',
   // the BTC token
-  BTC = 'BTC'
+  BTC = 'BTC',
 }
 
 export enum EInstrumentSettlementPeriod {
@@ -70,7 +70,7 @@ export enum EInstrumentSettlementPeriod {
   // Instrument settles at an expiry date, marked as a monthly instrument
   MONTHLY = 'MONTHLY',
   // Instrument settles at an expiry date, marked as a quarterly instrument
-  QUARTERLY = 'QUARTERLY'
+  QUARTERLY = 'QUARTERLY',
 }
 
 // The list of asset kinds that are supported on the GRVT exchange
@@ -82,14 +82,14 @@ export enum EKind {
   // the call option asset kind
   CALL = 'CALL',
   // the put option asset kind
-  PUT = 'PUT'
+  PUT = 'PUT',
 }
 
 export enum EMarginType {
   // Simple Cross Margin Mode: all assets have a predictable margin impact, the whole subaccount shares a single margin
   SIMPLE_CROSS_MARGIN = 'SIMPLE_CROSS_MARGIN',
   // Portfolio Cross Margin Mode: asset margin impact is analysed on portfolio level, the whole subaccount shares a single margin
-  PORTFOLIO_CROSS_MARGIN = 'PORTFOLIO_CROSS_MARGIN'
+  PORTFOLIO_CROSS_MARGIN = 'PORTFOLIO_CROSS_MARGIN',
 }
 
 export enum EOrderRejectReason {
@@ -138,7 +138,9 @@ export enum EOrderRejectReason {
   // the AON order could not be fully matched
   FAIL_AON = 'FAIL_AON',
   // the order matched with another order from the same sub account
-  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT'
+  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
+  // the signature size exceeds the maximum allowed size
+  SIGNATURE_SIZE_EXCEEDED = 'SIGNATURE_SIZE_EXCEEDED',
 }
 
 export enum EOrderStatus {
@@ -151,7 +153,7 @@ export enum EOrderStatus {
   // Order is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
   REJECTED = 'REJECTED',
   // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason)
-  CANCELLED = 'CANCELLED'
+  CANCELLED = 'CANCELLED',
 }
 
 export enum ERfqRejectReason {
@@ -176,7 +178,7 @@ export enum ERfqRejectReason {
   // the RFQ payload contains one or more validation error (Trading Server will reply with a more specific error)
   INVALID_RFQ = 'INVALID_RFQ',
   // the credentials used (userSession/apiKeySession/walletSignature) is not authorised to perform the action
-  UNAUTHORISED = 'UNAUTHORISED'
+  UNAUTHORISED = 'UNAUTHORISED',
 }
 
 export enum ERfqStatus {
@@ -185,7 +187,7 @@ export enum ERfqStatus {
   // RFQ is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
   REJECTED = 'REJECTED',
   // RFQ is cancelled by the user using one of the supported APIs (See OrderRejectReason)
-  CANCELLED = 'CANCELLED'
+  CANCELLED = 'CANCELLED',
 }
 
 export enum EStrategy {
@@ -228,7 +230,7 @@ export enum EStrategy {
   // ICon, [Long Put , Short Put, Short Call , Long Call] (_/ ̅\_)
   IRON_CONDOR = 'IRON_CONDOR',
   // Cstm - Everything Else
-  CUSTOM = 'CUSTOM'
+  CUSTOM = 'CUSTOM',
 }
 
 // |                       | Must Fill All | Can Fill Partial |
@@ -244,7 +246,7 @@ export enum ETimeInForce {
   // IOC - Fill the order as much as possible, when hitting the orderbook. Then cancel it
   IMMEDIATE_OR_CANCEL = 'IMMEDIATE_OR_CANCEL',
   // FOK - Both AoN and IoC. Either fill the full order when hitting the orderbook, or cancel it
-  FILL_OR_KILL = 'FILL_OR_KILL'
+  FILL_OR_KILL = 'FILL_OR_KILL',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -254,7 +256,7 @@ export enum EVenue {
   // the trade is cleared on the RFQ venue
   RFQ = 'RFQ',
   // the trade is cleared on the AXE venue
-  AXE = 'AXE'
+  AXE = 'AXE',
 }
 
 // A Tradeable (or previously tradeable) instrument in GRVT. Currently supports options/futures/perpetuals of various expiries and strikes.

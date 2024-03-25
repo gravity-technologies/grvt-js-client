@@ -92,7 +92,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.AXE_EXPIRED]: 20,
   [EOrderRejectReason.FAIL_FOK]: 21,
   [EOrderRejectReason.FAIL_AON]: 22,
-  [EOrderRejectReason.SELF_MATCHED_SUBACCOUNT]: 23
+  [EOrderRejectReason.SELF_MATCHED_SUBACCOUNT]: 23,
+  [EOrderRejectReason.SIGNATURE_SIZE_EXCEEDED]: 24
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({

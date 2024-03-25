@@ -8,7 +8,9 @@ export const WS_ORDERBOOK_LEVELS_REQUEST_MAP: SchemaPairMap = Object.freeze({
     quote: 'q',
     rate: 'r',
     depth: 'd',
-    aggregate: 'a'
+    aggregate: 'a',
+    expiration: 'e',
+    strike_price: 'sp'
   },
   LITE_TO_FULL: {
     k: 'kind',
@@ -16,6 +18,8 @@ export const WS_ORDERBOOK_LEVELS_REQUEST_MAP: SchemaPairMap = Object.freeze({
     q: 'quote',
     r: 'rate',
     d: 'depth',
-    a: 'aggregate'
+    a: 'aggregate',
+    e: 'expiration',
+    sp: 'strike_price'
   }
 })
