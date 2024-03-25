@@ -7,6 +7,8 @@ export const API_ORDER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     kind: 'k',
     underlying: 'u',
     quote: 'q',
+    expiration: 'e',
+    strike_price: 'sp',
     limit: 'l',
     cursor: 'c'
   },
@@ -15,6 +17,8 @@ export const API_ORDER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     k: 'kind',
     u: 'underlying',
     q: 'quote',
+    e: 'expiration',
+    sp: 'strike_price',
     l: 'limit',
     c: 'cursor'
   }

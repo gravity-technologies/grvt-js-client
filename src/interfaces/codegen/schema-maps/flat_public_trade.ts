@@ -1,6 +1,5 @@
 import { type SchemaPairMap } from './types'
 import { ASSET_MAP } from './asset'
-import { GREEKS_MAP } from './greeks'
 
 // Schema map for the 'PUBLIC_TRADE' struct.
 export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
@@ -11,9 +10,11 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
     size: 's',
     price: 'p',
     mark_price: 'mp',
+    index_price: 'ip',
+    interest_rate: 'ir',
+    forward_price: 'fp',
     trade_id: 'ti',
-    venue: 'v',
-    greeks: ['g', GREEKS_MAP.FULL_TO_LITE]
+    venue: 'v'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -22,8 +23,10 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
     s: 'size',
     p: 'price',
     mp: 'mark_price',
+    ip: 'index_price',
+    ir: 'interest_rate',
+    fp: 'forward_price',
     ti: 'trade_id',
-    v: 'venue',
-    g: ['greeks', GREEKS_MAP.LITE_TO_FULL]
+    v: 'venue'
   }
 })

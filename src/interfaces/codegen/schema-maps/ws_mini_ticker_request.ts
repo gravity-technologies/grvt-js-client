@@ -6,12 +6,16 @@ export const WS_MINI_TICKER_REQUEST_MAP: SchemaPairMap = Object.freeze({
     kind: 'k',
     underlying: 'u',
     quote: 'q',
-    rate: 'r'
+    rate: 'r',
+    expiration: 'e',
+    strike_price: 'sp'
   },
   LITE_TO_FULL: {
     k: 'kind',
     u: 'underlying',
     q: 'quote',
-    r: 'rate'
+    r: 'rate',
+    e: 'expiration',
+    sp: 'strike_price'
   }
 })

@@ -7,6 +7,8 @@ export const API_SETTLEMENT_PRICE_REQUEST_MAP: SchemaPairMap = Object.freeze({
     quote: 'q',
     start_time: 'st',
     end_time: 'et',
+    expiration: 'e',
+    strike_price: 'sp',
     limit: 'l'
   },
   LITE_TO_FULL: {
@@ -14,6 +16,8 @@ export const API_SETTLEMENT_PRICE_REQUEST_MAP: SchemaPairMap = Object.freeze({
     q: 'quote',
     st: 'start_time',
     et: 'end_time',
+    e: 'expiration',
+    sp: 'strike_price',
     l: 'limit'
   }
 })

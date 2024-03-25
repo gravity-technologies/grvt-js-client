@@ -7,13 +7,17 @@ export const WS_PUBLIC_TRADES_REQUEST_MAP: SchemaPairMap = Object.freeze({
     underlying: 'u',
     quote: 'q',
     venue: 'v',
-    limit: 'l'
+    limit: 'l',
+    expiration: 'e',
+    strike_price: 'sp'
   },
   LITE_TO_FULL: {
     k: 'kind',
     u: 'underlying',
     q: 'quote',
     v: 'venue',
-    l: 'limit'
+    l: 'limit',
+    e: 'expiration',
+    sp: 'strike_price'
   }
 })
