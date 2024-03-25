@@ -151,7 +151,7 @@ export class WS {
     })
   }
 
-  private _parseStream (stream: `${EStreamEndpoints}`) {
+  private _parseStream (stream: EStreamEndpoints) {
     if (Object.values(EStreamEndpoints).includes(stream as EStreamEndpoints)) {
       return stream
     }
