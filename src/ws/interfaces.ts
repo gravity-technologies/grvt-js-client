@@ -35,8 +35,8 @@ export enum EStreamEndpoints {
   FULL_ORDERBOOK_DELTA_V1 = 'full.v1.orderbook.delta',
   LITE_TRADES_V1 = 'lite.v1.trades',
   FULL_TRADES_V1 = 'full.v1.trades',
-  LITE_KLINE_TRADE_V1 = 'lite.v1.kline.trade',
-  FULL_KLINE_TRADE_V1 = 'full.v1.kline.trade',
+  LITE_CANDLESTICK_V1 = 'lite.v1.candlestick',
+  FULL_CANDLESTICK_V1 = 'full.v1.candlestick',
 
   // TDG
   LITE_ORDER_V1 = 'lite.v1.order',
