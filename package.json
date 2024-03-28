@@ -1,6 +1,6 @@
 {
   "name": "grvt",
-  "version": "0.1.1-beta.15",
+  "version": "0.1.1-beta.16",
   "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "test": "nodemon dist/index.js"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^0.28.1",
     "nanoid": "^3.3.6"
   },
   "devDependencies": {
