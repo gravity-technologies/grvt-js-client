@@ -11,7 +11,7 @@ export class Utils {
   }
 
   static jsonReviverBigInt (key: string, value: any) {
-    if (typeof value === 'string' && (/^\d+$/.test(value) || /^0x[0-9a-fA-F]+$/.test(value))) {
+    if (typeof value === 'string' && (/^([+-])?\d+$/.test(value) || /^0x[0-9a-fA-F]+$/.test(value))) {
       return BigInt(value)
     }
     return value
