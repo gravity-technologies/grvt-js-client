@@ -259,6 +259,20 @@ export enum EVenue {
   AXE = 'AXE',
 }
 
+// A Tradeable (or previously tradeable) instrument in GRVT. Currently supports options/futures/perpetuals of various expiries and strikes.
+export interface IAsset {
+  // The kind of the instrument
+  kind?: EKind
+  // The underlying asset of the instrument
+  underlying?: ECurrency
+  // The quote asset of the instrument
+  quote?: ECurrency
+  // Time at which the instrument expires expressed in unix nanoseconds ('null' for perpetuals)
+  expiration?: bigint
+  // The options strike price expressed in quote currency decimal units
+  strike_price?: bigint
+}
+
 export interface IAPIMiniTickerRequest {
   // The asset being represented
   asset?: string
@@ -1380,7 +1394,7 @@ export interface ITransferHistory {
 
 export interface IWSCandlestickRequest {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: string
+  asset?: IAsset
   // The interval of each candlestick
   interval?: ECandlestickInterval
   // The type of candlestick data to retrieve
