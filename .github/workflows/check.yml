@@ -12,11 +12,10 @@ on:
       # Add all monorepo dependency folders
 
 jobs:
-  ts-bot-check:
+  check:
     runs-on: ubuntu-latest
     env:
       node: ">=20"
-      module: "./frontend/ts-bot"
     steps:
       - name: Checkout Commit
         uses: actions/checkout@v3
@@ -25,24 +24,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node }}
-          cache: "yarn"
-          cache-dependency-path: ${{ env.module }}/yarn.lock
-      - name: Install Yarn
-        run: npm install -g yarn
-      - name: Install Dependencies
-        run: |
-          cd ${{ env.module }}
-          yarn install --frozen-lockfile
+          cache: "npm"
+          cache-dependency-path: ${{ env.module }}/package-lock.json
+
+      - name: Npm Install
+        run: npm ci
 
       # Ensure the files are linted before they are pushed
       - name: Npm Lint
         run: |
-          cd ${{ env.module }}
           npm run lint --fix
           $GITHUB_WORKSPACE/.github/scripts/assert_no_files_changed.sh
 
       # Ensure build not broken
       - name: Npm run build
-        run: |
-          cd ${{ env.module }}
-          npm run build
+        run: npm run build
