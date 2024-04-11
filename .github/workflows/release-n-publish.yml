@@ -18,7 +18,7 @@ jobs:
   ReleaseAndPublish:
     runs-on: ubuntu-latest
     env:
-      node: '20.9.0'
+      node: ">=20"
     steps:
         - uses: actions/checkout@v4
 
