@@ -1,12 +1,11 @@
 import { type SchemaPairMap } from './types'
-import { ASSET_MAP } from './asset'
 
 // Schema map for the 'POSITIONS' struct.
 export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
     sub_account_id: 'sa',
-    asset: ['a', ASSET_MAP.FULL_TO_LITE],
+    asset: 'a',
     balance: 'b',
     value: 'v',
     entry_price: 'ep',
@@ -20,7 +19,7 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
   LITE_TO_FULL: {
     et: 'event_time',
     sa: 'sub_account_id',
-    a: ['asset', ASSET_MAP.LITE_TO_FULL],
+    a: 'asset',
     b: 'balance',
     v: 'value',
     ep: 'entry_price',
