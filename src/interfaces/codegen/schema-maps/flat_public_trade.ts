@@ -1,11 +1,10 @@
 import { type SchemaPairMap } from './types'
-import { ASSET_MAP } from './asset'
 
 // Schema map for the 'PUBLIC_TRADE' struct.
 export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
-    asset: ['a', ASSET_MAP.FULL_TO_LITE],
+    asset: 'a',
     is_taker_buyer: 'it',
     size: 's',
     price: 'p',
@@ -18,7 +17,7 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
-    a: ['asset', ASSET_MAP.LITE_TO_FULL],
+    a: 'asset',
     it: 'is_taker_buyer',
     s: 'size',
     p: 'price',

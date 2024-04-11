@@ -259,28 +259,14 @@ export enum EVenue {
   AXE = 'AXE',
 }
 
-// A Tradeable (or previously tradeable) instrument in GRVT. Currently supports options/futures/perpetuals of various expiries and strikes.
-export interface IAsset {
-  // The kind of the instrument
-  kind?: EKind
-  // The underlying asset of the instrument
-  underlying?: ECurrency
-  // The quote asset of the instrument
-  quote?: ECurrency
-  // Time at which the instrument expires expressed in unix nanoseconds ('null' for perpetuals)
-  expiration?: bigint
-  // The options strike price expressed in quote currency decimal units
-  strike_price?: bigint
-}
-
 export interface IAPIMiniTickerRequest {
   // The asset being represented
-  asset?: IAsset
+  asset?: string
 }
 
 export interface IAPIOrderbookLevelsRequest {
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
   depth?: number
   // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
@@ -371,7 +357,7 @@ export interface IApiCancelRfqResponse {
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent candlesticks are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the candlesticks starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the candlesticks ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the candlesticks between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 export interface IApiCandlestickRequest {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  asset?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
   // The type of candlestick data to retrieve
@@ -462,7 +448,7 @@ export interface IApiDepositRequest {
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
 export interface IApiFundingRateRequest {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  asset?: string
   // Start time of funding rate in unix nanoseconds
   start_time?: bigint
   // End time of funding rate in unix nanoseconds
@@ -479,7 +465,7 @@ export interface IApiFundingRateResponse {
 // Fetch a single instrument by supplying the asset or instrument name
 export interface IApiGetInstrumentRequest {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  asset?: string
   // The readable name of the instrument
   instrument_name?: string
 }
@@ -627,7 +613,7 @@ export interface IApiPrivateTradeHistoryResponse {
 
 export interface IApiPublicTradeHistoryRequest {
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -641,7 +627,7 @@ export interface IApiPublicTradeHistoryResponse {
 
 export interface IApiPublicTradesRequest {
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
 }
@@ -718,7 +704,7 @@ export interface IApiTDGAckResponse {
 
 export interface IApiTickerRequest {
   // The asset being represented
-  asset?: IAsset
+  asset?: string
 }
 
 export interface IApiTickerResponse {
@@ -869,7 +855,7 @@ export interface IDepositHistory {
 
 export interface IFundingRate {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  asset?: string
   // The funding rate of the instrument, expressed in centibeeps
   funding_rate?: number
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
@@ -880,7 +866,7 @@ export interface IFundingRate {
 
 export interface IInstrument {
   // The asset referenced by the instrument
-  asset?: IAsset
+  asset?: string
   // The readable name of the instrument
   instrument_name?: string
   // Venues that this instrument can be traded at
@@ -905,7 +891,7 @@ export interface IMiniTicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The mark price of the instrument, expressed in quote asset decimal units
   mark_price?: bigint
   // The index price of the instrument, expressed in quote asset decimal units
@@ -982,7 +968,7 @@ export interface IOrder {
 
 export interface IOrderLeg {
   // The asset to trade in this leg
-  asset?: IAsset
+  asset?: string
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
   size?: bigint
   // The limit price of the order leg, expressed in quote asset decimal units.
@@ -1039,7 +1025,7 @@ export interface IOrderbookLevels {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The list of best bids up till query depth
   bids?: IOrderbookLevel[]
   // The list of best asks up till query depth
@@ -1052,7 +1038,7 @@ export interface IPositions {
   // The sub account ID that participated in the trade
   sub_account_id?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The balance of the position, expressed in underlying asset decimal units. Negative for short positions
   balance?: bigint
   // The value of the position, negative for short assets, expressed in quote asset decimal units
@@ -1087,7 +1073,7 @@ export interface IPrivateTrade {
   // The sub account ID that participated in the trade
   sub_account_id?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The side that the subaccount took on the trade
   is_buyer?: boolean
   // The role that the subaccount took on the trade
@@ -1123,7 +1109,7 @@ export interface IPublicTrade {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // If taker was the buyer on the trade
   is_taker_buyer?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
@@ -1165,7 +1151,7 @@ export interface IRFQBookLevel {
 
 export interface IRFQBookLevelLeg {
   // The asset to being traded in this leg
-  asset?: IAsset
+  asset?: string
   // List of all partial/GTT quotes in the level for this leg, sorted from best price to worst
   quotes?: IRFQBookQuote[]
 }
@@ -1223,7 +1209,7 @@ export interface IRfq {
 
 export interface IRfqLeg {
   // The asset to trade in this leg
-  asset?: IAsset
+  asset?: string
   // The total number of assets to trade in this leg, expressed without decimals. Negative size = short
   size_no_decimal?: number
   // [Filled by GRVT Backend] The relative ratio of this leg to the other legs in this RFQ. Base ratio is standardized (divided) by the GCD.
@@ -1324,7 +1310,7 @@ export interface ITicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
   // The asset being represented
-  asset?: IAsset
+  asset?: string
   // The mark price of the instrument, expressed in quote asset decimal units
   mark_price?: bigint
   // The index price of the instrument, expressed in quote asset decimal units
@@ -1394,7 +1380,7 @@ export interface ITransferHistory {
 
 export interface IWSCandlestickRequest {
   // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  asset?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
   // The type of candlestick data to retrieve
