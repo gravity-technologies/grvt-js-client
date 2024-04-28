@@ -9,12 +9,15 @@
   "keywords": [
     "GRVT"
   ],
-  "author": "danh@grvt.io",
-  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/gravity-technologies/grvt-js-client/issues"
   },
   "homepage": "https://github.com/gravity-technologies/grvt-js-client#readme",
+  "author": "danh@grvt.io",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "tsc --watch",
     "prebuild": "rimraf dist",

@@ -108,14 +108,20 @@ export class WS {
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
       const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
-      if (!message || ['subscribe', 'unsubscribe'].includes(message.method)) {
+      if (!message?.r || ['subscribe', 'unsubscribe'].includes(message.method)) {
         return
       }
       const stream = message.s as string
       const result = this._messageLiteToFull(message)
-      const consumers = Object.values(this._pairs[stream] || {})
+      if (!result) {
+        console.log('TODO: something went wrong with message', message)
+        return
+      }
+      const pair = `${stream}_${(result as any).asset}` // TODO: currently ICandlestick has no asset
+      const consumers = Object.values(this._pairs[pair] || {})
       if (!consumers?.length) {
-        console.log('TODO: send unsubscribe with stream'); return
+        console.log('TODO: send unsubscribe with stream')
+        return
       }
       if (result && consumers?.length) {
         for (const consumer of consumers) {
@@ -247,6 +253,30 @@ export class WS {
     }
   }
 
+  private _messageLiteToFull (message: {
+    s: string
+    n: string
+    f: TEntities
+  }) {
+    switch (message.s) {
+      case EStream.CANDLE:
+        return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
+      case EStream.ORDERBOOK_DELTA:
+      case EStream.ORDERBOOK_SNAP:
+        return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
+      case EStream.MINI_DELTA:
+      case EStream.MINI_SNAP:
+        return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
+      case EStream.TICKER_DELTA:
+      case EStream.TICKER_SNAP:
+        return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
+      case EStream.TRADE:
+        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+      default:
+        throw new Error('Unknown stream')
+    }
+  }
+
   private _sendMessage (payload: IWSRequestV1) {
     if (this._ws.readyState === 1) {
       this._ws.send(JSON.stringify(payload, Utils.jsonReplacerBigInt))
@@ -295,32 +325,6 @@ export class WS {
    * END: Pairs
    */
 
-  private _messageLiteToFull (message: {
-    s: string
-    n: string
-    f: TEntities
-  }) {
-    if (!message.s) {
-      return
-    }
-
-    if (message.s.startsWith('full.')) {
-      return message.f
-    }
-
-    if (message.s.includes('.v1.ticker.')) {
-      return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
-    } else if (message.s.includes('.v1.mini.')) {
-      return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
-    } else if (message.s.includes('.v1.orderbook.')) {
-      return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
-    } else if (message.s.includes('.v1.trades.')) {
-      return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
-    } else if (message.s.includes('.v1.candlestick.')) {
-      return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
-    }
-  }
-
   onClose (callback: (e: CloseEvent) => void) {
     this._ws.addEventListener('close', callback)
     return this
@@ -354,7 +358,7 @@ export class WS {
         s: string
         s1: string[]
       }>(e.data, Utils.jsonReviverBigInt)
-      if (!response) {
+      if (!response?.s || !response?.s1?.length) {
         return
       }
       const [stream, feed] = pair.split('_')
