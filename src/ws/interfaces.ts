@@ -1,66 +1,142 @@
 import {
+  type ECandlestickInterval,
+  type ECandlestickType,
   type ECurrency,
-  type EKind,
-  type EVenue,
-  type IWSCandlestickRequest,
-  type IWSMiniTickerRequest,
-  type IWSOrderbookLevelsRequest,
-  type IWSPositionsRequest,
-  type IWSPrivateTradeRequest,
-  type IWSPublicTradesRequest,
-  type IWSRfqQuoteRequest,
-  type IWSRfqRequest,
-  type IWSTickerRequest,
-  type IWsOrderRequest,
-  type IWsOrderStateRequest
+  type ICandlestick,
+  type IMiniTicker,
+  type IOrderbookLevels,
+  type IPublicTrade,
+  type ITicker
 } from '../interfaces'
 
-export enum EWsMethod {
-  SUBSCRIBE = 'subscribe',
+export enum EStream {
+  CANDLE = 'candle',
+  MINI_DELTA = 'mini.d',
+  MINI_SNAP = 'mini.s',
+  ORDERBOOK_DELTA = 'orderbook.d',
+  ORDERBOOK_SNAP = 'orderbook.s',
+  TICKER_DELTA = 'ticker.d',
+  TICKER_SNAP = 'ticker.s',
+  TRADE = 'trade',
 }
 
-export enum EStreamEndpoints {
-  // MDG
-  LITE_MINI_SNAP_V1 = 'lite.v1.mini.snap',
-  FULL_MINI_SNAP_V1 = 'full.v1.mini.snap',
-  LITE_MINI_DELTA_V1 = 'lite.v1.mini.delta',
-  FULL_MINI_DELTA_V1 = 'full.v1.mini.delta',
-  LITE_TICKER_SNAP_V1 = 'lite.v1.ticker.snap',
-  FULL_TICKER_SNAP_V1 = 'full.v1.ticker.snap',
-  LITE_TICKER_DELTA_V1 = 'lite.v1.ticker.delta',
-  FULL_TICKER_DELTA_V1 = 'full.v1.ticker.delta',
-  LITE_ORDERBOOK_SNAP_V1 = 'lite.v1.orderbook.snap',
-  FULL_ORDERBOOK_SNAP_V1 = 'full.v1.orderbook.snap',
-  LITE_ORDERBOOK_DELTA_V1 = 'lite.v1.orderbook.delta',
-  FULL_ORDERBOOK_DELTA_V1 = 'full.v1.orderbook.delta',
-  LITE_TRADES_V1 = 'lite.v1.trades',
-  FULL_TRADES_V1 = 'full.v1.trades',
-  LITE_CANDLESTICK_V1 = 'lite.v1.candlestick',
-  FULL_CANDLESTICK_V1 = 'full.v1.candlestick',
+// const EStrategyShort = Object.freeze({
+//   [EStrategy.FUTURE]: 'Fut',
+//   [EStrategy.PERPETUAL]: 'Perp',
+//   [EStrategy.CALL]: 'Call',
+//   [EStrategy.PUT]: 'Put',
+//   [EStrategy.CALL_SPREAD]: 'CSpd',
+//   [EStrategy.PUT_SPREAD]: 'PSpd',
+//   [EStrategy.FUTURE_SPREAD]: 'FSpd',
+//   [EStrategy.RISK_REVERSAL_CALL]: 'RRc',
+//   [EStrategy.RISK_REVERSAL_PUT]: 'RRp',
+//   [EStrategy.CALL_CALENDAR_SPREAD]: 'CCal',
+//   [EStrategy.PUT_CALENDAR_SPREAD]: 'PCal',
+//   [EStrategy.STRADDLE]: 'Strd',
+//   [EStrategy.STRANGLE]: 'Strg',
+//   [EStrategy.CALL_BUTTERFLY]: 'CFly',
+//   [EStrategy.PUT_BUTTERFLY]: 'PFly',
+//   [EStrategy.IRON_BUTTERFLY]: 'IFly',
+//   [EStrategy.CALL_CONDOR]: 'CCon',
+//   [EStrategy.PUT_CONDOR]: 'PCon',
+//   [EStrategy.IRON_CONDOR]: 'ICon',
+//   [EStrategy.CUSTOM]: 'Cstm',
+// }) as Readonly<Record<EStrategy, string>>
 
-  // TDG
-  LITE_ORDER_V1 = 'lite.v1.order',
-  FULL_ORDER_V1 = 'full.v1.order',
-  // FULL_ORDER_STATE_V1 = 'full.v1.order.state', // TODO: not implement
-  // LITE_ORDER_STATE_V1 = 'lite.v1.order.state', // TODO: not implement
-  LITE_RFQ_QUOTE_V1 = 'lite.v1.rfq_quote',
-  FULL_RFQ_QUOTE_V1 = 'full.v1.rfq_quote',
-  LITE_RFQ_V1 = 'lite.v1.rfq',
-  FULL_RFQ_V1 = 'full.v1.rfq',
-  // FULL_SUB_ACCOUNT_V1 = 'full.v1.sub_account', // TODO: not implement
-  // LITE_SUB_ACCOUNT_V1 = 'lite.v1.sub_account', // TODO: not implement
-  // FULL_TRADE_V1 = 'full.v1.trade', // TODO: not implement
-  // LITE_TRADE_V1 = 'lite.v1.trade', // TODO: not implement
-  // FULL_TRANSACTION_V1 = 'full.v1.transaction', // TODO: not implement
-  // LITE_TRANSACTION_V1 = 'lite.v1.transaction', // TODO: not implement
+export enum EStrategyShort {
+  FUTURE = 'Fut',
+  PERPETUAL = 'Perp',
+  CALL = 'Call',
+  PUT = 'Put',
+  CALL_SPREAD = 'CSpd',
+  PUT_SPREAD = 'PSpd',
+  FUTURE_SPREAD = 'FSpd',
+  RISK_REVERSAL_CALL = 'RRc',
+  RISK_REVERSAL_PUT = 'RRp',
+  CALL_CALENDAR_SPREAD = 'CCal',
+  PUT_CALENDAR_SPREAD = 'PCal',
+  STRADDLE = 'Strd',
+  STRANGLE = 'Strg',
+  CALL_BUTTERFLY = 'CFly',
+  PUT_BUTTERFLY = 'PFly',
+  IRON_BUTTERFLY = 'IFly',
+  CALL_CONDOR = 'CCon',
+  PUT_CONDOR = 'PCon',
+  IRON_CONDOR = 'ICon',
+  CUSTOM = 'Cstm',
 }
 
-type IWSRequest = IWSMiniTickerRequest & IWSOrderbookLevelsRequest & IWSPositionsRequest & IWSPrivateTradeRequest & IWSPublicTradesRequest & IWSRfqQuoteRequest & IWSRfqRequest & IWSTickerRequest & IWsOrderRequest & IWsOrderStateRequest & IWSCandlestickRequest
-export interface EWsStreamParam extends Omit<IWSRequest, 'kind' | 'underlying' | 'quote' | 'venue' | 'expiration' | 'strike_price'> {
-  kind?: `${EKind}`
-  underlying?: `${ECurrency}`
-  quote?: `${ECurrency}`
-  venue?: Array<`${EVenue}`>
-  expiration?: bigint
-  strike_price?: bigint
+export type TMessageHandler<T> = (data: T) => void
+
+export interface IWSCandleRequest {
+  stream: `${EStream.CANDLE}`
+  params: {
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    strategy: `${EStrategyShort}`
+    interval: `${ECandlestickInterval}`
+    type: `${ECandlestickType}`
+  }
+  onData?: TMessageHandler<ICandlestick>
+  onError?: (error: Error) => void
 }
+
+export interface IWSMiniRequest {
+  stream: `${EStream.MINI_DELTA}` | `${EStream.MINI_SNAP}`
+  params: {
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    strategy: `${EStrategyShort}`
+    expiration?: Date
+    strikePrice?: bigint
+    rate?: number
+  }
+  onData?: TMessageHandler<IMiniTicker>
+  onError?: (error: Error) => void
+}
+
+export interface IWSBookRequest {
+  stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}`
+  params: {
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    strategy: `${EStrategyShort}`
+    expiration?: Date
+    strikePrice?: bigint
+    rate?: number
+    depth?: number
+    aggregate?: number
+  }
+  onData?: TMessageHandler<IOrderbookLevels>
+  onError?: (error: Error) => void
+}
+
+export interface IWSTickerRequest {
+  stream: `${EStream.TICKER_DELTA}` | `${EStream.TICKER_SNAP}`
+  params: {
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    strategy: `${EStrategyShort}`
+    expiration?: Date
+    strikePrice?: bigint
+    rate?: number
+  }
+  onData?: TMessageHandler<ITicker>
+  onError?: (error: Error) => void
+}
+
+export interface IWSTradeRequest {
+  stream: `${EStream.TRADE}`
+  params: {
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    strategy: `${EStrategyShort}`
+    expiration?: Date
+    strikePrice?: bigint
+    limit?: number
+  }
+  onData?: TMessageHandler<IPublicTrade>
+  onError?: (error: Error) => void
+}
+
+export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest

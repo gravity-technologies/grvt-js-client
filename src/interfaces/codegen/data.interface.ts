@@ -259,27 +259,21 @@ export enum EVenue {
   AXE = 'AXE',
 }
 
-// A Tradeable (or previously tradeable) instrument in GRVT. Currently supports options/futures/perpetuals of various expiries and strikes.
-export interface IAsset {
-  // The kind of the instrument
-  kind?: EKind
-  // The underlying asset of the instrument
-  underlying?: ECurrency
-  // The quote asset of the instrument
-  quote?: ECurrency
-  // Time at which the instrument expires expressed in unix nanoseconds ('null' for perpetuals)
-  expiration?: bigint
-  // The options strike price expressed in quote currency decimal units
-  strike_price?: bigint
-}
-
 export interface IAPIMiniTickerRequest {
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
 }
 
 export interface IAPIOrderbookLevelsRequest {
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
   depth?: number
@@ -370,7 +364,11 @@ export interface IApiCancelRfqResponse {
 
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent candlesticks are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the candlesticks starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the candlesticks ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the candlesticks between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 export interface IApiCandlestickRequest {
-  // The asset used throughout all APIs as an instrument identifier
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
@@ -461,7 +459,11 @@ export interface IApiDepositRequest {
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
 export interface IApiFundingRateRequest {
-  // The asset used throughout all APIs as an instrument identifier
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // Start time of funding rate in unix nanoseconds
   start_time?: bigint
@@ -478,7 +480,11 @@ export interface IApiFundingRateResponse {
 
 // Fetch a single instrument by supplying the asset or instrument name
 export interface IApiGetInstrumentRequest {
-  // The asset used throughout all APIs as an instrument identifier
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The readable name of the instrument
   instrument_name?: string
@@ -626,7 +632,11 @@ export interface IApiPrivateTradeHistoryResponse {
 }
 
 export interface IApiPublicTradeHistoryRequest {
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
@@ -640,7 +650,11 @@ export interface IApiPublicTradeHistoryResponse {
 }
 
 export interface IApiPublicTradesRequest {
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
@@ -717,11 +731,20 @@ export interface IApiTDGAckResponse {
 }
 
 export interface IApiTickerRequest {
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
 }
 
 export interface IApiTickerResponse {
+  // The mini ticker matching the request asset
+  results?: ITicker
+}
+
+export interface IApiTickerResponseV1 {
   // The mini ticker matching the request asset
   results?: ITicker
 }
@@ -868,7 +891,11 @@ export interface IDepositHistory {
 }
 
 export interface IFundingRate {
-  // The asset used throughout all APIs as an instrument identifier
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The funding rate of the instrument, expressed in centibeeps
   funding_rate?: number
@@ -879,7 +906,11 @@ export interface IFundingRate {
 }
 
 export interface IInstrument {
-  // The asset referenced by the instrument
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The readable name of the instrument
   instrument_name?: string
@@ -904,7 +935,11 @@ export interface IInstrument {
 export interface IMiniTicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The mark price of the instrument, expressed in quote asset decimal units
   mark_price?: bigint
@@ -1038,7 +1073,11 @@ export interface IOrderbookLevel {
 export interface IOrderbookLevels {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The list of best bids up till query depth
   bids?: IOrderbookLevel[]
@@ -1122,7 +1161,11 @@ export interface IPrivateTrade {
 export interface IPublicTrade {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // If taker was the buyer on the trade
   is_taker_buyer?: boolean
@@ -1323,7 +1366,11 @@ export interface ISubAccount {
 export interface ITicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The asset being represented
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
   asset?: string
   // The mark price of the instrument, expressed in quote asset decimal units
   mark_price?: bigint
@@ -1393,8 +1440,25 @@ export interface ITransferHistory {
 }
 
 export interface IWSCandlestickRequest {
-  // The asset used throughout all APIs as an instrument identifier
-  asset?: IAsset
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
+  // The interval of each candlestick
+  interval?: ECandlestickInterval
+  // The type of candlestick data to retrieve
+  type?: ECandlestickType
+}
+
+export interface IWSCandlestickRequestV1 {
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
   // The type of candlestick data to retrieve
@@ -1408,6 +1472,15 @@ export interface IWSCandlestickResponse {
   n?: bigint
   // A candlestick entry matching the request filters
   f?: ICandlestick
+}
+
+export interface IWSCandlestickResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A candlestick entry matching the request filters
+  feed?: ICandlestick
 }
 
 export interface IWSMiniTickerRequest {
@@ -1427,6 +1500,19 @@ export interface IWSMiniTickerRequest {
   strike_price?: bigint[]
 }
 
+export interface IWSMiniTickerRequestV1 {
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
+  // The minimal rate at which we publish feeds (in milliseconds)
+  // Delta (raw, 50, 100, 200, 500, 1000, 5000)
+  // Snapshot (200, 500, 1000, 5000)
+  rate?: number
+}
+
 export interface IWSMiniTickerResponse {
   // Stream name
   s?: string
@@ -1434,6 +1520,15 @@ export interface IWSMiniTickerResponse {
   n?: bigint
   // A mini ticker matching the request filter
   f?: IMiniTicker
+}
+
+export interface IWSMiniTickerResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A mini ticker matching the request filter
+  feed?: IMiniTicker
 }
 
 export interface IWSOrderbookLevelsRequest {
@@ -1457,6 +1552,23 @@ export interface IWSOrderbookLevelsRequest {
   strike_price?: bigint[]
 }
 
+export interface IWSOrderbookLevelsRequestV1 {
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
+  // The minimal rate at which we publish feeds (in milliseconds)
+  // Delta (100, 200, 500, 1000, 5000)
+  // Snapshot (500, 1000, 5000)
+  rate?: number
+  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
+  depth?: number
+  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
+  aggregate?: number
+}
+
 export interface IWSOrderbookLevelsResponse {
   // Stream name
   s?: string
@@ -1464,6 +1576,15 @@ export interface IWSOrderbookLevelsResponse {
   n?: bigint
   // An orderbook levels object matching the request filter
   f?: IOrderbookLevels
+}
+
+export interface IWSOrderbookLevelsResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // An orderbook levels object matching the request filter
+  feed?: IOrderbookLevels
 }
 
 export interface IWSPositionsRequest {
@@ -1523,6 +1644,17 @@ export interface IWSPublicTradesRequest {
   strike_price?: bigint[]
 }
 
+export interface IWSPublicTradesRequestV1 {
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+}
+
 export interface IWSPublicTradesResponse {
   // Stream name
   s?: string
@@ -1530,6 +1662,24 @@ export interface IWSPublicTradesResponse {
   n?: bigint
   // A public trade matching the request filter
   f?: IPublicTrade
+}
+
+export interface IWSPublicTradesResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A public trade matching the request filter
+  feed?: IPublicTrade
+}
+
+export interface IWSRequestV1 {
+  // The channel to subscribe to (eg: ticker.s / ticker.d
+  stream?: string
+  // The list of feeds to subscribe to (eg:
+  feed?: string[]
+  // The method to use for the request (eg: subscribe / unsubscribe)
+  method?: string
 }
 
 export interface IWSRfqQuoteRequest {
@@ -1577,6 +1727,19 @@ export interface IWSTickerRequest {
   strike_price?: bigint[]
 }
 
+export interface IWSTickerRequestV1 {
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
+  // The minimal rate at which we publish feeds (in milliseconds)
+  // Delta (100, 200, 500, 1000, 5000)
+  // Snapshot (500, 1000, 5000)
+  rate?: number
+}
+
 export interface IWSTickerResponse {
   // Stream name
   s?: string
@@ -1584,6 +1747,15 @@ export interface IWSTickerResponse {
   n?: bigint
   // A ticker matching the request filter
   f?: ITicker
+}
+
+export interface IWSTickerResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A ticker matching the request filter
+  feed?: ITicker
 }
 
 export interface IWithdrawalHistory {

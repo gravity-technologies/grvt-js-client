@@ -1,19 +1,11 @@
 import { customAlphabet } from 'nanoid'
 import {
-  ECandlestickIntervalInt,
-  ECandlestickTypeInt,
-  ECurrencyInt,
-  EKind,
-  EKindInt,
+  ECurrency,
   WS_CANDLESTICK_RESPONSE_MAP,
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
-  WS_ORDER_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
-  WS_RFQ_QUOTE_RESPONSE_MAP,
-  WS_RFQ_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
-  type ECurrency,
   type ICandlestick,
   type IMiniTicker,
   type IOrder,
@@ -26,13 +18,20 @@ import {
   type IWSMiniTickerResponse,
   type IWSOrderbookLevelsResponse,
   type IWSPublicTradesResponse,
-  type IWSRfqQuoteResponse,
-  type IWSRfqResponse,
-  type IWSTickerResponse,
-  type IWsOrderResponse
+  type IWSRequestV1,
+  type IWSTickerResponse
 } from '../interfaces'
 import { JsonUtils, Utils } from '../utils'
-import { EStreamEndpoints, type EWsStreamParam } from './interfaces'
+import {
+  EStrategyShort,
+  EStream,
+  type IWSBookRequest,
+  type IWSCandleRequest,
+  type IWSMiniRequest,
+  type IWSTickerRequest,
+  type IWSTradeRequest,
+  type TWSRequest
+} from './interfaces'
 
 type TEntities = // all entities
                   IMiniTicker
@@ -44,36 +43,6 @@ type TEntities = // all entities
                   | IRfq
                   | IRfqQuote
 
-interface ISubscribeOptions<T extends EStreamEndpoints, R extends TEntities> {
-  stream: T
-  params: EWsStreamParam
-  onData?: TMessageHandler<R>
-  onError?: (error: Error) => void
-}
-
-type TSubscribeOptions = ISubscribeOptions<EStreamEndpoints.LITE_MINI_SNAP_V1 | EStreamEndpoints.FULL_MINI_SNAP_V1 | EStreamEndpoints.LITE_MINI_DELTA_V1 | EStreamEndpoints.FULL_MINI_DELTA_V1, IMiniTicker>
-| ISubscribeOptions<EStreamEndpoints.LITE_TICKER_SNAP_V1 | EStreamEndpoints.FULL_TICKER_SNAP_V1 | EStreamEndpoints.LITE_TICKER_DELTA_V1 | EStreamEndpoints.FULL_TICKER_DELTA_V1, ITicker>
-| ISubscribeOptions<EStreamEndpoints.LITE_ORDERBOOK_SNAP_V1 | EStreamEndpoints.FULL_ORDERBOOK_SNAP_V1 | EStreamEndpoints.LITE_ORDERBOOK_DELTA_V1 | EStreamEndpoints.FULL_ORDERBOOK_DELTA_V1, IOrderbookLevels>
-| ISubscribeOptions<EStreamEndpoints.LITE_TRADES_V1 | EStreamEndpoints.FULL_TRADES_V1, IPublicTrade>
-| ISubscribeOptions<EStreamEndpoints.LITE_CANDLESTICK_V1 | EStreamEndpoints.FULL_CANDLESTICK_V1, ICandlestick>
-| ISubscribeOptions<EStreamEndpoints.LITE_ORDER_V1 | EStreamEndpoints.FULL_ORDER_V1, IOrder>
-| ISubscribeOptions<EStreamEndpoints.LITE_RFQ_QUOTE_V1 | EStreamEndpoints.FULL_RFQ_QUOTE_V1, IRfqQuote>
-| ISubscribeOptions<EStreamEndpoints.LITE_RFQ_V1 | EStreamEndpoints.FULL_RFQ_V1, IRfq>
-
-interface IParsedParams extends Omit<EWsStreamParam, 'kind' | 'underlying' | 'quote' | 'rate' | 'expiration' | 'strike_price'> {
-  kind?: Array<`${EKind}`>
-  underlying?: Array<`${ECurrency}`>
-  quote?: Array<`${ECurrency}`>
-  expiration?: bigint[]
-  strike_price?: bigint[]
-  rate?: number
-}
-
-type TSubscribeParams = Array<{
-  stream: string
-  stream_params: IParsedParams
-}>
-
 type TMessageHandler<T> = (data: T) => void
 
 interface IOptions {
@@ -83,6 +52,11 @@ interface IOptions {
   timeout?: number
   reconnectStrategy?: ((retries: number) => number | Error)
 }
+
+const SHORT_MONTHS = Object.freeze([
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+])
 
 export class WS {
   private _retries = 0
@@ -151,275 +125,131 @@ export class WS {
     })
   }
 
-  private _parseStream (stream: EStreamEndpoints) {
-    if (Object.values(EStreamEndpoints).includes(stream as EStreamEndpoints)) {
-      return stream
+  private _parseExpiration (expiration?: Date): string {
+    if (!expiration) {
+      return ''
     }
-    throw new Error('Unknown stream')
+    const dd = `0${expiration.getDate()}`.slice(-2)
+    const mmm = SHORT_MONTHS[expiration.getMonth()]
+    const yy = expiration.getFullYear().toString().slice(-2)
+    return `${dd}${mmm}${yy}`
   }
 
-  private _parseParams (params: EWsStreamParam): IParsedParams {
-    return {
-      ...params,
-      kind: params.kind ? [params.kind] : undefined,
-      underlying: params.underlying ? [params.underlying as ECurrency] : undefined,
-      quote: params.quote ? [params.quote as ECurrency] : undefined,
-      expiration: params.expiration ? [params.expiration] : undefined,
-      strike_price: params.strike_price ? [params.strike_price] : undefined,
-      rate: Math.min(
-        Math.max(
-          params.rate ? params.rate : 1000,
-          200
-        ),
-        5000
-      ),
-      asset: {
-        kind: params.asset?.kind ?? (params.kind as EKind),
-        underlying: params.asset?.underlying ?? (params.underlying as ECurrency),
-        quote: params.asset?.quote ?? (params.quote as ECurrency),
-        expiration: params.asset?.expiration ?? params.expiration,
-        strike_price: params.asset?.strike_price ?? params.strike_price
-      }
+  private _parseStrikePrice (strikePrice?: bigint, underlying?: `${ECurrency}`): string {
+    if (!strikePrice || !underlying) {
+      return ''
     }
+    const multiplierRegex = [ECurrency.BTC, ECurrency.ETH].includes(underlying as ECurrency)
+      ? /(\d{9})$/
+      : /(\d{6})$/
+    return strikePrice.toString().replace(multiplierRegex, '')
   }
 
-  /**
-   * @see /backend/svc/marketdatagateway/client/websocket.go#generateRoomName
-   */
-  private _paramsToKeyPairs (subscribeParams: TSubscribeParams) {
-    return subscribeParams.reduce<string[]>((merged, { stream, stream_params: streamParams }) => {
-      for (const _kind of (streamParams.kind?.length ? streamParams.kind : [streamParams.asset?.kind])) {
-        for (const _underlying of (streamParams.underlying?.length ? streamParams.underlying : [streamParams.asset?.underlying])) {
-          for (const _quote of (streamParams.quote?.length ? streamParams.quote : [streamParams.asset?.quote])) {
-            const kind = typeof _kind === 'string'
-              ? _kind
-              : Utils.getKeyByValue(EKindInt, _kind) as string
-            const underlying = typeof _underlying === 'string'
-              ? _underlying
-              : Utils.getKeyByValue(ECurrencyInt, _underlying) as string
-            const quote = typeof _quote === 'string'
-              ? _quote
-              : Utils.getKeyByValue(ECurrencyInt, _quote) as string
+  private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
+    const candleFeed = (params: IWSCandleRequest['params']): string => [
+      [
+        params.underlying,
+        params.quote,
+        params.strategy
+      ].filter(Boolean).join(' '),
+      [
+        params.interval.toLowerCase(),
+        params.type.toLowerCase()
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
 
-            if (stream.includes('.v1.ticker')) {
-              merged.push([
-                stream,
-                [
-                  kind,
-                  underlying,
-                  quote,
-                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
-                  streamParams.rate ?? 1000
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.mini')) {
-              merged.push([
-                stream,
-                [
-                  kind,
-                  underlying,
-                  quote,
-                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
-                  streamParams.rate ?? 1000
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.orderbook')) {
-              merged.push([
-                stream,
-                [
-                  kind,
-                  underlying,
-                  quote,
-                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
-                  streamParams.rate ?? 1000,
-                  streamParams.depth ?? 10,
-                  streamParams.aggregate ?? 1
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.trades')) {
-              merged.push([
-                stream,
-                [
-                  kind,
-                  underlying,
-                  quote,
-                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.candlestick')) {
-              const _interval = typeof streamParams.interval === 'string'
-                ? streamParams.interval
-                : Utils.getKeyByValue(ECandlestickIntervalInt, streamParams.interval) as string
-              const _type = typeof streamParams.type === 'string'
-                ? streamParams.type
-                : Utils.getKeyByValue(ECandlestickTypeInt, streamParams.type) as string
-              merged.push([
-                stream,
-                [
-                  kind,
-                  underlying,
-                  quote,
-                  _interval.replace(/_/g, ''),
-                  _type?.toLowerCase()
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.order')) {
-              merged.push([
-                stream.split('.').reverse().join('.'),
-                [
-                  BigInt(streamParams.sub_account_id ?? 0).toString(),
-                  kind,
-                  underlying,
-                  quote,
-                  [EKind.CALL, EKind.PUT, EKind.FUTURE].includes(kind as EKind) && streamParams.expiration,
-                  [EKind.CALL, EKind.PUT].includes(kind as EKind) && streamParams.strike_price,
-                  streamParams.create_only ? 'create' : 'stat'
-                ].filter(Boolean).join('-')
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.rfq_quote')) {
-              merged.push([
-                stream.split('.').reverse().join('.'),
-                BigInt(streamParams.sub_account_id ?? 0).toString()
-              ].join('.').toLowerCase())
-              continue
-            } else if (stream.includes('.v1.rfq')) {
-              merged.push([
-                stream.split('.').reverse().join('.'),
-                BigInt(streamParams.sub_account_id ?? 0).toString()
-              ].join('.').toLowerCase())
-              continue
-            }
-          }
+    const bookFeed = (params: IWSBookRequest['params']): string => [
+      [
+        params.underlying,
+        params.quote,
+        params.strategy,
+        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
+        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
+      ].filter(Boolean).join(' '),
+      [
+        params.rate ?? 1000,
+        params.depth ?? 10,
+        params.aggregate ?? 1
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const miniFeed = (params: IWSMiniRequest['params']): string => [
+      [
+        params.underlying,
+        params.quote,
+        params.strategy,
+        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
+        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
+      ].filter(Boolean).join(' '),
+      [
+        params.rate ?? 1000
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const tickerFeed = (params: IWSTickerRequest['params']): string => [
+      [
+        params.underlying,
+        params.quote,
+        params.strategy,
+        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
+        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
+      ].filter(Boolean).join(' '),
+      [
+        params.rate ?? 1000
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const tradeFeed = (params: IWSTradeRequest['params']): string => [
+      [
+        params.underlying,
+        params.quote,
+        params.strategy,
+        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
+        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
+      ].filter(Boolean).join(' '),
+      [
+        params.limit ?? 500
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const { stream, params } = options
+    switch (stream) {
+      case EStream.CANDLE:
+        return {
+          stream,
+          feed: [candleFeed(params as IWSCandleRequest['params'])]
         }
-      }
-      return merged
-    }, [])
-  }
-
-  /**
-   * Revert of _paramsToKeyPairs
-   */
-  private _getPairedParams (pairedKey: string): TSubscribeParams | undefined {
-    return this._pairedParams[pairedKey]
-
-    // for (const streamEndpoint of Object.values(EStreamEndpoints)) {
-    //   if (
-    //     !pairedKey.startsWith(streamEndpoint) && (
-    //       !(pairedKey.startsWith('order.v1.') && streamEndpoint.endsWith('.v1.order')) &&
-    //       !(pairedKey.startsWith('rfq_quote.v1.') && streamEndpoint.endsWith('.v1.rfq_quote')) &&
-    //       !(pairedKey.startsWith('rfq.v1.') && streamEndpoint.endsWith('.v1.rfq'))
-    //     )
-    //   ) {
-    //     continue
-    //   }
-    //   if (pairedKey.includes('.v1.ticker')) {
-    //     const [kind, underlying, quote, rate/** , greeks */] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         kind: [String(kind).toUpperCase()] as EKind[],
-    //         underlying: [String(underlying).toUpperCase()] as ECurrency[],
-    //         quote: [String(quote).toUpperCase()] as ECurrency[],
-    //         rate: Number(rate)
-    //       }
-    //     }]
-    //   } else if (pairedKey.includes('.v1.mini')) {
-    //     const [kind, underlying, quote, rate] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         kind: [String(kind).toUpperCase()] as EKind[],
-    //         underlying: [String(underlying).toUpperCase()] as ECurrency[],
-    //         quote: [String(quote).toUpperCase()] as ECurrency[],
-    //         rate: Number(rate)
-    //       }
-    //     }]
-    //   } else if (pairedKey.includes('.v1.orderbook')) {
-    //     const [kind, underlying, quote, rate, depth] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         kind: [String(kind).toUpperCase()] as EKind[],
-    //         underlying: [String(underlying).toUpperCase()] as ECurrency[],
-    //         quote: [String(quote).toUpperCase()] as ECurrency[],
-    //         rate: Number(rate),
-    //         depth: Number(depth) || 0
-    //       }
-    //     }]
-    //   } else if (pairedKey.includes('.v1.trades')) {
-    //     const [kind, underlying, quote, rate, limit] = pairedKey.replace(streamEndpoint + '.', '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         kind: [String(kind).toUpperCase()] as EKind[],
-    //         underlying: [String(underlying).toUpperCase()] as ECurrency[],
-    //         quote: [String(quote).toUpperCase()] as ECurrency[],
-    //         rate: Number(rate),
-    //         // venue: 'all', // TODO
-    //         limit: Number(limit) || 0
-    //       }
-    //     }]
-    //   } else if (pairedKey.startsWith('order.v1.')) {
-    //     const [subAccountId, kind, underlying, quote, create] = pairedKey.replace(/^order\.v1\.(full|lite)\./, '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         sub_account_id: BigInt(subAccountId),
-    //         kind: [String(kind).toUpperCase()] as EKind[],
-    //         underlying: [String(underlying).toUpperCase()] as ECurrency[],
-    //         quote: [String(quote).toUpperCase()] as ECurrency[],
-    //         create_only: ['create', 'stat'].indexOf(create) === 0
-    //       }
-    //     }]
-    //   } else if (pairedKey.startsWith('rfq_quote.v1.')) {
-    //     const [subAccountId] = pairedKey.replace(/^rfq_quote\.v1\.(full|lite)\./, '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         sub_account_id: BigInt(subAccountId)
-    //       }
-    //     }]
-    //   } else if (pairedKey.startsWith('rfq.v1.')) {
-    //     const [subAccountId] = pairedKey.replace(/^rfq\.v1\.(full|lite)\./, '').split('.')
-    //     return [{
-    //       stream: streamEndpoint,
-    //       stream_params: {
-    //         sub_account_id: BigInt(subAccountId)
-    //       }
-    //     }]
-    //   }
-    // }
-  }
-
-  private _sendSubscribe (subscribeParams: TSubscribeParams) {
-    if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'subscribe',
-        params: subscribeParams
-      }, Utils.jsonReplacerBigInt))
+      case EStream.ORDERBOOK_DELTA:
+      case EStream.ORDERBOOK_SNAP:
+        return {
+          stream,
+          feed: [bookFeed(params as IWSBookRequest['params'])]
+        }
+      case EStream.MINI_DELTA:
+      case EStream.MINI_SNAP:
+        return {
+          stream,
+          feed: [miniFeed(params as IWSMiniRequest['params'])]
+        }
+      case EStream.TICKER_DELTA:
+      case EStream.TICKER_SNAP:
+        return {
+          stream,
+          feed: [tickerFeed(params as IWSTickerRequest['params'])]
+        }
+      case EStream.TRADE:
+        return {
+          stream,
+          feed: [tradeFeed(params as IWSTradeRequest['params'])]
+        }
+      default:
+        throw new Error('Unknown stream')
     }
   }
 
-  private _sendUnSubscribe (subscribeParams: TSubscribeParams) {
+  private _sendMessage (payload: IWSRequestV1) {
     if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'unsubscribe',
-        params: subscribeParams
-      }, Utils.jsonReplacerBigInt))
+      this._ws.send(JSON.stringify(payload, Utils.jsonReplacerBigInt))
     }
   }
 
@@ -428,8 +258,6 @@ export class WS {
    */
 
   private readonly _pairs: Record<string, Record<string, TMessageHandler<TEntities>>> = {}
-  // use for unsubscribe
-  private _pairedParams: Record<string, TSubscribeParams | undefined> = {}
 
   private _addConsumer (pair: string, onMessage: TMessageHandler<TEntities>) {
     if (!this._pairs[pair]) {
@@ -447,19 +275,19 @@ export class WS {
   }
 
   private _removeConsumer (consumerKey: string) {
-    const [pair, key] = consumerKey.split('_')
+    const [stream, feed, key] = consumerKey.split('_')
+    const pair = `${stream}_${feed}`
     if (!this._pairs[pair]) {
       return
     }
     const { [key]: _, ...keep } = this._pairs[pair]
     this._pairs[pair] = keep
     if (!Object.keys(keep).length) {
-      const unsubscribeParams = this._getPairedParams(pair)
-      if (unsubscribeParams) {
-        this._sendUnSubscribe(unsubscribeParams)
-        const { [pair]: _, ...keep } = this._pairedParams
-        this._pairedParams = keep
-      }
+      this._sendMessage({
+        method: 'unsubscribe',
+        stream,
+        feed: [feed]
+      })
     }
   }
 
@@ -490,12 +318,6 @@ export class WS {
       return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
     } else if (message.s.includes('.v1.candlestick.')) {
       return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
-    } else if (message.s.includes('order.v1.')) {
-      return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
-    } else if (message.s.includes('rfq_quote.v1.')) {
-      return (Utils.schemaMap(message, WS_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqQuoteResponse).f
-    } else if (message.s.includes('rfq.v1.')) {
-      return (Utils.schemaMap(message, WS_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IWSRfqResponse).f
     }
   }
 
@@ -512,27 +334,31 @@ export class WS {
   private _subscribeCurrentPairs () {
     const pairs = Object.keys(this._pairs)
     for (const pair of pairs) {
-      const subscribeParams = this._getPairedParams(pair)
-      if (subscribeParams?.length) {
-        this._sendSubscribe(subscribeParams)
-      }
+      const [stream, feed] = pair.split('_')
+      this._sendMessage({
+        method: 'subscribe',
+        stream,
+        feed: [feed]
+      })
     }
   }
 
-  private async _subscribe (pair: string, subscribeParams: TSubscribeParams) {
+  private async _subscribe (pair: string, subscribePayload: IWSRequestV1) {
     if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const _params = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)?.results as TSubscribeParams
-      if (!_params) {
+      const response = JsonUtils.parse<{
+        s: string
+        s1: string[]
+      }>(e.data, Utils.jsonReviverBigInt)
+      if (!response) {
         return
       }
-      const params = Utils.pascalToSnake(_params)
-      const [responsePair] = this._paramsToKeyPairs(params)
-      if (responsePair === pair) {
+      const [stream, feed] = pair.split('_')
+      if (stream === response.s && response.s1.includes(feed)) {
         _resolve()
       }
     }
@@ -540,7 +366,7 @@ export class WS {
       _resolve = resolve
       this._ws.addEventListener('message', onPaired)
     })
-    this._sendSubscribe(subscribeParams)
+    this._sendMessage(subscribePayload)
     return Utils.timeout(
       promise,
       this._options.timeout ?? 30000,
@@ -551,20 +377,21 @@ export class WS {
   }
 
   /**
-   * Only supports one pair for now
+   * Only supports one feed
    */
-  subscribe (_options: TSubscribeOptions): string {
+  subscribe (_options: TWSRequest): string {
     const { onData: onMessage, onError, ...options } = _options
-    const subscribeParams: TSubscribeParams = [{
-      // stream: this._parseStream(options.stream).replace(/^full\./, 'lite.'), // TODO: force all to lite
-      stream: this._parseStream(options.stream).replace(/^lite\./, 'full.'),
-      stream_params: this._parseParams(options.params)
-    }]
-    const [pair] = this._paramsToKeyPairs(subscribeParams) // only allow one pair for now
-    void this._subscribe(pair, subscribeParams).catch(onError)
-    if (!this._pairedParams[pair]) {
-      this._pairedParams[pair] = subscribeParams
+    const subscribePayload: IWSRequestV1 = {
+      ...this._parseStream(options),
+      method: 'subscribe'
     }
+    const stream = subscribePayload.stream
+    const feed = subscribePayload.feed?.[0] as string
+    if (!stream || !feed) {
+      throw new Error('Unknown stream or feed')
+    }
+    const pair = `${stream}_${feed}`
+    void this._subscribe(pair, subscribePayload).catch(onError)
     return this._addConsumer(pair, onMessage as TMessageHandler<TEntities>)
   }
 
