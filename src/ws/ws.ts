@@ -117,7 +117,11 @@ export class WS {
         console.log('TODO: something went wrong with message', message)
         return
       }
-      const pair = `${stream}_${(result as any).asset}` // TODO: currently ICandlestick has no asset
+      // TODO: currently ICandlestick has no asset
+      const pair = this._getPair({
+        stream,
+        feed: (result as any).asset as string
+      })
       const consumers = Object.values(this._pairs[pair] || {})
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with stream')
@@ -289,6 +293,13 @@ export class WS {
 
   private readonly _pairs: Record<string, Record<string, TMessageHandler<TEntities>>> = {}
 
+  private _getPair ({ stream, feed }: {
+    stream: string
+    feed: string
+  }) {
+    return `${stream}_${feed?.split('@')?.[0]}`
+  }
+
   private _addConsumer (pair: string, onMessage: TMessageHandler<TEntities>) {
     if (!this._pairs[pair]) {
       this._pairs[pair] = {}
@@ -306,7 +317,7 @@ export class WS {
 
   private _removeConsumer (consumerKey: string) {
     const [stream, feed, key] = consumerKey.split('_')
-    const pair = `${stream}_${feed}`
+    const pair = this._getPair({ stream, feed })
     if (!this._pairs[pair]) {
       return
     }
@@ -394,7 +405,7 @@ export class WS {
     if (!stream || !feed) {
       throw new Error('Unknown stream or feed')
     }
-    const pair = `${stream}_${feed}`
+    const pair = this._getPair({ stream, feed })
     void this._subscribe(pair, subscribePayload).catch(onError)
     return this._addConsumer(pair, onMessage as TMessageHandler<TEntities>)
   }
