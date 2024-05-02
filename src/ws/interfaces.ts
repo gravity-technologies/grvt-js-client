@@ -2,8 +2,10 @@ import {
   type ECandlestickInterval,
   type ECandlestickType,
   type ECurrency,
+  type EKind,
   type ICandlestick,
   type IMiniTicker,
+  type IOrder,
   type IOrderbookLevels,
   type IPublicTrade,
   type ITicker
@@ -17,6 +19,10 @@ export enum EStream {
   ORDERBOOK_SNAP = 'orderbook.s',
   TICKER_DELTA = 'ticker.d',
   TICKER_SNAP = 'ticker.s',
+  TRADES = 'trades',
+
+  ORDER = 'order',
+  POSITION = 'position',
   TRADE = 'trade',
 }
 
@@ -126,7 +132,7 @@ export interface IWSTickerRequest {
 }
 
 export interface IWSTradeRequest {
-  stream: `${EStream.TRADE}`
+  stream: `${EStream.TRADES}`
   params: {
     underlying: `${ECurrency}`
     quote: `${ECurrency}`
@@ -139,4 +145,17 @@ export interface IWSTradeRequest {
   onError?: (error: Error) => void
 }
 
-export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest
+export interface IWSTdgOrderRequest {
+  stream: `${EStream.ORDER}`
+  params: {
+    subAccountId: string
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+    kind: `${EKind}`
+    createOnly?: boolean
+  }
+  onData?: TMessageHandler<IOrder>
+  onError?: (error: Error) => void
+}
+
+export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest | IWSTdgOrderRequest

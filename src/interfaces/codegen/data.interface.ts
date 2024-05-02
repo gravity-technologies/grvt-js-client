@@ -871,6 +871,12 @@ export interface ICandlestick {
   volume_q?: bigint
   // The number of trades transacted
   trades?: number
+  // The readable name of the instrument. This is the asset being represented differently based on the type of the asset
+  // For Perpetual: ETH USDC Perp [Underlying Quote Perp]
+  // For Future: BTC USDT Fut 20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH USDC Call 20Oct23 4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH USDC Put 20Oct23 4123 [Underlying Quote Put DateFormat StrikePrice]
+  asset?: string
 }
 
 export interface IDepositHistory {
@@ -1531,6 +1537,50 @@ export interface IWSMiniTickerResponseV1 {
   feed?: IMiniTicker
 }
 
+export interface IWSOrderRequestV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+  // Only streams created orders in this stream. If false, updated orders will also be streamed
+  create_only?: boolean
+}
+
+export interface IWSOrderResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The order object being created or updated
+  feed?: IOrder
+}
+
+export interface IWSOrderStateRequestV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+  // Only streams updated orders in this stream. If false, created orders will also reflect here
+  update_only?: boolean
+}
+
+export interface IWSOrderStateResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The order state object being created or updated
+  feed?: IOrderState
+}
+
 export interface IWSOrderbookLevelsRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
@@ -1598,6 +1648,17 @@ export interface IWSPositionsRequest {
   quote?: ECurrency[]
 }
 
+export interface IWSPositionsRequestV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+}
+
 export interface IWSPositionsResponse {
   // Stream name
   s?: string
@@ -1605,6 +1666,15 @@ export interface IWSPositionsResponse {
   n?: bigint
   // A Position being created or updated matching the request filter
   f?: IPositions
+}
+
+export interface IWSPositionsResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A Position being created or updated matching the request filter
+  feed?: IPositions
 }
 
 export interface IWSPrivateTradeRequest {
@@ -1618,6 +1688,17 @@ export interface IWSPrivateTradeRequest {
   quote?: ECurrency[]
 }
 
+export interface IWSPrivateTradeRequestV1 {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+}
+
 export interface IWSPrivateTradeResponse {
   // The websocket channel to which the response is sent
   s?: string
@@ -1625,6 +1706,15 @@ export interface IWSPrivateTradeResponse {
   n?: bigint
   // A private trade matching the request filter
   f?: IPrivateTrade
+}
+
+export interface IWSPrivateTradeResponseV1 {
+  // The websocket channel to which the response is sent
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A private trade matching the request filter
+  feed?: IPrivateTrade
 }
 
 export interface IWSPublicTradesRequest {
@@ -1680,11 +1770,33 @@ export interface IWSRequestV1 {
   feed?: string[]
   // The method to use for the request (eg: subscribe / unsubscribe)
   method?: string
+  // Whether the request is for full data or lite data
+  is_full?: boolean
+}
+
+export interface IWSResponseV1 {
+  // The channel to subscribe to (eg: ticker.s / ticker.d
+  stream?: string
+  // The list of feeds subscribed to
+  subs?: string[]
+  // The list of feeds unsubscribed to
+  unsubs?: string[]
 }
 
 export interface IWSRfqQuoteRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
+}
+
+export interface IWSRfqQuoteRequestV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
 }
 
 export interface IWSRfqQuoteResponse {
@@ -1696,9 +1808,29 @@ export interface IWSRfqQuoteResponse {
   f?: IRfqQuote
 }
 
+export interface IWSRfqQuoteResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The RfqQuote being created or updated
+  feed?: IRfqQuote
+}
+
 export interface IWSRfqRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
+}
+
+export interface IWSRfqRequestV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
 }
 
 export interface IWSRfqResponse {
@@ -1708,6 +1840,15 @@ export interface IWSRfqResponse {
   n?: bigint
   // The Rfq being created or updated
   f?: IRfq
+}
+
+export interface IWSRfqResponseV1 {
+  // Stream name
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The Rfq being created or updated
+  feed?: IRfq
 }
 
 export interface IWSTickerRequest {

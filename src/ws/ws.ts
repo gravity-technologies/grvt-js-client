@@ -4,6 +4,7 @@ import {
   WS_CANDLESTICK_RESPONSE_MAP,
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
+  WS_ORDER_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
   type ICandlestick,
@@ -19,7 +20,8 @@ import {
   type IWSOrderbookLevelsResponse,
   type IWSPublicTradesResponse,
   type IWSRequestV1,
-  type IWSTickerResponse
+  type IWSTickerResponse,
+  type IWsOrderResponse
 } from '../interfaces'
 import { JsonUtils, Utils } from '../utils'
 import {
@@ -28,6 +30,7 @@ import {
   type IWSBookRequest,
   type IWSCandleRequest,
   type IWSMiniRequest,
+  type IWSTdgOrderRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TWSRequest
@@ -42,6 +45,12 @@ type TEntities = // all entities
                   | IOrder
                   | IRfq
                   | IRfqQuote
+type TSupportedEntities = // all entities
+                  IMiniTicker
+                  | ITicker
+                  | IOrderbookLevels
+                  | IPublicTrade
+                  | ICandlestick
 
 type TMessageHandler<T> = (data: T) => void
 
@@ -108,20 +117,20 @@ export class WS {
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
       const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
-      if (!message?.r || ['subscribe', 'unsubscribe'].includes(message.method)) {
-        return
-      }
       const stream = message.s as string
       const result = this._messageLiteToFull(message)
       if (!result) {
-        console.log('TODO: something went wrong with message', message)
+        if (!(message.s1 as string[])?.length) {
+          console.log('TODO: something went wrong with message', message)
+        }
         return
       }
-      // TODO: currently ICandlestick has no asset
-      const pair = this._getPair({
-        stream,
-        feed: (result as any).asset as string
-      })
+      const feed = (result as IOrder).legs?.[0]?.asset ?? (result as TSupportedEntities).asset
+      if (!stream || !feed) {
+        console.log('TODO: can\'t parse stream or feed from message', message)
+        return
+      }
+      const pair = this._getPair({ stream, feed })
       const consumers = Object.values(this._pairs[pair] || {})
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with stream')
@@ -161,9 +170,9 @@ export class WS {
         params.underlying,
         params.quote,
         params.strategy
-      ].filter(Boolean).join(' '),
+      ].filter(Boolean).join('_'),
       [
-        params.interval.toLowerCase(),
+        params.interval.toLowerCase().replace(/_/g, ''),
         params.type.toLowerCase()
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
@@ -175,7 +184,7 @@ export class WS {
         params.strategy,
         [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
         [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join(' '),
+      ].filter(Boolean).join('_'),
       [
         params.rate ?? 1000,
         params.depth ?? 10,
@@ -190,7 +199,7 @@ export class WS {
         params.strategy,
         [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
         [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join(' '),
+      ].filter(Boolean).join('_'),
       [
         params.rate ?? 1000
       ].filter(Boolean).join('-')
@@ -203,22 +212,34 @@ export class WS {
         params.strategy,
         [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
         [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join(' '),
+      ].filter(Boolean).join('_'),
       [
         params.rate ?? 1000
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const tradeFeed = (params: IWSTradeRequest['params']): string => [
+    const tradesFeed = (params: IWSTradeRequest['params']): string => [
       [
         params.underlying,
         params.quote,
         params.strategy,
         [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
         [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join(' '),
+      ].filter(Boolean).join('_'),
       [
         params.limit ?? 500
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('_'),
+      [
+        params.createOnly
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
@@ -247,10 +268,15 @@ export class WS {
           stream,
           feed: [tickerFeed(params as IWSTickerRequest['params'])]
         }
-      case EStream.TRADE:
+      case EStream.TRADES:
         return {
           stream,
-          feed: [tradeFeed(params as IWSTradeRequest['params'])]
+          feed: [tradesFeed(params as IWSTradeRequest['params'])]
+        }
+      case EStream.ORDER:
+        return {
+          stream,
+          feed: [orderFeed(params as IWSTdgOrderRequest['params'])]
         }
       default:
         throw new Error('Unknown stream')
@@ -261,7 +287,7 @@ export class WS {
     s: string
     n: string
     f: TEntities
-  }) {
+  }): undefined | TEntities {
     switch (message.s) {
       case EStream.CANDLE:
         return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
@@ -274,8 +300,10 @@ export class WS {
       case EStream.TICKER_DELTA:
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
-      case EStream.TRADE:
+      case EStream.TRADES:
         return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+      case EStream.ORDER:
+        return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
       default:
         throw new Error('Unknown stream')
     }
@@ -297,7 +325,16 @@ export class WS {
     stream: string
     feed: string
   }) {
-    return `${stream}_${feed?.split('@')?.[0]}`
+    return `${stream}__${feed?.split('@')?.[0]}`
+  }
+
+  private _parsePair (pair: string) {
+    const [stream, feed] = pair.split('__')
+    return {
+      stream,
+      feed,
+      asset: feed?.split('@')?.[0]
+    }
   }
 
   private _addConsumer (pair: string, onMessage: TMessageHandler<TEntities>) {
@@ -312,11 +349,11 @@ export class WS {
     }
     const consumerKey = Date.now() + customAlphabet('abcdefghijklmnopqrstuvwxyz', 3)()
     this._pairs[pair][consumerKey] = onMessage
-    return `${pair}_${consumerKey}`
+    return `${pair}__${consumerKey}`
   }
 
   private _removeConsumer (consumerKey: string) {
-    const [stream, feed, key] = consumerKey.split('_')
+    const [stream, feed, key] = consumerKey.split('__')
     const pair = this._getPair({ stream, feed })
     if (!this._pairs[pair]) {
       return
@@ -349,7 +386,7 @@ export class WS {
   private _subscribeCurrentPairs () {
     const pairs = Object.keys(this._pairs)
     for (const pair of pairs) {
-      const [stream, feed] = pair.split('_')
+      const { stream, feed } = this._parsePair(pair)
       this._sendMessage({
         method: 'subscribe',
         stream,
@@ -359,6 +396,7 @@ export class WS {
   }
 
   private async _subscribe (pair: string, subscribePayload: IWSRequestV1) {
+    console.log(this._pairs)
     if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
@@ -372,7 +410,7 @@ export class WS {
       if (!response?.s || !response?.s1?.length) {
         return
       }
-      const [stream, feed] = pair.split('_')
+      const { stream, feed } = this._parsePair(pair)
       if (stream === response.s && response.s1.includes(feed)) {
         _resolve()
       }
