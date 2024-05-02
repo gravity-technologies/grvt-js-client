@@ -125,15 +125,21 @@ export class WS {
         }
         return
       }
-      const feed = (result as IOrder).legs?.[0]?.asset ?? (result as TSupportedEntities).asset
-      if (!stream || !feed) {
+      const asset = (result as IOrder).legs?.[0]?.asset ?? (result as TSupportedEntities).asset
+      if (!stream || !asset) {
         console.log('TODO: can\'t parse stream or feed from message', message)
         return
       }
-      const pair = this._getPair({ stream, feed })
-      const consumers = Object.values(this._pairs[pair] || {})
+      // const pair = this._getPair({ stream, feed })
+      // const consumers = Object.values(this._pairs[pair] || {})
+      const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
+        (acc, [key, value]) => key.startsWith(`${stream}__`) && key.includes(asset)
+          ? [...acc, ...Object.values(value)]
+          : acc,
+        []
+      )
       if (!consumers?.length) {
-        console.log('TODO: send unsubscribe with stream')
+        console.log('TODO: send unsubscribe with by message:', message)
         return
       }
       if (result && consumers?.length) {
@@ -164,6 +170,9 @@ export class WS {
     return strikePrice.toString().replace(multiplierRegex, '')
   }
 
+  /**
+   * TODO: implement EStream.POSITION / EStream.TRADE
+   */
   private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
     const candleFeed = (params: IWSCandleRequest['params']): string => [
       [
@@ -325,7 +334,7 @@ export class WS {
     stream: string
     feed: string
   }) {
-    return `${stream}__${feed?.split('@')?.[0]}`
+    return `${stream}__${feed}`
   }
 
   private _parsePair (pair: string) {
@@ -345,20 +354,20 @@ export class WS {
       ([, consumer]) => consumer === onMessage
     )?.[0]
     if (key) {
-      return `${pair}_${key}` // already bound
+      return `${pair}__${key}` // already bound
     }
     const consumerKey = Date.now() + customAlphabet('abcdefghijklmnopqrstuvwxyz', 3)()
     this._pairs[pair][consumerKey] = onMessage
     return `${pair}__${consumerKey}`
   }
 
-  private _removeConsumer (consumerKey: string) {
-    const [stream, feed, key] = consumerKey.split('__')
+  private _removeConsumer (pairedConsumerKey: string) {
+    const [stream, feed, consumerKey] = pairedConsumerKey.split('__')
     const pair = this._getPair({ stream, feed })
     if (!this._pairs[pair]) {
       return
     }
-    const { [key]: _, ...keep } = this._pairs[pair]
+    const { [consumerKey]: _, ...keep } = this._pairs[pair]
     this._pairs[pair] = keep
     if (!Object.keys(keep).length) {
       this._sendMessage({
@@ -396,7 +405,6 @@ export class WS {
   }
 
   private async _subscribe (pair: string, subscribePayload: IWSRequestV1) {
-    console.log(this._pairs)
     if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
@@ -411,7 +419,8 @@ export class WS {
         return
       }
       const { stream, feed } = this._parsePair(pair)
-      if (stream === response.s && response.s1.includes(feed)) {
+      const asset = feed.split('@')[0]
+      if (stream === response.s && response.s1.includes(asset)) {
         _resolve()
       }
     }
@@ -448,8 +457,8 @@ export class WS {
     return this._addConsumer(pair, onMessage as TMessageHandler<TEntities>)
   }
 
-  unsubscribe (consumerKey: string) {
-    this._removeConsumer(consumerKey)
+  unsubscribe (pairedConsumerKey: string) {
+    this._removeConsumer(pairedConsumerKey)
     return this
   }
 
