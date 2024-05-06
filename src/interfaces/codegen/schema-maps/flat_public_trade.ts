@@ -4,7 +4,7 @@ import { type SchemaPairMap } from './types'
 export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
-    asset: 'a',
+    instrument: 'i',
     is_taker_buyer: 'it',
     size: 's',
     price: 'p',
@@ -17,7 +17,7 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
-    a: 'asset',
+    i: 'instrument',
     it: 'is_taker_buyer',
     s: 'size',
     p: 'price',

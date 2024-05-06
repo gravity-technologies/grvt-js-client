@@ -6,6 +6,7 @@ import {
   EKind,
   EMarginType,
   EOrderRejectReason,
+  EOrderStateFilter,
   EOrderStatus,
   ERfqRejectReason,
   ERfqStatus,
@@ -94,6 +95,12 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.FAIL_AON]: 22,
   [EOrderRejectReason.SELF_MATCHED_SUBACCOUNT]: 23,
   [EOrderRejectReason.SIGNATURE_SIZE_EXCEEDED]: 24
+})
+
+export const EOrderStateFilterInt: Record<EOrderStateFilter, number> = Object.freeze({
+  [EOrderStateFilter.C]: 1,
+  [EOrderStateFilter.U]: 2,
+  [EOrderStateFilter.A]: 3
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({

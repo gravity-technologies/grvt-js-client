@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'WS_PRIVATE_TRADE_REQUEST_V_1' struct.
-export const WS_PRIVATE_TRADE_REQUEST_V_1_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_RFQ_QUOTE_FEED_SELECTOR_V_1' struct.
+export const WS_RFQ_QUOTE_FEED_SELECTOR_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
     kind: 'k',

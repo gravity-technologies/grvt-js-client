@@ -3,7 +3,7 @@ import { type SchemaPairMap } from './types'
 // Schema map for the 'INSTRUMENT' struct.
 export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    asset: 'a',
+    instrument: 'i',
     instrument_name: 'in',
     venues: 'v',
     settlement_period: 'sp',
@@ -15,7 +15,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     create_time: 'ct'
   },
   LITE_TO_FULL: {
-    a: 'asset',
+    i: 'instrument',
     in: 'instrument_name',
     v: 'venues',
     sp: 'settlement_period',

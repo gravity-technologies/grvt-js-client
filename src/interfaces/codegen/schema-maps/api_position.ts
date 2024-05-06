@@ -5,7 +5,7 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
     sub_account_id: 'sa',
-    asset: 'a',
+    instrument: 'i',
     balance: 'b',
     value: 'v',
     entry_price: 'ep',
@@ -19,7 +19,7 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
   LITE_TO_FULL: {
     et: 'event_time',
     sa: 'sub_account_id',
-    a: 'asset',
+    i: 'instrument',
     b: 'balance',
     v: 'value',
     ep: 'entry_price',

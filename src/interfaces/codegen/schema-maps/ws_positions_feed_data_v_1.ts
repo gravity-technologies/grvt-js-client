@@ -1,8 +1,8 @@
 import { type SchemaPairMap } from './types'
 import { POSITIONS_MAP } from './api_position'
 
-// Schema map for the 'WS_POSITIONS_RESPONSE_V_1' struct.
-export const WS_POSITIONS_RESPONSE_V_1_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_POSITIONS_FEED_DATA_V_1' struct.
+export const WS_POSITIONS_FEED_DATA_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     stream: 's',
     sequence_number: 'sn',
