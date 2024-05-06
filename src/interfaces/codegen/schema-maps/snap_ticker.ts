@@ -4,7 +4,7 @@ import { type SchemaPairMap } from './types'
 export const TICKER_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
-    asset: 'a',
+    instrument: 'i',
     mark_price: 'mp',
     index_price: 'ip',
     last_price: 'lp',
@@ -30,7 +30,7 @@ export const TICKER_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
-    a: 'asset',
+    i: 'instrument',
     mp: 'mark_price',
     ip: 'index_price',
     lp: 'last_price',

@@ -5,7 +5,7 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
     sub_account_id: 'sa',
-    asset: 'a',
+    instrument: 'i',
     is_buyer: 'ib',
     is_taker: 'it',
     size: 's',
@@ -24,7 +24,7 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
   LITE_TO_FULL: {
     et: 'event_time',
     sa: 'sub_account_id',
-    a: 'asset',
+    i: 'instrument',
     ib: 'is_buyer',
     it: 'is_taker',
     s: 'size',

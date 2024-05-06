@@ -1,8 +1,8 @@
 import { type SchemaPairMap } from './types'
 import { CANDLESTICK_MAP } from './candlestick'
 
-// Schema map for the 'WS_CANDLESTICK_RESPONSE_V_1' struct.
-export const WS_CANDLESTICK_RESPONSE_V_1_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_CANDLESTICK_FEED_DATA_V_1' struct.
+export const WS_CANDLESTICK_FEED_DATA_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     stream: 's',
     sequence_number: 'sn',

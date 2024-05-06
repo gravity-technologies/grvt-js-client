@@ -1,8 +1,8 @@
 import { type SchemaPairMap } from './types'
 import { PUBLIC_TRADE_MAP } from './flat_public_trade'
 
-// Schema map for the 'WS_PUBLIC_TRADES_RESPONSE_V_1' struct.
-export const WS_PUBLIC_TRADES_RESPONSE_V_1_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_PUBLIC_TRADES_FEED_DATA_V_1' struct.
+export const WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     stream: 's',
     sequence_number: 'sn',

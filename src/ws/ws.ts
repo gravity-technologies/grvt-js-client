@@ -125,15 +125,15 @@ export class WS {
         }
         return
       }
-      const asset = (result as IOrder).legs?.[0]?.asset ?? (result as TSupportedEntities).asset
-      if (!stream || !asset) {
+      const instrument = (result as IOrder).legs?.[0]?.instrument ?? (result as TSupportedEntities).instrument
+      if (!stream || !instrument) {
         console.log('TODO: can\'t parse stream or feed from message', message)
         return
       }
       // const pair = this._getPair({ stream, feed })
       // const consumers = Object.values(this._pairs[pair] || {})
       const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
-        (acc, [key, value]) => key.startsWith(`${stream}__`) && key.includes(asset)
+        (acc, [key, value]) => key.startsWith(`${stream}__`) && key.includes(instrument)
           ? [...acc, ...Object.values(value)]
           : acc,
         []
