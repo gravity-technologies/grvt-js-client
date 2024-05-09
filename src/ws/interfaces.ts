@@ -19,11 +19,11 @@ export enum EStream {
   ORDERBOOK_SNAP = 'book.s',
   TICKER_DELTA = 'ticker.d',
   TICKER_SNAP = 'ticker.s',
-  TRADES = 'trades',
+  TRADE = 'trade',
 
   ORDER = 'order',
   POSITION = 'position',
-  TRADE = 'trade',
+  // TRADE = 'trade', // Duplicate MDG/TDG
 }
 
 // const EStrategyShort = Object.freeze({
@@ -132,7 +132,7 @@ export interface IWSTickerRequest {
 }
 
 export interface IWSTradeRequest {
-  stream: `${EStream.TRADES}`
+  stream: `${EStream.TRADE}`
   params: {
     underlying: `${ECurrency}`
     quote: `${ECurrency}`

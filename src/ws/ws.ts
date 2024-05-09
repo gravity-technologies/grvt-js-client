@@ -277,7 +277,7 @@ export class WS {
           stream,
           feed: [tickerFeed(params as IWSTickerRequest['params'])]
         }
-      case EStream.TRADES:
+      case EStream.TRADE:
         return {
           stream,
           feed: [tradesFeed(params as IWSTradeRequest['params'])]
@@ -309,7 +309,7 @@ export class WS {
       case EStream.TICKER_DELTA:
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
-      case EStream.TRADES:
+      case EStream.TRADE:
         return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
       case EStream.ORDER:
         return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
