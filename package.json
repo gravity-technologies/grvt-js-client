@@ -1,6 +1,6 @@
 {
   "name": "grvt",
-  "version": "0.3.0-beta.2",
+  "version": "0.3.0-beta.3",
   "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",

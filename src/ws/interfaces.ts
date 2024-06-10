@@ -7,6 +7,8 @@ import {
   type IMiniTicker,
   type IOrder,
   type IOrderbookLevels,
+  type IPositions,
+  type IPrivateTrade,
   type IPublicTrade,
   type ITicker
 } from '../interfaces'
@@ -149,13 +151,37 @@ export interface IWSTdgOrderRequest {
   stream: `${EStream.ORDER}`
   params: {
     subAccountId: string
+    kind: `${EKind}`
     underlying: `${ECurrency}`
     quote: `${ECurrency}`
-    kind: `${EKind}`
-    createOnly?: boolean
+    state_filter: 'all' | 'createOnly' | 'updateOnly' // a / c / u
   }
   onData?: TMessageHandler<IOrder>
   onError?: (error: Error) => void
 }
 
-export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest | IWSTdgOrderRequest
+export interface IWSTdgPositionRequest {
+  stream: `${EStream.POSITION}`
+  params: {
+    subAccountId: string
+    kind: `${EKind}`
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+  }
+  onData?: TMessageHandler<IPositions>
+  onError?: (error: Error) => void
+}
+
+export interface IWSTdgTradeRequest {
+  stream: `${EStream.TRADE}`
+  params: {
+    subAccountId: string
+    kind: `${EKind}`
+    underlying: `${ECurrency}`
+    quote: `${ECurrency}`
+  }
+  onData?: TMessageHandler<IPrivateTrade>
+  onError?: (error: Error) => void
+}
+
+export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest | IWSTdgOrderRequest | IWSTdgPositionRequest | IWSTdgTradeRequest

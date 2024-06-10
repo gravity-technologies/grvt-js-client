@@ -5,6 +5,8 @@ import {
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
   WS_ORDER_RESPONSE_MAP,
+  WS_POSITIONS_RESPONSE_MAP,
+  WS_PRIVATE_TRADE_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
   type ICandlestick,
@@ -18,6 +20,8 @@ import {
   type IWSCandlestickResponse,
   type IWSMiniTickerResponse,
   type IWSOrderbookLevelsResponse,
+  type IWSPositionsResponse,
+  type IWSPrivateTradeResponse,
   type IWSPublicTradesResponse,
   type IWSRequestV1,
   type IWSTickerResponse,
@@ -31,6 +35,8 @@ import {
   type IWSCandleRequest,
   type IWSMiniRequest,
   type IWSTdgOrderRequest,
+  type IWSTdgPositionRequest,
+  type IWSTdgTradeRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TWSRequest
@@ -170,9 +176,6 @@ export class WS {
     return strikePrice.toString().replace(multiplierRegex, '')
   }
 
-  /**
-   * TODO: implement EStream.POSITION / EStream.TRADE
-   */
   private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
     const candleFeed = (params: IWSCandleRequest['params']): string => [
       [
@@ -227,7 +230,7 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const tradesFeed = (params: IWSTradeRequest['params']): string => [
+    const publicTradesFeed = (params: IWSTradeRequest['params']): string => [
       [
         params.underlying,
         params.quote,
@@ -248,8 +251,36 @@ export class WS {
         params.quote
       ].filter(Boolean).join('_'),
       [
-        params.createOnly
+        {
+          all: 'a',
+          createOnly: 'c',
+          updateOnly: 'u'
+        }[params.state_filter] || 'a'
       ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('_')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('_')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const { stream, params } = options
@@ -280,12 +311,21 @@ export class WS {
       case EStream.TRADE:
         return {
           stream,
-          feed: [tradesFeed(params as IWSTradeRequest['params'])]
+          feed: [
+            (params as IWSTdgTradeRequest['params'])?.subAccountId
+              ? publicTradesFeed(params as IWSTradeRequest['params'])
+              : privateTradesFeed(params as IWSTdgTradeRequest['params'])
+          ]
         }
       case EStream.ORDER:
         return {
           stream,
           feed: [orderFeed(params as IWSTdgOrderRequest['params'])]
+        }
+      case EStream.POSITION:
+        return {
+          stream,
+          feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
         }
       default:
         throw new Error('Unknown stream')
@@ -310,9 +350,13 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
-        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+        return !(message as any)?.sa // if no subAccountId then it's public trade
+          ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+          : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
         return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+      case EStream.POSITION:
+        return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
       default:
         throw new Error('Unknown stream')
     }
