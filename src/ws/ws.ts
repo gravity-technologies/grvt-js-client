@@ -138,11 +138,31 @@ export class WS {
       }
       // const pair = this._getPair({ stream, feed })
       // const consumers = Object.values(this._pairs[pair] || {})
+      // TODO: handle TDG consumers by subAccountId
       const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
-        (acc, [key, value]) => key.startsWith(`${stream}__`) && key.includes(instrument)
-          ? [...acc, ...Object.values(value)]
-          : acc,
-        []
+        (acc, [key, value]) => {
+          if (!key.startsWith(`${stream}__`)) {
+            return acc
+          }
+
+          // MDG
+          const subAccountId = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
+          if (!subAccountId) {
+            return key.includes(instrument)
+              ? [...acc, ...Object.values(value)]
+              : acc
+          }
+
+          console.log(key, instrument, this._pairs)
+          const _subAccountId = String((result as IOrder).sub_account_id)
+          // const _subAccountId = String((result as IPositions).sub_account_id)
+          // const _subAccountId = String((result as IPrivateTrade).sub_account_id)
+          if (_subAccountId === subAccountId) {
+            return [...acc, ...Object.values(value)]
+          }
+
+          return acc
+        }, []
       )
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with by message:', message)
@@ -243,13 +263,17 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
+    /**
+     * TDG
+     */
+
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
       [
         params.subAccountId,
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_'),
+      ].filter(Boolean).join('-'),
       [
         {
           all: 'a',
@@ -265,7 +289,7 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_')
+      ].filter(Boolean).join('-')
       // [
       //   params.createOnly
       // ].filter(Boolean).join('-')
@@ -277,7 +301,7 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_')
+      ].filter(Boolean).join('-')
       // [
       //   params.createOnly
       // ].filter(Boolean).join('-')
@@ -312,7 +336,8 @@ export class WS {
         return {
           stream,
           feed: [
-            (params as IWSTdgTradeRequest['params'])?.subAccountId
+            // if no subAccountId then it's public trade
+            !(params as IWSTdgTradeRequest['params'])?.subAccountId
               ? publicTradesFeed(params as IWSTradeRequest['params'])
               : privateTradesFeed(params as IWSTdgTradeRequest['params'])
           ]
@@ -350,7 +375,8 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
-        return !(message as any)?.sa // if no subAccountId then it's public trade
+        // if no subAccountId then it's public trade
+        return !(message as any)?.sa
           ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
           : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
@@ -464,7 +490,11 @@ export class WS {
       }
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      if (stream === response.s && response.s1.includes(asset)) {
+      const isSubscribed = response.s1.includes(asset) ||
+                            response.s1.includes(asset.toLowerCase()) ||
+                            response.s1.includes(feed) ||
+                            response.s1.includes(feed.toLowerCase())
+      if (stream === response.s && isSubscribed) {
         _resolve()
       }
     }
