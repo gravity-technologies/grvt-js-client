@@ -5,6 +5,8 @@ import {
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
   WS_ORDER_RESPONSE_MAP,
+  WS_POSITIONS_RESPONSE_MAP,
+  WS_PRIVATE_TRADE_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
   type ICandlestick,
@@ -18,6 +20,8 @@ import {
   type IWSCandlestickResponse,
   type IWSMiniTickerResponse,
   type IWSOrderbookLevelsResponse,
+  type IWSPositionsResponse,
+  type IWSPrivateTradeResponse,
   type IWSPublicTradesResponse,
   type IWSRequestV1,
   type IWSTickerResponse,
@@ -31,6 +35,8 @@ import {
   type IWSCandleRequest,
   type IWSMiniRequest,
   type IWSTdgOrderRequest,
+  type IWSTdgPositionRequest,
+  type IWSTdgTradeRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TWSRequest
@@ -132,11 +138,31 @@ export class WS {
       }
       // const pair = this._getPair({ stream, feed })
       // const consumers = Object.values(this._pairs[pair] || {})
+      // TODO: handle TDG consumers by subAccountId
       const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
-        (acc, [key, value]) => key.startsWith(`${stream}__`) && key.includes(instrument)
-          ? [...acc, ...Object.values(value)]
-          : acc,
-        []
+        (acc, [key, value]) => {
+          if (!key.startsWith(`${stream}__`)) {
+            return acc
+          }
+
+          // MDG
+          const subAccountId = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
+          if (!subAccountId) {
+            return key.includes(instrument)
+              ? [...acc, ...Object.values(value)]
+              : acc
+          }
+
+          console.log(key, instrument, this._pairs)
+          const _subAccountId = String((result as IOrder).sub_account_id)
+          // const _subAccountId = String((result as IPositions).sub_account_id)
+          // const _subAccountId = String((result as IPrivateTrade).sub_account_id)
+          if (_subAccountId === subAccountId) {
+            return [...acc, ...Object.values(value)]
+          }
+
+          return acc
+        }, []
       )
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with by message:', message)
@@ -170,9 +196,6 @@ export class WS {
     return strikePrice.toString().replace(multiplierRegex, '')
   }
 
-  /**
-   * TODO: implement EStream.POSITION / EStream.TRADE
-   */
   private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
     const candleFeed = (params: IWSCandleRequest['params']): string => [
       [
@@ -227,7 +250,7 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const tradesFeed = (params: IWSTradeRequest['params']): string => [
+    const publicTradesFeed = (params: IWSTradeRequest['params']): string => [
       [
         params.underlying,
         params.quote,
@@ -240,16 +263,48 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
+    /**
+     * TDG
+     */
+
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
       [
         params.subAccountId,
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_'),
+      ].filter(Boolean).join('-'),
       [
-        params.createOnly
+        {
+          all: 'a',
+          createOnly: 'c',
+          updateOnly: 'u'
+        }[params.state_filter] || 'a'
       ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('-')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('-')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const { stream, params } = options
@@ -280,12 +335,22 @@ export class WS {
       case EStream.TRADE:
         return {
           stream,
-          feed: [tradesFeed(params as IWSTradeRequest['params'])]
+          feed: [
+            // if no subAccountId then it's public trade
+            !(params as IWSTdgTradeRequest['params'])?.subAccountId
+              ? publicTradesFeed(params as IWSTradeRequest['params'])
+              : privateTradesFeed(params as IWSTdgTradeRequest['params'])
+          ]
         }
       case EStream.ORDER:
         return {
           stream,
           feed: [orderFeed(params as IWSTdgOrderRequest['params'])]
+        }
+      case EStream.POSITION:
+        return {
+          stream,
+          feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
         }
       default:
         throw new Error('Unknown stream')
@@ -310,9 +375,14 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
-        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+        // if no subAccountId then it's public trade
+        return !(message as any)?.sa
+          ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+          : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
         return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+      case EStream.POSITION:
+        return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
       default:
         throw new Error('Unknown stream')
     }
@@ -420,7 +490,11 @@ export class WS {
       }
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      if (stream === response.s && response.s1.includes(asset)) {
+      const isSubscribed = response.s1.includes(asset) ||
+                            response.s1.includes(asset.toLowerCase()) ||
+                            response.s1.includes(feed) ||
+                            response.s1.includes(feed.toLowerCase())
+      if (stream === response.s && isSubscribed) {
         _resolve()
       }
     }
