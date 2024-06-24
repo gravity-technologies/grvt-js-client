@@ -125,7 +125,9 @@ export class WS {
       const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
       const stream = message.s as string
       const result = this._messageLiteToFull(message)
+      // no entity found
       if (!result) {
+        // if no entity found and not a subscription message
         if (!(message.s1 as string[])?.length) {
           console.log('TODO: something went wrong with message', message)
         }
