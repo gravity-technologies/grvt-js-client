@@ -24,7 +24,7 @@ export enum EStream {
   TRADE = 'trade',
 
   ORDER = 'order',
-  POSITION = 'position',
+  POSITION = 'positions',
   // TRADE = 'trade', // Duplicate MDG/TDG
 }
 
