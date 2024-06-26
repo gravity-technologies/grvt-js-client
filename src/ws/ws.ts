@@ -1,6 +1,7 @@
 import { customAlphabet } from 'nanoid'
 import {
   ECurrency,
+  EKind,
   WS_CANDLESTICK_RESPONSE_MAP,
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
@@ -138,28 +139,42 @@ export class WS {
         console.log('TODO: can\'t parse stream or feed from message', message)
         return
       }
-      // const pair = this._getPair({ stream, feed })
-      // const consumers = Object.values(this._pairs[pair] || {})
-      // TODO: handle TDG consumers by subAccountId
+
       const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
         (acc, [key, value]) => {
           if (!key.startsWith(`${stream}__`)) {
             return acc
           }
 
-          // MDG
-          const subAccountId = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
-          if (!subAccountId) {
+          // MDG if no subAccountId
+          const isTdg = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
+          if (!isTdg) {
             return key.includes(instrument)
               ? [...acc, ...Object.values(value)]
               : acc
           }
 
-          console.log(key, instrument, this._pairs)
-          const _subAccountId = String((result as IOrder).sub_account_id)
-          // const _subAccountId = String((result as IPositions).sub_account_id)
-          // const _subAccountId = String((result as IPrivateTrade).sub_account_id)
-          if (_subAccountId === subAccountId) {
+          // TDG
+          const subAccountId = String((result as IOrder).sub_account_id)
+          // const subAccountId = String((result as IPositions).sub_account_id)
+          // const subAccountId = String((result as IPrivateTrade).sub_account_id)
+          const [underlying, quote, kind] = instrument.split('_')
+          const { feed } = this._parseStream({
+            stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
+            params: {
+              subAccountId,
+              kind: {
+                [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
+                [EStrategyShort.CALL]: EKind.CALL,
+                [EStrategyShort.PUT]: EKind.PUT,
+                [EStrategyShort.FUTURE]: EKind.FUTURE
+              }[kind] ?? EKind.PERPETUAL,
+              underlying: underlying as ECurrency,
+              quote: quote as ECurrency
+            }
+          })
+          const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
+          if (tdgFeedPrefix && key.startsWith(`${stream}__${tdgFeedPrefix}`)) {
             return [...acc, ...Object.values(value)]
           }
 
@@ -378,7 +393,7 @@ export class WS {
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
         // if no subAccountId then it's public trade
-        return !(message as any)?.sa
+        return !(message as any)?.f?.sa
           ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
           : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
