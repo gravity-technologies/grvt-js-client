@@ -1,4 +1,3 @@
-import { customAlphabet } from 'nanoid'
 import {
   ECurrency,
   EKind,
@@ -28,7 +27,7 @@ import {
   type IWSTickerResponse,
   type IWsOrderResponse
 } from '../interfaces'
-import { JsonUtils, Utils } from '../utils'
+import { JsonUtils, StringUtils, Utils } from '../utils'
 import {
   EStrategyShort,
   EStream,
@@ -443,7 +442,7 @@ export class WS {
     if (key) {
       return `${pair}__${key}` // already bound
     }
-    const consumerKey = Date.now() + customAlphabet('abcdefghijklmnopqrstuvwxyz', 3)()
+    const consumerKey = `${Date.now()}${StringUtils.randChars(3)}`
     this._pairs[pair][consumerKey] = onMessage
     return `${pair}__${consumerKey}`
   }
