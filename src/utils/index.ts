@@ -1,6 +1,7 @@
 import { HexStringMap, type SchemaMap } from '../interfaces'
 
 export * from './json.utils'
+export * from './string.utils'
 
 export class Utils {
   static jsonReplacerBigInt (key: string, value: any) {
