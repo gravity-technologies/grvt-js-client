@@ -6,6 +6,7 @@ import {
   type ICandlestick,
   type IMiniTicker,
   type IOrder,
+  type IOrderState,
   type IOrderbookLevels,
   type IPositions,
   type IPrivateTrade,
@@ -89,49 +90,64 @@ export interface IWSCandleRequest {
   onError?: (error: Error) => void
 }
 
-export interface IWSMiniRequest {
-  stream: `${EStream.MINI_DELTA}` | `${EStream.MINI_SNAP}`
+interface IWSMiniSnapRequest {
+  stream: `${EStream.MINI_SNAP}`
   params: {
     underlying: `${ECurrency}`
     quote: `${ECurrency}`
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
+    rate?: 500 | 1000 | 5000
   }
   onData?: TMessageHandler<IMiniTicker>
   onError?: (error: Error) => void
 }
+interface IWSMiniDeltaRequest extends Pick<IWSMiniSnapRequest, 'onData' | 'onError'> {
+  stream: `${EStream.MINI_DELTA}`
+  params: { rate?: 100 | 200 | 500 | 1000 | 5000 } & Omit<IWSMiniSnapRequest['params'], 'rate'>
+}
+export type IWSMiniRequest = IWSMiniSnapRequest | IWSMiniDeltaRequest
 
-export interface IWSBookRequest {
-  stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}`
+interface IWSBookSnapRequest {
+  stream: `${EStream.ORDERBOOK_SNAP}`
   params: {
     underlying: `${ECurrency}`
     quote: `${ECurrency}`
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
+    rate?: 500 | 1000 | 5000
     depth?: number
     aggregate?: number
   }
   onData?: TMessageHandler<IOrderbookLevels>
   onError?: (error: Error) => void
 }
+interface IWSBookDeltaRequest extends Pick<IWSBookSnapRequest, 'onData' | 'onError'> {
+  stream: `${EStream.ORDERBOOK_DELTA}`
+  params: { rate?: 100 | 200 | 500 | 1000 | 5000 } & Omit<IWSBookSnapRequest['params'], 'rate'>
+}
+export type IWSBookRequest = IWSBookSnapRequest | IWSBookDeltaRequest
 
-export interface IWSTickerRequest {
-  stream: `${EStream.TICKER_DELTA}` | `${EStream.TICKER_SNAP}`
+interface IWSTickerSnapRequest {
+  stream: `${EStream.TICKER_SNAP}`
   params: {
     underlying: `${ECurrency}`
     quote: `${ECurrency}`
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
+    rate?: 500 | 1000 | 5000
   }
   onData?: TMessageHandler<ITicker>
   onError?: (error: Error) => void
 }
+interface IWSTickerDeltaRequest extends Pick<IWSTickerSnapRequest, 'onData' | 'onError'> {
+  stream: `${EStream.TICKER_DELTA}`
+  params: { rate?: 100 | 200 | 500 | 1000 | 5000 } & Omit<IWSTickerSnapRequest['params'], 'rate'>
+}
+export type IWSTickerRequest = IWSTickerSnapRequest | IWSTickerDeltaRequest
 
 export interface IWSTradeRequest {
   stream: `${EStream.TRADE}`
@@ -156,7 +172,7 @@ export interface IWSTdgOrderRequest {
     quote: `${ECurrency}`
     state_filter: 'all' | 'createOnly' | 'updateOnly' // a / c / u
   }
-  onData?: TMessageHandler<IOrder>
+  onData?: TMessageHandler<IOrder | IOrderState>
   onError?: (error: Error) => void
 }
 
