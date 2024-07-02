@@ -94,7 +94,28 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.FAIL_FOK]: 21,
   [EOrderRejectReason.FAIL_AON]: 22,
   [EOrderRejectReason.SELF_MATCHED_SUBACCOUNT]: 23,
-  [EOrderRejectReason.SIGNATURE_SIZE_EXCEEDED]: 24
+  [EOrderRejectReason.SIGNATURE_SIZE_EXCEEDED]: 24,
+  [EOrderRejectReason.SUB_ACCOUNT_NOT_FOUND]: 25,
+  [EOrderRejectReason.BAD_SIGNATURE]: 26,
+  [EOrderRejectReason.SIZE_NON_ZERO_ON_UNMACHED_LEG]: 27,
+  [EOrderRejectReason.TRADE_SAME_SIDE]: 28,
+  [EOrderRejectReason.TRADE_PRICE_DOES_NOT_CROSS]: 29,
+  [EOrderRejectReason.NO_LEG]: 30,
+  [EOrderRejectReason.MARKET_ORDER_ON_MAKER_SIDE]: 31,
+  [EOrderRejectReason.TIME_IN_FORCE_REQUIRE_TAKER]: 32,
+  [EOrderRejectReason.ASSET_QUOTE_NOT_MATCHING]: 33,
+  [EOrderRejectReason.MISSING_MARK_PRICE]: 34,
+  [EOrderRejectReason.MISSING_INDEX_PRICE]: 35,
+  [EOrderRejectReason.SESSION_KEY_EXPIRED]: 36,
+  [EOrderRejectReason.DUPLICATE_LEG_ASSET]: 37,
+  [EOrderRejectReason.CHARGED_FEE_ABOVE_SIGNED_AMOUNT]: 38,
+  [EOrderRejectReason.CHARGED_FEE_BELOW_MIN]: 39,
+  [EOrderRejectReason.NO_TRADE_PERMISSION]: 40,
+  [EOrderRejectReason.NOT_MATCHED_AGAINS_TAKER_LEGS]: 41,
+  [EOrderRejectReason.ORDER_NOT_FULLY_MATCHED]: 42,
+  [EOrderRejectReason.ASSET_EXPIRED]: 43,
+  [EOrderRejectReason.NUM_LEGS_SIZE_MATCHED_MISMATCH]: 44,
+  [EOrderRejectReason.INVALID_ASSET]: 45
 })
 
 export const EOrderStateFilterInt: Record<EOrderStateFilter, number> = Object.freeze({

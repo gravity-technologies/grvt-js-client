@@ -141,6 +141,48 @@ export enum EOrderRejectReason {
   SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
   // the signature size exceeds the maximum allowed size
   SIGNATURE_SIZE_EXCEEDED = 'SIGNATURE_SIZE_EXCEEDED',
+  // the subaccount does not exist
+  SUB_ACCOUNT_NOT_FOUND = 'SUB_ACCOUNT_NOT_FOUND',
+  // the signature is invalid
+  BAD_SIGNATURE = 'BAD_SIGNATURE',
+  // maker order size is non-zero on an unmatched leg
+  SIZE_NON_ZERO_ON_UNMACHED_LEG = 'SIZE_NON_ZERO_ON_UNMACHED_LEG',
+  // the order trades with another order on the same side
+  TRADE_SAME_SIDE = 'TRADE_SAME_SIDE',
+  // the order trades with another order but the price does not cross
+  TRADE_PRICE_DOES_NOT_CROSS = 'TRADE_PRICE_DOES_NOT_CROSS',
+  // the order has no legs
+  NO_LEG = 'NO_LEG',
+  // market order on maker side
+  MARKET_ORDER_ON_MAKER_SIDE = 'MARKET_ORDER_ON_MAKER_SIDE',
+  // time in force requires taker
+  TIME_IN_FORCE_REQUIRE_TAKER = 'TIME_IN_FORCE_REQUIRE_TAKER',
+  // asset quote not matching
+  ASSET_QUOTE_NOT_MATCHING = 'ASSET_QUOTE_NOT_MATCHING',
+  // missing mark price
+  MISSING_MARK_PRICE = 'MISSING_MARK_PRICE',
+  // missing index price
+  MISSING_INDEX_PRICE = 'MISSING_INDEX_PRICE',
+  // session key expired
+  SESSION_KEY_EXPIRED = 'SESSION_KEY_EXPIRED',
+  // duplicate leg asset
+  DUPLICATE_LEG_ASSET = 'DUPLICATE_LEG_ASSET',
+  // charged fee above signed amount
+  CHARGED_FEE_ABOVE_SIGNED_AMOUNT = 'CHARGED_FEE_ABOVE_SIGNED_AMOUNT',
+  // charged fee below minimum
+  CHARGED_FEE_BELOW_MIN = 'CHARGED_FEE_BELOW_MIN',
+  // no trade permission
+  NO_TRADE_PERMISSION = 'NO_TRADE_PERMISSION',
+  // a maker order without any leg that is matched (size > 0) against at least 1 taker leg
+  NOT_MATCHED_AGAINS_TAKER_LEGS = 'NOT_MATCHED_AGAINS_TAKER_LEGS',
+  // AON/FOK order not fully matched
+  ORDER_NOT_FULLY_MATCHED = 'ORDER_NOT_FULLY_MATCHED',
+  // asset expired
+  ASSET_EXPIRED = 'ASSET_EXPIRED',
+  // number of legs and number of legs mismatch, eg: 2 legs, but sizeMatched is [1,2,3]
+  NUM_LEGS_SIZE_MATCHED_MISMATCH = 'NUM_LEGS_SIZE_MATCHED_MISMATCH',
+  // invalid asset, types = UNSPECIFIED
+  INVALID_ASSET = 'INVALID_ASSET',
 }
 
 export enum EOrderStateFilter {
@@ -295,7 +337,7 @@ export interface IAPISettlementPrice {
   quote?: ECurrency
   // The settlement timestamp of the settlement price, expressed in unix nanoseconds
   settlement_time?: bigint
-  // The settlement price, expressed in quote asset decimal units
+  // The settlement price, expressed in `9` decimals
   settlement_price?: bigint
 }
 
@@ -906,7 +948,7 @@ export interface IFundingRate {
   funding_rate?: number
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
   funding_time?: bigint
-  // The mark price of the instrument at funding timestamp, expressed in quote asset decimal units
+  // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: bigint
 }
 
@@ -944,21 +986,21 @@ export interface IMiniTicker {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The mark price of the instrument, expressed in quote asset decimal units
+  // The mark price of the instrument, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument, expressed in quote asset decimal units
+  // The index price of the instrument, expressed in `9` decimals
   index_price?: bigint
-  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
-  // The mid price of the instrument, expressed in quote asset decimal units
+  // The mid price of the instrument, expressed in `9` decimals
   mid_price?: bigint
-  // The best bid price of the instrument, expressed in quote asset decimal units
+  // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The best ask price of the instrument, expressed in quote asset decimal units
+  // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
@@ -1023,7 +1065,7 @@ export interface IOrderLeg {
   instrument?: string
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
   size?: bigint
-  // The limit price of the order leg, expressed in quote asset decimal units.
+  // The limit price of the order leg, expressed in `9` decimals.
   // This is the total amount of base currency to pay/receive for all legs.
   limit_price?: bigint
   // If a OCO order is specified, this must contain the other limit price
@@ -1065,7 +1107,7 @@ export interface IOrderState {
 }
 
 export interface IOrderbookLevel {
-  // The price of the level, expressed in quote asset decimal units
+  // The price of the level, expressed in `9` decimals
   price?: bigint
   // The number of assets offered, expressed in underlying asset decimal units
   size?: bigint
@@ -1098,15 +1140,15 @@ export interface IPositions {
   balance?: bigint
   // The value of the position, negative for short assets, expressed in quote asset decimal units
   value?: bigint
-  // The entry price of the position, expressed in quote asset decimal units
+  // The entry price of the position, expressed in `9` decimals
   // Whenever increasing the balance of a position, the entry price is updated to the new average entry price
   // newEntryPrice = (oldEntryPrice * oldBalance + tradePrice * tradeBalance) / (oldBalance + tradeBalance)
   entry_price?: bigint
-  // The exit price of the position, expressed in quote asset decimal units
+  // The exit price of the position, expressed in `9` decimals
   // Whenever decreasing the balance of a position, the exit price is updated to the new average exit price
   // newExitPrice = (oldExitPrice * oldExitBalance + tradePrice * tradeBalance) / (oldExitBalance + tradeBalance)
   exit_price?: bigint
-  // The mark price of the position, expressed in quote asset decimal units
+  // The mark price of the position, expressed in `9` decimals
   mark_price?: bigint
   // The unrealized PnL of the position, expressed in quote asset decimal units
   // unrealizedPnl = (markPrice - entryPrice) * balance
@@ -1135,15 +1177,15 @@ export interface IPrivateTrade {
   is_taker?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
   size?: bigint
-  // The traded price, expressed in quote asset decimal units
+  // The traded price, expressed in `9` decimals
   price?: bigint
-  // The mark price of the instrument at point of trade, expressed in quote asset decimal units
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  // The index price of the instrument at point of trade, expressed in `9` decimals
   index_price?: bigint
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: bigint
   // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
   realized_pnl?: bigint
@@ -1172,15 +1214,15 @@ export interface IPublicTrade {
   is_taker_buyer?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
   size?: bigint
-  // The traded price, expressed in quote asset decimal units
+  // The traded price, expressed in `9` decimals
   price?: bigint
-  // The mark price of the instrument at point of trade, expressed in quote asset decimal units
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  // The index price of the instrument at point of trade, expressed in `9` decimals
   index_price?: bigint
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: bigint
   // A trade identifier
   trade_id?: bigint
@@ -1199,7 +1241,7 @@ export interface IRFQBookLevel {
   // The timestamp after which the price quoted in this level expires, expressed in unix nanoseconds
   // This is the earliest expiration of all partial quotes grouped into this level
   level_expiration?: bigint
-  // price of the level, expressed in quote asset decimal units
+  // price of the level, expressed in `9` decimals
   level_price?: bigint
   // The size of the level. The number of full structures in this level, expressed in base ratio units
   lots?: number
@@ -1372,21 +1414,21 @@ export interface ITicker {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The mark price of the instrument, expressed in quote asset decimal units
+  // The mark price of the instrument, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument, expressed in quote asset decimal units
+  // The index price of the instrument, expressed in `9` decimals
   index_price?: bigint
-  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
-  // The mid price of the instrument, expressed in quote asset decimal units
+  // The mid price of the instrument, expressed in `9` decimals
   mid_price?: bigint
-  // The best bid price of the instrument, expressed in quote asset decimal units
+  // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The best ask price of the instrument, expressed in quote asset decimal units
+  // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
@@ -1396,7 +1438,7 @@ export interface ITicker {
   funding_rate_avg?: number
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option, expressed in quote asset decimal units
+  // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: bigint
   // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
   buy_volume_u?: bigint
@@ -1406,11 +1448,11 @@ export interface ITicker {
   buy_volume_q?: bigint
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
   sell_volume_q?: bigint
-  // The 24 hour highest traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour highest traded price of the instrument, expressed in `9` decimals
   high_price?: bigint
-  // The 24 hour lowest traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour lowest traded price of the instrument, expressed in `9` decimals
   low_price?: bigint
-  // The 24 hour first traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour first traded price of the instrument, expressed in `9` decimals
   open_price?: bigint
   // The open interest in the instrument, expressed in underlying asset decimal units
   open_interest?: bigint
@@ -1557,6 +1599,19 @@ export interface IWSOrderStateFeedDataV1 {
   sequence_number?: bigint
   // The order state object being created or updated
   feed?: IOrderState
+}
+
+export interface IWSOrderStateFeedSelectorV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+  // create only, update only, all
+  state_filter?: EOrderStateFilter
 }
 
 export interface IWSOrderbookLevelsFeedDataV1 {
