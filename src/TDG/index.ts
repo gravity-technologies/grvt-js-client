@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from 'axios'
 import {
+  API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_CANCEL_ALL_ORDERS_REQUEST_MAP,
   API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
   API_CANCEL_ALL_RFQS_REQUEST_MAP,
@@ -21,6 +22,7 @@ import {
   API_DEPOSIT_HISTORY_REQUEST_MAP,
   API_DEPOSIT_HISTORY_RESPONSE_MAP,
   API_DEPOSIT_REQUEST_MAP,
+  API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
   API_OPEN_ORDERS_RESPONSE_MAP,
   API_OPEN_RFQS_REQUEST_MAP,
@@ -47,6 +49,7 @@ import {
   API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
   API_WITHDRAWAL_REQUEST_MAP,
   validConfig,
+  type IApiAggregatedAccountSummaryResponse,
   type IApiCancelAllOrdersRequest,
   type IApiCancelAllOrdersResponse,
   type IApiCancelAllRfqQuotesRequest,
@@ -68,6 +71,7 @@ import {
   type IApiDepositHistoryRequest,
   type IApiDepositHistoryResponse,
   type IApiDepositRequest,
+  type IApiFundingAccountSummaryResponse,
   type IApiOpenOrdersRequest,
   type IApiOpenOrdersResponse,
   type IApiOpenRfqQuotesRequest,
@@ -454,5 +458,31 @@ export class TDG {
    */
   quoteHistory () {
     throw new Error('Error: Historical data is served through our DB and may not match new data in flight, see https://docs.gravitymarkets.io/trading_api/#rfq-quote-history')
+  }
+
+  /**
+   * @description Missing documentation
+   */
+  fundingAccountSummary (config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/funding_account_summary',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingAccountSummaryResponse
+    })
+  }
+
+  /**
+   * @description Missing documentation
+   */
+  aggregatedAccountSummary (config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/aggregated_account_summary',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiAggregatedAccountSummaryResponse
+    })
   }
 }

@@ -5,18 +5,13 @@ import {
   WS_MINI_TICKER_RESPONSE_MAP,
   WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
   WS_ORDER_RESPONSE_MAP,
+  WS_ORDER_STATE_RESPONSE_MAP,
   WS_POSITIONS_RESPONSE_MAP,
   WS_PRIVATE_TRADE_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
-  type ICandlestick,
-  type IMiniTicker,
   type IOrder,
-  type IOrderbookLevels,
-  type IPublicTrade,
-  type IRfq,
-  type IRfqQuote,
-  type ITicker,
+  type IOrderState,
   type IWSCandlestickResponse,
   type IWSMiniTickerResponse,
   type IWSOrderbookLevelsResponse,
@@ -25,7 +20,8 @@ import {
   type IWSPublicTradesResponse,
   type IWSRequestV1,
   type IWSTickerResponse,
-  type IWsOrderResponse
+  type IWsOrderResponse,
+  type IWsOrderStateResponse
 } from '../interfaces'
 import { JsonUtils, StringUtils, Utils } from '../utils'
 import {
@@ -39,26 +35,11 @@ import {
   type IWSTdgTradeRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
+  type TMessageHandler,
   type TWSRequest
 } from './interfaces'
 
-type TEntities = // all entities
-                  IMiniTicker
-                  | ITicker
-                  | IOrderbookLevels
-                  | IPublicTrade
-                  | ICandlestick
-                  | IOrder
-                  | IRfq
-                  | IRfqQuote
-type TSupportedEntities = // all entities
-                  IMiniTicker
-                  | ITicker
-                  | IOrderbookLevels
-                  | IPublicTrade
-                  | ICandlestick
-
-type TMessageHandler<T> = (data: T) => void
+type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
 
 interface IOptions {
   url: string | URL
@@ -133,9 +114,13 @@ export class WS {
         }
         return
       }
-      const instrument = (result as IOrder).legs?.[0]?.instrument ?? (result as TSupportedEntities).instrument
-      if (!stream || !instrument) {
-        console.log('TODO: can\'t parse stream or feed from message', message)
+      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<Exclude<TEntities, IOrder>, IOrderState>)?.instrument
+      if (!stream) {
+        console.log('TODO: cannot parse stream or feed from message', message)
+        return
+      }
+      if (!instrument) {
+        console.log('TODO: handle IOrderState', message)
         return
       }
 
@@ -157,19 +142,20 @@ export class WS {
           const subAccountId = String((result as IOrder).sub_account_id)
           // const subAccountId = String((result as IPositions).sub_account_id)
           // const subAccountId = String((result as IPrivateTrade).sub_account_id)
-          const [underlying, quote, kind] = instrument.split('_')
+          const kindDef = {
+            [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
+            [EStrategyShort.CALL]: EKind.CALL,
+            [EStrategyShort.PUT]: EKind.PUT,
+            [EStrategyShort.FUTURE]: EKind.FUTURE
+          }
+          const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
           const { feed } = this._parseStream({
             stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
             params: {
               subAccountId,
-              kind: {
-                [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
-                [EStrategyShort.CALL]: EKind.CALL,
-                [EStrategyShort.PUT]: EKind.PUT,
-                [EStrategyShort.FUTURE]: EKind.FUTURE
-              }[kind] ?? EKind.PERPETUAL,
-              underlying: underlying as ECurrency,
-              quote: quote as ECurrency
+              kind: kindDef[kind] ?? EKind.PERPETUAL,
+              underlying,
+              quote
             }
           })
           const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
@@ -396,7 +382,11 @@ export class WS {
           ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
           : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
-        return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+        // if has oi then it's full order
+        if ((message as any)?.f?.oi) {
+          return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+        }
+        return (Utils.schemaMap(message, WS_ORDER_STATE_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderStateResponse).f
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
       default:

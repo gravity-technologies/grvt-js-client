@@ -141,6 +141,48 @@ export enum EOrderRejectReason {
   SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
   // the signature size exceeds the maximum allowed size
   SIGNATURE_SIZE_EXCEEDED = 'SIGNATURE_SIZE_EXCEEDED',
+  // the subaccount does not exist
+  SUB_ACCOUNT_NOT_FOUND = 'SUB_ACCOUNT_NOT_FOUND',
+  // the signature is invalid
+  BAD_SIGNATURE = 'BAD_SIGNATURE',
+  // maker order size is non-zero on an unmatched leg
+  SIZE_NON_ZERO_ON_UNMACHED_LEG = 'SIZE_NON_ZERO_ON_UNMACHED_LEG',
+  // the order trades with another order on the same side
+  TRADE_SAME_SIDE = 'TRADE_SAME_SIDE',
+  // the order trades with another order but the price does not cross
+  TRADE_PRICE_DOES_NOT_CROSS = 'TRADE_PRICE_DOES_NOT_CROSS',
+  // the order has no legs
+  NO_LEG = 'NO_LEG',
+  // market order on maker side
+  MARKET_ORDER_ON_MAKER_SIDE = 'MARKET_ORDER_ON_MAKER_SIDE',
+  // time in force requires taker
+  TIME_IN_FORCE_REQUIRE_TAKER = 'TIME_IN_FORCE_REQUIRE_TAKER',
+  // asset quote not matching
+  ASSET_QUOTE_NOT_MATCHING = 'ASSET_QUOTE_NOT_MATCHING',
+  // missing mark price
+  MISSING_MARK_PRICE = 'MISSING_MARK_PRICE',
+  // missing index price
+  MISSING_INDEX_PRICE = 'MISSING_INDEX_PRICE',
+  // session key expired
+  SESSION_KEY_EXPIRED = 'SESSION_KEY_EXPIRED',
+  // duplicate leg asset
+  DUPLICATE_LEG_ASSET = 'DUPLICATE_LEG_ASSET',
+  // charged fee above signed amount
+  CHARGED_FEE_ABOVE_SIGNED_AMOUNT = 'CHARGED_FEE_ABOVE_SIGNED_AMOUNT',
+  // charged fee below minimum
+  CHARGED_FEE_BELOW_MIN = 'CHARGED_FEE_BELOW_MIN',
+  // no trade permission
+  NO_TRADE_PERMISSION = 'NO_TRADE_PERMISSION',
+  // a maker order without any leg that is matched (size > 0) against at least 1 taker leg
+  NOT_MATCHED_AGAINS_TAKER_LEGS = 'NOT_MATCHED_AGAINS_TAKER_LEGS',
+  // AON/FOK order not fully matched
+  ORDER_NOT_FULLY_MATCHED = 'ORDER_NOT_FULLY_MATCHED',
+  // asset expired
+  ASSET_EXPIRED = 'ASSET_EXPIRED',
+  // number of legs and number of legs mismatch, eg: 2 legs, but sizeMatched is [1,2,3]
+  NUM_LEGS_SIZE_MATCHED_MISMATCH = 'NUM_LEGS_SIZE_MATCHED_MISMATCH',
+  // invalid asset, types = UNSPECIFIED
+  INVALID_ASSET = 'INVALID_ASSET',
 }
 
 export enum EOrderStateFilter {
@@ -242,6 +284,13 @@ export enum EStrategy {
   CUSTOM = 'CUSTOM',
 }
 
+export enum ESubAccountTradeInterval {
+  // 1 month
+  SAT_1_MO = 'SAT_1_MO',
+  // Lifetime
+  SAT_LIFETIME = 'SAT_LIFETIME',
+}
+
 // |                       | Must Fill All | Can Fill Partial |
 // | -                     | -             | -                |
 // | Must Fill Immediately | FOK           | IOC              |
@@ -295,8 +344,19 @@ export interface IAPISettlementPrice {
   quote?: ECurrency
   // The settlement timestamp of the settlement price, expressed in unix nanoseconds
   settlement_time?: bigint
-  // The settlement price, expressed in quote asset decimal units
+  // The settlement price, expressed in `9` decimals
   settlement_price?: bigint
+}
+
+export interface IApiAggregatedAccountSummaryResponse {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the account, denominated in USD
+  total_equity?: bigint
+  // The list of spot assets owned by this sub account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of mark prices for the assets owned by this account
+  mark_prices?: IMarkPrice[]
 }
 
 export interface IApiCancelAllOrdersRequest {
@@ -461,6 +521,17 @@ export interface IApiDepositRequest {
   num_tokens?: bigint
 }
 
+export interface IApiFundingAccountSummaryResponse {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the account, denominated in USD
+  total_equity?: bigint
+  // The list of spot assets owned by this account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of mark prices for the assets owned by this account
+  mark_prices?: IMarkPrice[]
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -481,6 +552,24 @@ export interface IApiFundingRateRequest {
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
   results?: IFundingRate[]
+}
+
+export interface IApiGetEcosystemReferralStatRequest {
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The starting time in unix nanoseconds of a specific interval to query. Required for interval 1 month
+  start_interval?: bigint
+}
+
+export interface IApiGetEcosystemReferralStatResponse {
+  // Direct invite count
+  direct_invite_count?: number
+  // Indirect invite count
+  indirect_invite_count?: number
+  // Total volume traded by direct invites multiple by 1e9
+  direct_invite_trading_volume?: bigint
+  // Total volume traded by indirect invites multiple by 1e9
+  indirect_invite_trading_volume?: bigint
 }
 
 // Fetch a single instrument by supplying the asset or instrument name
@@ -515,6 +604,40 @@ export interface IApiGetInstrumentsRequest {
 export interface IApiGetInstrumentsResponse {
   // The instruments matching the request filter
   results?: IInstrument[]
+}
+
+// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiGetListFlatReferralRequest {
+  // The off chain referrer account id to get all flat referrals
+  referral_id?: string
+  // Optional. Start time in unix nanoseconds
+  start_time?: bigint
+  // Optional. End time in unix nanoseconds
+  end_time?: bigint
+  // The off chain account id to get all user's referrers
+  account_id?: string
+}
+
+export interface IApiGetListFlatReferralResponse {
+  // The list of flat referrals
+  flat_referrals?: IFlatReferral[]
+}
+
+export interface IApiGetTraderStatResponse {
+  // Total fee paid
+  total_fee?: bigint
+}
+
+// The request to get the latest snapshot of list sub account
+//
+export interface IApiLatestSnapSubAccountsRequest {
+  // The list of sub account ids to query
+  sub_account_i_ds?: bigint[]
+}
+
+export interface IApiLatestSnapSubAccountsResponse {
+  // The sub account history matching the request sub account
+  results?: ISubAccount[]
 }
 
 export interface IApiMiniTickerResponse {
@@ -667,6 +790,15 @@ export interface IApiPublicTradesResponse {
   results?: IPublicTrade[]
 }
 
+export interface IApiResolveEpochEcosystemMetricResponse {
+  // The name of the epoch
+  epoch_name?: string
+  // Ecosystem points up to the most recently calculated time within this epoch
+  point?: number
+  // The time in unix nanoseconds when the ecosystem points were last calculated
+  last_calculated_time?: bigint
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent settlement prices are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the settlement prices starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the settlement prices ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the settlement prices between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -725,6 +857,30 @@ export interface IApiSubAccountSummaryRequest {
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   results?: ISubAccount
+}
+
+// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiSubAccountTradeRequest {
+  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
+  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  instrument?: string
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The list of sub account ids to query
+  sub_account_i_ds?: bigint[]
+  // Optional. The starting time in unix nanoseconds of a specific interval to query
+  start_interval?: bigint
+  // Optional. Start time in unix nanoseconds
+  start_time?: bigint
+  // Optional. End time in unix nanoseconds
+  end_time?: bigint
+}
+
+export interface IApiSubAccountTradeResponse {
+  // The sub account trade result set for given interval
+  results?: ISubAccountTrade[]
 }
 
 export interface IApiTDGAckResponse {
@@ -882,18 +1038,27 @@ export interface ICandlestick {
 export interface IDepositHistory {
   // The transaction ID of the deposit
   tx_id?: bigint
-  // The ethereum address where the deposit originates
-  from_eth_address?: bigint
+  // The txHash of the bridgemint event
+  tx_hash?: bigint
   // The account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
   token_currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: bigint
-  // The signature of the deposit (supplied on L1 by the user)
-  signature?: ISignature
   // The timestamp of the deposit in unix nanoseconds
   event_time?: bigint
+}
+
+export interface IFlatReferral {
+  // The off chain account id
+  account_id?: string
+  // The off chain referrer account id
+  referrer_id?: string
+  // The referrer level; 1: direct referrer, 2: indirect referrer
+  referrer_level?: number
+  // The account creation time
+  account_create_time?: bigint
 }
 
 export interface IFundingRate {
@@ -906,7 +1071,7 @@ export interface IFundingRate {
   funding_rate?: number
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
   funding_time?: bigint
-  // The mark price of the instrument at funding timestamp, expressed in quote asset decimal units
+  // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: bigint
 }
 
@@ -936,6 +1101,13 @@ export interface IInstrument {
   create_time?: bigint
 }
 
+export interface IMarkPrice {
+  // The currency you hold a spot balance in
+  currency?: ECurrency
+  // The mark price of the asset, expressed in `9` decimals
+  mark_price?: bigint
+}
+
 export interface IMiniTicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
@@ -944,21 +1116,21 @@ export interface IMiniTicker {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The mark price of the instrument, expressed in quote asset decimal units
+  // The mark price of the instrument, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument, expressed in quote asset decimal units
+  // The index price of the instrument, expressed in `9` decimals
   index_price?: bigint
-  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
-  // The mid price of the instrument, expressed in quote asset decimal units
+  // The mid price of the instrument, expressed in `9` decimals
   mid_price?: bigint
-  // The best bid price of the instrument, expressed in quote asset decimal units
+  // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The best ask price of the instrument, expressed in quote asset decimal units
+  // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
@@ -1023,7 +1195,7 @@ export interface IOrderLeg {
   instrument?: string
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
   size?: bigint
-  // The limit price of the order leg, expressed in quote asset decimal units.
+  // The limit price of the order leg, expressed in `9` decimals.
   // This is the total amount of base currency to pay/receive for all legs.
   limit_price?: bigint
   // If a OCO order is specified, this must contain the other limit price
@@ -1064,8 +1236,15 @@ export interface IOrderState {
   update_time?: bigint
 }
 
+export interface IOrderStateFeed {
+  // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
+  order_id?: bigint
+  // The order state object being created or updated
+  order_state?: IOrderState
+}
+
 export interface IOrderbookLevel {
-  // The price of the level, expressed in quote asset decimal units
+  // The price of the level, expressed in `9` decimals
   price?: bigint
   // The number of assets offered, expressed in underlying asset decimal units
   size?: bigint
@@ -1098,15 +1277,15 @@ export interface IPositions {
   balance?: bigint
   // The value of the position, negative for short assets, expressed in quote asset decimal units
   value?: bigint
-  // The entry price of the position, expressed in quote asset decimal units
+  // The entry price of the position, expressed in `9` decimals
   // Whenever increasing the balance of a position, the entry price is updated to the new average entry price
   // newEntryPrice = (oldEntryPrice * oldBalance + tradePrice * tradeBalance) / (oldBalance + tradeBalance)
   entry_price?: bigint
-  // The exit price of the position, expressed in quote asset decimal units
+  // The exit price of the position, expressed in `9` decimals
   // Whenever decreasing the balance of a position, the exit price is updated to the new average exit price
   // newExitPrice = (oldExitPrice * oldExitBalance + tradePrice * tradeBalance) / (oldExitBalance + tradeBalance)
   exit_price?: bigint
-  // The mark price of the position, expressed in quote asset decimal units
+  // The mark price of the position, expressed in `9` decimals
   mark_price?: bigint
   // The unrealized PnL of the position, expressed in quote asset decimal units
   // unrealizedPnl = (markPrice - entryPrice) * balance
@@ -1135,15 +1314,15 @@ export interface IPrivateTrade {
   is_taker?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
   size?: bigint
-  // The traded price, expressed in quote asset decimal units
+  // The traded price, expressed in `9` decimals
   price?: bigint
-  // The mark price of the instrument at point of trade, expressed in quote asset decimal units
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  // The index price of the instrument at point of trade, expressed in `9` decimals
   index_price?: bigint
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: bigint
   // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
   realized_pnl?: bigint
@@ -1172,15 +1351,15 @@ export interface IPublicTrade {
   is_taker_buyer?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
   size?: bigint
-  // The traded price, expressed in quote asset decimal units
+  // The traded price, expressed in `9` decimals
   price?: bigint
-  // The mark price of the instrument at point of trade, expressed in quote asset decimal units
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument at point of trade, expressed in quote asset decimal units
+  // The index price of the instrument at point of trade, expressed in `9` decimals
   index_price?: bigint
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option at point of trade, expressed in quote asset decimal units
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: bigint
   // A trade identifier
   trade_id?: bigint
@@ -1199,7 +1378,7 @@ export interface IRFQBookLevel {
   // The timestamp after which the price quoted in this level expires, expressed in unix nanoseconds
   // This is the earliest expiration of all partial quotes grouped into this level
   level_expiration?: bigint
-  // price of the level, expressed in quote asset decimal units
+  // price of the level, expressed in `9` decimals
   level_price?: bigint
   // The size of the level. The number of full structures in this level, expressed in base ratio units
   lots?: number
@@ -1352,6 +1531,19 @@ export interface ISubAccount {
   positions?: IPositions[]
 }
 
+export interface ISubAccountTrade {
+  // Start of calculation epoch
+  start_interval?: bigint
+  // The sub account id
+  sub_account_id?: bigint
+  // The instrument being represented
+  instrument?: string
+  // Total fee paid
+  total_fee?: bigint
+  // Total volume traded
+  total_trade_volume?: bigint
+}
+
 // Derived data such as the below, will not be included by default:
 //   - 24 hour volume (`buyVolume + sellVolume`)
 //   - 24 hour taker buy/sell ratio (`buyVolume / sellVolume`)
@@ -1372,21 +1564,21 @@ export interface ITicker {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The mark price of the instrument, expressed in quote asset decimal units
+  // The mark price of the instrument, expressed in `9` decimals
   mark_price?: bigint
-  // The index price of the instrument, expressed in quote asset decimal units
+  // The index price of the instrument, expressed in `9` decimals
   index_price?: bigint
-  // The last traded price of the instrument (also close price), expressed in quote asset decimal units
+  // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: bigint
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
   last_size?: bigint
-  // The mid price of the instrument, expressed in quote asset decimal units
+  // The mid price of the instrument, expressed in `9` decimals
   mid_price?: bigint
-  // The best bid price of the instrument, expressed in quote asset decimal units
+  // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: bigint
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
   best_bid_size?: bigint
-  // The best ask price of the instrument, expressed in quote asset decimal units
+  // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: bigint
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
@@ -1396,7 +1588,7 @@ export interface ITicker {
   funding_rate_avg?: number
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
-  // [Options] The forward price of the option, expressed in quote asset decimal units
+  // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: bigint
   // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
   buy_volume_u?: bigint
@@ -1406,11 +1598,11 @@ export interface ITicker {
   buy_volume_q?: bigint
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
   sell_volume_q?: bigint
-  // The 24 hour highest traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour highest traded price of the instrument, expressed in `9` decimals
   high_price?: bigint
-  // The 24 hour lowest traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour lowest traded price of the instrument, expressed in `9` decimals
   low_price?: bigint
-  // The 24 hour first traded price of the instrument, expressed in quote asset decimal units
+  // The 24 hour first traded price of the instrument, expressed in `9` decimals
   open_price?: bigint
   // The open interest in the instrument, expressed in underlying asset decimal units
   open_interest?: bigint
@@ -1555,8 +1747,21 @@ export interface IWSOrderStateFeedDataV1 {
   stream?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
-  // The order state object being created or updated
-  feed?: IOrderState
+  // The Order State Feed
+  feed?: IOrderStateFeed
+}
+
+export interface IWSOrderStateFeedSelectorV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The kind filter to apply.
+  kind?: EKind
+  // The underlying filter to apply.
+  underlying?: ECurrency
+  // The quote filter to apply.
+  quote?: ECurrency
+  // create only, update only, all
+  state_filter?: EOrderStateFilter
 }
 
 export interface IWSOrderbookLevelsFeedDataV1 {
