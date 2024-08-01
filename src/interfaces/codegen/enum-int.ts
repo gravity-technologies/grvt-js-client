@@ -11,6 +11,7 @@ import {
   ERfqRejectReason,
   ERfqStatus,
   EStrategy,
+  ESubAccountTradeInterval,
   ETimeInForce,
   EVenue
 } from './data.interface'
@@ -173,6 +174,11 @@ export const EStrategyInt: Record<EStrategy, number> = Object.freeze({
   [EStrategy.PUT_CONDOR]: 18,
   [EStrategy.IRON_CONDOR]: 19,
   [EStrategy.CUSTOM]: 20
+})
+
+export const ESubAccountTradeIntervalInt: Record<ESubAccountTradeInterval, number> = Object.freeze({
+  [ESubAccountTradeInterval.SAT_1_MO]: 1,
+  [ESubAccountTradeInterval.SAT_LIFETIME]: 2
 })
 
 export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({

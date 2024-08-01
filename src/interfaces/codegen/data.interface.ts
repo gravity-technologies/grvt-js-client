@@ -284,6 +284,13 @@ export enum EStrategy {
   CUSTOM = 'CUSTOM',
 }
 
+export enum ESubAccountTradeInterval {
+  // 1 month
+  SAT_1_MO = 'SAT_1_MO',
+  // Lifetime
+  SAT_LIFETIME = 'SAT_LIFETIME',
+}
+
 // |                       | Must Fill All | Can Fill Partial |
 // | -                     | -             | -                |
 // | Must Fill Immediately | FOK           | IOC              |
@@ -339,6 +346,17 @@ export interface IAPISettlementPrice {
   settlement_time?: bigint
   // The settlement price, expressed in `9` decimals
   settlement_price?: bigint
+}
+
+export interface IApiAggregatedAccountSummaryResponse {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the account, denominated in USD
+  total_equity?: bigint
+  // The list of spot assets owned by this sub account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of mark prices for the assets owned by this account
+  mark_prices?: IMarkPrice[]
 }
 
 export interface IApiCancelAllOrdersRequest {
@@ -503,6 +521,17 @@ export interface IApiDepositRequest {
   num_tokens?: bigint
 }
 
+export interface IApiFundingAccountSummaryResponse {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the account, denominated in USD
+  total_equity?: bigint
+  // The list of spot assets owned by this account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of mark prices for the assets owned by this account
+  mark_prices?: IMarkPrice[]
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -523,6 +552,24 @@ export interface IApiFundingRateRequest {
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
   results?: IFundingRate[]
+}
+
+export interface IApiGetEcosystemReferralStatRequest {
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The starting time in unix nanoseconds of a specific interval to query. Required for interval 1 month
+  start_interval?: bigint
+}
+
+export interface IApiGetEcosystemReferralStatResponse {
+  // Direct invite count
+  direct_invite_count?: number
+  // Indirect invite count
+  indirect_invite_count?: number
+  // Total volume traded by direct invites multiple by 1e9
+  direct_invite_trading_volume?: bigint
+  // Total volume traded by indirect invites multiple by 1e9
+  indirect_invite_trading_volume?: bigint
 }
 
 // Fetch a single instrument by supplying the asset or instrument name
@@ -557,6 +604,40 @@ export interface IApiGetInstrumentsRequest {
 export interface IApiGetInstrumentsResponse {
   // The instruments matching the request filter
   results?: IInstrument[]
+}
+
+// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiGetListFlatReferralRequest {
+  // The off chain referrer account id to get all flat referrals
+  referral_id?: string
+  // Optional. Start time in unix nanoseconds
+  start_time?: bigint
+  // Optional. End time in unix nanoseconds
+  end_time?: bigint
+  // The off chain account id to get all user's referrers
+  account_id?: string
+}
+
+export interface IApiGetListFlatReferralResponse {
+  // The list of flat referrals
+  flat_referrals?: IFlatReferral[]
+}
+
+export interface IApiGetTraderStatResponse {
+  // Total fee paid
+  total_fee?: bigint
+}
+
+// The request to get the latest snapshot of list sub account
+//
+export interface IApiLatestSnapSubAccountsRequest {
+  // The list of sub account ids to query
+  sub_account_i_ds?: bigint[]
+}
+
+export interface IApiLatestSnapSubAccountsResponse {
+  // The sub account history matching the request sub account
+  results?: ISubAccount[]
 }
 
 export interface IApiMiniTickerResponse {
@@ -709,6 +790,15 @@ export interface IApiPublicTradesResponse {
   results?: IPublicTrade[]
 }
 
+export interface IApiResolveEpochEcosystemMetricResponse {
+  // The name of the epoch
+  epoch_name?: string
+  // Ecosystem points up to the most recently calculated time within this epoch
+  point?: number
+  // The time in unix nanoseconds when the ecosystem points were last calculated
+  last_calculated_time?: bigint
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent settlement prices are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the settlement prices starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the settlement prices ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the settlement prices between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -767,6 +857,30 @@ export interface IApiSubAccountSummaryRequest {
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   results?: ISubAccount
+}
+
+// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiSubAccountTradeRequest {
+  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
+  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  instrument?: string
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The list of sub account ids to query
+  sub_account_i_ds?: bigint[]
+  // Optional. The starting time in unix nanoseconds of a specific interval to query
+  start_interval?: bigint
+  // Optional. Start time in unix nanoseconds
+  start_time?: bigint
+  // Optional. End time in unix nanoseconds
+  end_time?: bigint
+}
+
+export interface IApiSubAccountTradeResponse {
+  // The sub account trade result set for given interval
+  results?: ISubAccountTrade[]
 }
 
 export interface IApiTDGAckResponse {
@@ -924,18 +1038,27 @@ export interface ICandlestick {
 export interface IDepositHistory {
   // The transaction ID of the deposit
   tx_id?: bigint
-  // The ethereum address where the deposit originates
-  from_eth_address?: bigint
+  // The txHash of the bridgemint event
+  tx_hash?: bigint
   // The account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
   token_currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: bigint
-  // The signature of the deposit (supplied on L1 by the user)
-  signature?: ISignature
   // The timestamp of the deposit in unix nanoseconds
   event_time?: bigint
+}
+
+export interface IFlatReferral {
+  // The off chain account id
+  account_id?: string
+  // The off chain referrer account id
+  referrer_id?: string
+  // The referrer level; 1: direct referrer, 2: indirect referrer
+  referrer_level?: number
+  // The account creation time
+  account_create_time?: bigint
 }
 
 export interface IFundingRate {
@@ -976,6 +1099,13 @@ export interface IInstrument {
   min_block_trade_size?: bigint
   // Creation time in unix nanoseconds
   create_time?: bigint
+}
+
+export interface IMarkPrice {
+  // The currency you hold a spot balance in
+  currency?: ECurrency
+  // The mark price of the asset, expressed in `9` decimals
+  mark_price?: bigint
 }
 
 export interface IMiniTicker {
@@ -1104,6 +1234,13 @@ export interface IOrderState {
   traded_size?: bigint[]
   // Time at which the order was updated by GRVT, expressed in unix nanoseconds
   update_time?: bigint
+}
+
+export interface IOrderStateFeed {
+  // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
+  order_id?: bigint
+  // The order state object being created or updated
+  order_state?: IOrderState
 }
 
 export interface IOrderbookLevel {
@@ -1394,6 +1531,19 @@ export interface ISubAccount {
   positions?: IPositions[]
 }
 
+export interface ISubAccountTrade {
+  // Start of calculation epoch
+  start_interval?: bigint
+  // The sub account id
+  sub_account_id?: bigint
+  // The instrument being represented
+  instrument?: string
+  // Total fee paid
+  total_fee?: bigint
+  // Total volume traded
+  total_trade_volume?: bigint
+}
+
 // Derived data such as the below, will not be included by default:
 //   - 24 hour volume (`buyVolume + sellVolume`)
 //   - 24 hour taker buy/sell ratio (`buyVolume / sellVolume`)
@@ -1597,8 +1747,8 @@ export interface IWSOrderStateFeedDataV1 {
   stream?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
-  // The order state object being created or updated
-  feed?: IOrderState
+  // The Order State Feed
+  feed?: IOrderStateFeed
 }
 
 export interface IWSOrderStateFeedSelectorV1 {
