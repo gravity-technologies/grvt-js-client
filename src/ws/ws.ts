@@ -275,14 +275,14 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-'),
+      ].filter(Boolean).join('_'),
       [
         {
           all: 'a',
           createOnly: 'c',
           updateOnly: 'u'
         }[params.state_filter] || 'a'
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
@@ -291,10 +291,10 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('-')
+      // ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
@@ -303,10 +303,10 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('-')
+      // ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const { stream, params } = options
@@ -355,7 +355,7 @@ export class WS {
           feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
         }
       default:
-        throw new Error('Unknown stream')
+        throw new Error('Unknown stream: ' + stream)
     }
   }
 
@@ -390,7 +390,7 @@ export class WS {
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
       default:
-        throw new Error('Unknown stream')
+        console.error('Unknown message: ', message)
     }
   }
 
