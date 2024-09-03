@@ -6,12 +6,16 @@ export const FLAT_REFERRAL_MAP: SchemaPairMap = Object.freeze({
     account_id: 'ai',
     referrer_id: 'ri',
     referrer_level: 'rl',
-    account_create_time: 'ac'
+    account_create_time: 'ac',
+    main_account_id: 'ma',
+    referrer_main_account_id: 'rm'
   },
   LITE_TO_FULL: {
     ai: 'account_id',
     ri: 'referrer_id',
     rl: 'referrer_level',
-    ac: 'account_create_time'
+    ac: 'account_create_time',
+    ma: 'main_account_id',
+    rm: 'referrer_main_account_id'
   }
 })

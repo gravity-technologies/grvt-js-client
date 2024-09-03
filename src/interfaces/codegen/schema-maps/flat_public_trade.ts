@@ -13,7 +13,8 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
     interest_rate: 'ir',
     forward_price: 'fp',
     trade_id: 'ti',
-    venue: 'v'
+    venue: 'v',
+    is_liquidation: 'il'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -26,6 +27,7 @@ export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
     ir: 'interest_rate',
     fp: 'forward_price',
     ti: 'trade_id',
-    v: 'venue'
+    v: 'venue',
+    il: 'is_liquidation'
   }
 })
