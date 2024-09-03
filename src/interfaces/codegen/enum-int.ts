@@ -189,7 +189,5 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({
-  [EVenue.ORDERBOOK]: 1,
-  [EVenue.RFQ]: 2,
-  [EVenue.AXE]: 3
+  [EVenue.ORDERBOOK]: 1
 })

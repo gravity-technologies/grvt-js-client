@@ -19,7 +19,9 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
     fee_rate: 'fr',
     trade_id: 'ti',
     order_id: 'oi',
-    venue: 'v'
+    venue: 'v',
+    is_liquidation: 'il',
+    client_order_id: 'co'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -38,6 +40,8 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
     fr: 'fee_rate',
     ti: 'trade_id',
     oi: 'order_id',
-    v: 'venue'
+    v: 'venue',
+    il: 'is_liquidation',
+    co: 'client_order_id'
   }
 })
