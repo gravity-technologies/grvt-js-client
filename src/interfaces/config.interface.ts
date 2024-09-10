@@ -4,10 +4,6 @@ export interface IConfig {
 }
 
 export const validConfig = (config: IConfig) => {
-  if (config?.version !== 'v1') {
-    throw new Error('API only supports v1')
-  }
-
   if (!config?.host) {
     throw new Error('API requires a host')
   }
