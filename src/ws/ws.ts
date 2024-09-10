@@ -323,10 +323,10 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('-')
+      // ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
@@ -335,14 +335,14 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-'),
+      ].filter(Boolean).join('_'),
       [
         {
           all: 'a',
           createOnly: 'c',
           updateOnly: 'u'
         }[params.state_filter] || 'a'
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
@@ -351,10 +351,10 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('-')
+      ].filter(Boolean).join('_')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('-')
+      // ].filter(Boolean).join('_')
     ].filter(Boolean).join('@')
 
     const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
