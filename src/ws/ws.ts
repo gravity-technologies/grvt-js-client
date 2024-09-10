@@ -96,15 +96,24 @@ export class WS {
     result: TEntities
     stream: `${EStream}`
   }) {
-    console.log('ws.ts:99', this._pairs)
     return Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
       (acc, [key, value]) => {
+        if (!key.startsWith(`${stream}__`)) {
+          return acc
+        }
+
+        const destinationAccountId = (result as ITransfer).to_account_id?.toString(16) || (result as ITransfer).to_sub_account_id?.toString()
         switch (stream) {
           case EStream.ORDER:
-            console.log('ws.ts:107', 'IOrderState', result)
+            // updateOnly
+            if (key.endsWith('@u')) {
+              return [...acc, ...Object.values(value)]
+            }
             break
           case EStream.TRANSFER:
-            console.log('ws.ts:107', 'ITransfer', result)
+            if (destinationAccountId && key.endsWith(destinationAccountId)) {
+              return [...acc, ...Object.values(value)]
+            }
             break
         }
 
@@ -542,17 +551,19 @@ export class WS {
     const onPaired = (e: MessageEvent<string>) => {
       const response = JsonUtils.parse<{
         s: string
-        s1: string[]
+        s1: Array<string | bigint>
       }>(e.data, Utils.jsonReviverBigInt)
       if (!response?.s || !response?.s1?.length) {
         return
       }
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      const isSubscribed = response.s1.includes(asset) ||
-                            response.s1.includes(asset.toLowerCase()) ||
-                            response.s1.includes(feed) ||
-                            response.s1.includes(feed.toLowerCase())
+      const subs = response.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
+      const isSubscribed = subs.includes(asset) ||
+                            subs.includes(asset.toLowerCase()) ||
+                            subs.includes(feed) ||
+                            subs.includes(feed.toLowerCase()) ||
+                            subs.includes(StringUtils.toBigint(feed))
       if (stream === response.s && isSubscribed) {
         _resolve()
       }

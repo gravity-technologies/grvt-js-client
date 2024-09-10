@@ -190,11 +190,11 @@ export interface IWSTdgTradeRequest {
 export interface IWSTdgTransferRequest {
   stream: `${EStream.TRANSFER}`
   params: {
-    subAccountId: `${number}`
-    mainAccountId?: `0x${string}`
+    subAccountId: string
+    mainAccountId?: string
   } | {
-    subAccountId?: `${number}`
-    mainAccountId: `0x${string}`
+    subAccountId?: string
+    mainAccountId: string
   }
   onData?: TMessageHandler<ITransfer>
   onError?: (error: Error) => void
