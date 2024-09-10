@@ -1,5 +1,5 @@
 export interface IConfig {
-  version: 'v1'
+  version: `v${number}`
   host: string
 }
 

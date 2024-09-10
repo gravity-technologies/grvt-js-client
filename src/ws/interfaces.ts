@@ -11,7 +11,8 @@ import {
   type IPositions,
   type IPrivateTrade,
   type IPublicTrade,
-  type ITicker
+  type ITicker,
+  type ITransfer
 } from '../interfaces'
 
 export enum EStream {
@@ -26,6 +27,7 @@ export enum EStream {
 
   ORDER = 'order',
   POSITION = 'positions',
+  TRANSFER = 'transfers',
   // TRADE = 'trade', // Duplicate MDG/TDG
 }
 
@@ -185,4 +187,26 @@ export interface IWSTdgTradeRequest {
   onError?: (error: Error) => void
 }
 
-export type TWSRequest = IWSCandleRequest | IWSBookRequest | IWSMiniRequest | IWSTickerRequest | IWSTradeRequest | IWSTdgOrderRequest | IWSTdgPositionRequest | IWSTdgTradeRequest
+export interface IWSTdgTransferRequest {
+  stream: `${EStream.TRANSFER}`
+  params: {
+    subAccountId: string
+    mainAccountId?: string
+  } | {
+    subAccountId?: string
+    mainAccountId: string
+  }
+  onData?: TMessageHandler<ITransfer>
+  onError?: (error: Error) => void
+}
+
+export type TWSRequest =
+  | IWSCandleRequest
+  | IWSBookRequest
+  | IWSMiniRequest
+  | IWSTickerRequest
+  | IWSTradeRequest
+  | IWSTdgOrderRequest
+  | IWSTdgPositionRequest
+  | IWSTdgTradeRequest
+  | IWSTdgTransferRequest

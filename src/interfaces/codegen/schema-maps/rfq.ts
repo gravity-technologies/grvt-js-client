@@ -1,6 +1,7 @@
 import { type SchemaPairMap } from './types'
 import { RFQ_LEG_MAP } from './rfq_leg'
 import { RFQ_BOOK_MAP } from './rfq_book'
+
 import { RFQ_STATE_MAP } from './rfq_state'
 
 // Schema map for the 'RFQ' struct.

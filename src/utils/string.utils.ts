@@ -16,4 +16,12 @@ export class StringUtils {
     }
     return result
   }
+
+  static toBigint (value: string | number): bigint {
+    try {
+      return BigInt(value)
+    } catch (error) {
+      return BigInt(0)
+    }
+  }
 }

@@ -667,6 +667,20 @@ export interface IApiGetListFlatReferralResponse {
   flat_referrals?: IFlatReferral[]
 }
 
+export interface IApiGetOrderRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // Filter for `order_id`
+  order_id?: bigint
+  // Filter for `client_order_id`
+  client_order_id?: bigint
+}
+
+export interface IApiGetOrderResponse {
+  // The order object for the requested filter
+  order?: IOrder
+}
+
 export interface IApiGetTraderStatResponse {
   // Total fee paid
   total_fee?: bigint
@@ -765,6 +779,20 @@ export interface IApiOrderHistoryResponse {
   next?: string
   // The Open Orders matching the request filter
   orders?: IOrder[]
+}
+
+export interface IApiOrderStateRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // Filter for `order_id`
+  order_id?: bigint
+  // Filter for `client_order_id`
+  client_order_id?: bigint
+}
+
+export interface IApiOrderStateResponse {
+  // The order state for the requested filter
+  state?: IOrderState
 }
 
 export interface IApiOrderbookLevelsResponse {
