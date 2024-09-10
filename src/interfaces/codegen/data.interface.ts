@@ -311,10 +311,6 @@ export enum ETimeInForce {
 export enum EVenue {
   // the trade is cleared on the orderbook venue
   ORDERBOOK = 'ORDERBOOK',
-  // the trade is cleared on the RFQ venue
-  RFQ = 'RFQ',
-  // the trade is cleared on the AXE venue
-  AXE = 'AXE',
 }
 
 export interface IAPIMiniTickerRequest {
@@ -395,7 +391,7 @@ export interface IApiCancelOrderRequest {
   // Cancel the order with this `order_id`
   order_id?: bigint
   // Cancel the order with this `client_order_id`
-  client_order_id?: number
+  client_order_id?: bigint
 }
 
 export interface IApiCancelOrderResponse {
@@ -521,6 +517,42 @@ export interface IApiDepositRequest {
   num_tokens?: bigint
 }
 
+export interface IApiFindEcosystemLeaderboardResponse {
+  // The list of ecosystem leaderboard users
+  users?: IEcosystemLeaderboardUser[]
+}
+
+export interface IApiFindFirstEpochMetricResponse {
+  // Phase zero metric
+  phase_zero_metric?: IEcosystemMetric
+  // Phase one metric
+  phase_one_metric?: IEcosystemMetric
+  // The rank of the account in the ecosystem
+  rank?: number
+  // The total number of accounts in the ecosystem
+  total?: number
+  // Total ecosystem point of the first epoch
+  total_point?: bigint
+  // The time when the ecosystem points were last calculated
+  last_calculated_at?: bigint
+}
+
+export interface IApiFindTraderEpochMetricResponse {
+  // Phase zero metric
+  metric?: ITraderMetric
+  // The rank of the account in the trader
+  rank?: number
+  // The total number of accounts in the trader
+  total?: number
+  // The time when the trader points were last calculated
+  last_calculated_at?: bigint
+}
+
+export interface IApiFindTraderLeaderboardResponse {
+  // The list of trader leaderboard users
+  users?: ITraderLeaderboardUser[]
+}
+
 export interface IApiFundingAccountSummaryResponse {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
@@ -552,6 +584,18 @@ export interface IApiFundingRateRequest {
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
   results?: IFundingRate[]
+}
+
+export interface IApiGetEcosystemLeaderboardRequest {
+  // Start time of the epoch - phase
+  calculate_from?: bigint
+  // The number of accounts to return
+  limit?: number
+}
+
+export interface IApiGetEcosystemLeaderboardResponse {
+  // The list of ecosystem points
+  points?: IEcosystemPoint[]
 }
 
 export interface IApiGetEcosystemReferralStatRequest {
@@ -623,9 +667,37 @@ export interface IApiGetListFlatReferralResponse {
   flat_referrals?: IFlatReferral[]
 }
 
+export interface IApiGetOrderRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // Filter for `order_id`
+  order_id?: bigint
+  // Filter for `client_order_id`
+  client_order_id?: bigint
+}
+
+export interface IApiGetOrderResponse {
+  // The order object for the requested filter
+  order?: IOrder
+}
+
 export interface IApiGetTraderStatResponse {
   // Total fee paid
   total_fee?: bigint
+}
+
+export interface IApiGetUserEcosystemPointRequest {
+  // The off chain account id
+  account_id?: string
+  // Start time of the epoch - phase
+  calculate_from?: bigint
+  // Include user rank in the response
+  include_user_rank?: boolean
+}
+
+export interface IApiGetUserEcosystemPointResponse {
+  // The list of ecosystem points
+  points?: IEcosystemPoint[]
 }
 
 // The request to get the latest snapshot of list sub account
@@ -707,6 +779,20 @@ export interface IApiOrderHistoryResponse {
   next?: string
   // The Open Orders matching the request filter
   orders?: IOrder[]
+}
+
+export interface IApiOrderStateRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+  // Filter for `order_id`
+  order_id?: bigint
+  // Filter for `client_order_id`
+  client_order_id?: bigint
+}
+
+export interface IApiOrderStateResponse {
+  // The order state for the requested filter
+  state?: IOrderState
 }
 
 export interface IApiOrderbookLevelsResponse {
@@ -857,6 +943,21 @@ export interface IApiSubAccountSummaryRequest {
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   results?: ISubAccount
+}
+
+// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiSubAccountTradeAggregationRequest {
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The list of sub account ids to query
+  sub_account_i_ds?: bigint[]
+  // Optional. The starting time in unix nanoseconds of a specific interval to query
+  start_interval?: bigint
+}
+
+export interface IApiSubAccountTradeAggregationResponse {
+  // The sub account trade aggregation result set for given interval
+  results?: ISubAccountTradeAggregation[]
 }
 
 // startTime are optional parameters. The semantics of these parameters are as follows:<ul>
@@ -1014,13 +1115,13 @@ export interface ICandlestick {
   open_time?: bigint
   // Close time of kline bar in unix nanosecond
   close_time?: bigint
-  // The open price, expressed in base currency resolution units
+  // The open price, expressed in underlying currency resolution units
   open?: bigint
-  // The close price, expressed in base currency resolution units
+  // The close price, expressed in underlying currency resolution units
   close?: bigint
-  // The high price, expressed in base currency resolution units
+  // The high price, expressed in underlying currency resolution units
   high?: bigint
-  // The low price, expressed in base currency resolution units
+  // The low price, expressed in underlying currency resolution units
   low?: bigint
   // The underlying volume transacted, expressed in underlying asset decimal units
   volume_u?: bigint
@@ -1033,6 +1134,17 @@ export interface ICandlestick {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
+}
+
+export interface IDeposit {
+  // The hash of the bridgemint event producing the deposit
+  tx_hash?: bigint
+  // The account to deposit into
+  to_account_id?: bigint
+  // The token currency to deposit
+  token_currency?: ECurrency
+  // The number of tokens to deposit
+  num_tokens?: bigint
 }
 
 export interface IDepositHistory {
@@ -1050,6 +1162,55 @@ export interface IDepositHistory {
   event_time?: bigint
 }
 
+export interface IEcosystemLeaderboardUser {
+  // The off chain account id
+  account_id?: string
+  // The rank of the account in the ecosystem
+  rank?: number
+  // Total ecosystem point
+  total_point?: bigint
+  // The twitter username of the account
+  twitter_username?: string
+}
+
+export interface IEcosystemMetric {
+  // Direct invite count
+  direct_invite_count?: number
+  // Indirect invite count
+  indirect_invite_count?: number
+  // Direct invite trading volume
+  direct_invite_trading_volume?: bigint
+  // Indirect invite trading volume
+  indirect_invite_trading_volume?: bigint
+  // Total ecosystem point of this epoch/phase
+  total_point?: bigint
+}
+
+export interface IEcosystemPoint {
+  // The off chain account id
+  account_id?: string
+  // The main account id
+  main_account_id?: bigint
+  // Total ecosystem point
+  total_point?: bigint
+  // Direct invite count
+  direct_invite_count?: number
+  // Indirect invite count
+  indirect_invite_count?: number
+  // Direct invite trading volume
+  direct_invite_trading_volume?: bigint
+  // Indirect invite trading volume
+  indirect_invite_trading_volume?: bigint
+  // The time when the ecosystem point is calculated
+  calculate_at?: bigint
+  // Start time of the epoch - phase
+  calculate_from?: bigint
+  // End time of the epoch - phase
+  calculate_to?: bigint
+  // The rank of the account in the ecosystem
+  rank?: number
+}
+
 export interface IFlatReferral {
   // The off chain account id
   account_id?: string
@@ -1059,6 +1220,10 @@ export interface IFlatReferral {
   referrer_level?: number
   // The account creation time
   account_create_time?: bigint
+  // The main account id
+  main_account_id?: bigint
+  // The referrer main account id
+  referrer_main_account_id?: bigint
 }
 
 export interface IFundingRate {
@@ -1081,8 +1246,16 @@ export interface IInstrument {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The readable name of the instrument
-  instrument_name?: string
+  // The underlying currency
+  underlying?: ECurrency
+  // The quote currency
+  quote?: ECurrency
+  // The kind of instrument
+  kind?: EKind
+  // The expiry time of the instrument in unix nanoseconds
+  expiry?: bigint
+  // The strike price of the instrument, expressed in `9` decimals
+  strike_price?: bigint
   // Venues that this instrument can be traded at
   venues?: EVenue[]
   // The settlement period of the instrument
@@ -1188,6 +1361,10 @@ export interface IOrder {
   metadata?: IOrderMetadata
   // [Filled by GRVT Backend] The current state of the order, ignored by the smart contract, and unsigned by the client
   state?: IOrderState
+  // If the order is a liquidation order.
+  // Liquidation Orders can be signed by the insurance fund, however, SubAccount must be provably under MM.
+  // Trade.FeeCharged will mean liquidation fee. Sent to insurance fund instead of fee collection fund.
+  is_liquidation?: boolean
 }
 
 export interface IOrderLeg {
@@ -1214,11 +1391,11 @@ export interface IOrderMetadata {
   // This field can be used for order amendment/cancellation, but has no bearing on the smart contract layer
   // This field will not be propagated to the smart contract, and should not be signed by the client
   // This value must be unique for all active orders in a subaccount, or amendment/cancellation will not work as expected
-  // Gravity UI will generate a random clientOrderID for each order in the range [0, 2^31 - 1]
-  // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^31, 2^32 - 1]
+  // Gravity UI will generate a random clientOrderID for each order in the range [0, 2^63 - 1]
+  // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
   //
   // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
-  client_order_id?: number
+  client_order_id?: bigint
   // [Filled by GRVT Backend] Time at which the order was received by GRVT in unix nanoseconds
   create_time?: bigint
 }
@@ -1336,6 +1513,18 @@ export interface IPrivateTrade {
   order_id?: bigint
   // The venue where the trade occurred
   venue?: EVenue
+  // If the trade was a liquidation
+  is_liquidation?: boolean
+  // A unique identifier for the active order within a subaccount, specified by the client
+  // This is used to identify the order in the client's system
+  // This field can be used for order amendment/cancellation, but has no bearing on the smart contract layer
+  // This field will not be propagated to the smart contract, and should not be signed by the client
+  // This value must be unique for all active orders in a subaccount, or amendment/cancellation will not work as expected
+  // Gravity UI will generate a random clientOrderID for each order in the range [0, 2^63 - 1]
+  // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
+  //
+  // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
+  client_order_id?: bigint
 }
 
 // All private RFQs and Private AXEs will be filtered out from the responses
@@ -1365,6 +1554,8 @@ export interface IPublicTrade {
   trade_id?: bigint
   // The venue where the trade occurred
   venue?: EVenue
+  // If the trade was a liquidation
+  is_liquidation?: boolean
 }
 
 export interface IRFQBook {
@@ -1397,7 +1588,7 @@ export interface IRFQBookQuote {
   // The 128-bit orderID of the RFQ Quote
   quote_id?: bigint
   // The clientOrderID of the RFQ Quote
-  client_quote_id?: number
+  client_quote_id?: bigint
   // The quoter's subaccount
   quoter_subaccount_id?: bigint
   // The timestamp after which Gravity expires the quote, expressed in unix nanoseconds.
@@ -1544,6 +1735,18 @@ export interface ISubAccountTrade {
   total_trade_volume?: bigint
 }
 
+// Similar to sub-account trade, but not divided by individual assets.
+export interface ISubAccountTradeAggregation {
+  // Start of calculation epoch
+  start_interval?: bigint
+  // The sub account id
+  sub_account_id?: bigint
+  // Total fee paid
+  total_fee?: bigint
+  // Total volume traded
+  total_trade_volume?: bigint
+}
+
 // Derived data such as the below, will not be included by default:
 //   - 24 hour volume (`buyVolume + sellVolume`)
 //   - 24 hour taker buy/sell ratio (`buyVolume / sellVolume`)
@@ -1583,21 +1786,21 @@ export interface ITicker {
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
   best_ask_size?: bigint
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  funding_rate_curr?: number
+  funding_rate_8_h_curr?: number
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
-  funding_rate_avg?: number
+  funding_rate_8_h_avg?: number
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: number
   // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: bigint
   // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
-  buy_volume_u?: bigint
+  buy_volume_24_h_u?: bigint
   // The 24 hour taker sell volume of the instrument, expressed in underlying asset decimal units
-  sell_volume_u?: bigint
+  sell_volume_24_h_u?: bigint
   // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
-  buy_volume_q?: bigint
+  buy_volume_24_h_q?: bigint
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
-  sell_volume_q?: bigint
+  sell_volume_24_h_q?: bigint
   // The 24 hour highest traded price of the instrument, expressed in `9` decimals
   high_price?: bigint
   // The 24 hour lowest traded price of the instrument, expressed in `9` decimals
@@ -1608,6 +1811,41 @@ export interface ITicker {
   open_interest?: bigint
   // The ratio of accounts that are net long vs net short on this instrument
   long_short_ratio?: number
+}
+
+export interface ITraderLeaderboardUser {
+  // The off chain account id
+  account_id?: string
+  // The rank of the account in the Trader
+  rank?: number
+  // Total Trader point
+  total_point?: bigint
+  // The twitter username of the account
+  twitter_username?: string
+}
+
+export interface ITraderMetric {
+  // Total fee paid
+  total_fee?: bigint
+  // Total trader point of this epoch/phase
+  total_point?: bigint
+}
+
+export interface ITransfer {
+  // The account to transfer from
+  from_account_id?: bigint
+  // The subaccount to transfer from (0 if transferring from main account)
+  from_sub_account_id?: bigint
+  // The account to deposit into
+  to_account_id?: bigint
+  // The subaccount to transfer to (0 if transferring to main account)
+  to_sub_account_id?: bigint
+  // The token currency to transfer
+  token_currency?: ECurrency
+  // The number of tokens to transfer
+  num_tokens?: bigint
+  // The signature of the transfer
+  signature?: ISignature
 }
 
 export interface ITransferHistory {
@@ -1671,6 +1909,15 @@ export interface IWSCandlestickResponse {
   n?: bigint
   // A candlestick entry matching the request filters
   f?: ICandlestick
+}
+
+export interface IWSDepositFeedDataV1DTO {
+  // The websocket channel to which the response is sent
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The Deposit object
+  feed?: IDeposit
 }
 
 export interface IWSMiniTickerFeedDataV1 {
@@ -2077,6 +2324,37 @@ export interface IWSTickerResponse {
   n?: bigint
   // A ticker matching the request filter
   f?: ITicker
+}
+
+export interface IWSTransferFeedDataV1DTO {
+  // The websocket channel to which the response is sent
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The Transfer object
+  feed?: ITransfer
+}
+
+export interface IWSWithdrawalFeedDataV1DTO {
+  // The websocket channel to which the response is sent
+  stream?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The Withdrawal object
+  feed?: IWithdrawal
+}
+
+export interface IWithdrawal {
+  // The subaccount to withdraw from
+  from_account_id?: bigint
+  // The ethereum address to withdraw to
+  to_eth_address?: bigint
+  // The token currency to withdraw
+  token_currency?: ECurrency
+  // The number of tokens to withdraw
+  num_tokens?: bigint
+  // The signature of the withdrawal
+  signature?: ISignature
 }
 
 export interface IWithdrawalHistory {

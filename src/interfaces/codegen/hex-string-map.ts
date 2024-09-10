@@ -7,6 +7,7 @@ export const HexStringMap = [
   'order_id',
   'quote_id',
   'r',
+  'referrer_main_account_id',
   'rfq_id',
   's',
   'signer',

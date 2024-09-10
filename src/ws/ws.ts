@@ -10,8 +10,10 @@ import {
   WS_PRIVATE_TRADE_RESPONSE_MAP,
   WS_PUBLIC_TRADES_RESPONSE_MAP,
   WS_TICKER_RESPONSE_MAP,
+  WS_TRANSFER_FEED_DATA_V_1_DTO_MAP,
   type IOrder,
   type IOrderState,
+  type ITransfer,
   type IWSCandlestickResponse,
   type IWSMiniTickerResponse,
   type IWSOrderbookLevelsResponse,
@@ -20,6 +22,7 @@ import {
   type IWSPublicTradesResponse,
   type IWSRequestV1,
   type IWSTickerResponse,
+  type IWSTransferFeedDataV1DTO,
   type IWsOrderResponse,
   type IWsOrderStateResponse
 } from '../interfaces'
@@ -33,6 +36,7 @@ import {
   type IWSTdgOrderRequest,
   type IWSTdgPositionRequest,
   type IWSTdgTradeRequest,
+  type IWSTdgTransferRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TMessageHandler,
@@ -85,6 +89,82 @@ export class WS {
     return this._ws
   }
 
+  /**
+   * Only use for ITransfer | IOrderState
+   */
+  private _getNonInstrumentConsumers ({ result, stream }: {
+    result: TEntities
+    stream: `${EStream}`
+  }) {
+    console.log('ws.ts:99', this._pairs)
+    return Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
+      (acc, [key, value]) => {
+        switch (stream) {
+          case EStream.ORDER:
+            console.log('ws.ts:107', 'IOrderState', result)
+            break
+          case EStream.TRANSFER:
+            console.log('ws.ts:107', 'ITransfer', result)
+            break
+        }
+
+        return acc
+      }, []
+    )
+  }
+
+  /**
+   * Use for TEntities not ITransfer | IOrderState
+   */
+  private _getInstrumentConsumers ({ result, stream, instrument }: {
+    result: TEntities
+    stream: `${EStream}`
+    instrument: string
+  }) {
+    return Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
+      (acc, [key, value]) => {
+        if (!key.startsWith(`${stream}__`)) {
+          return acc
+        }
+
+        // MDG if no subAccountId
+        const isTdg = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
+        if (!isTdg) {
+          return key.includes(instrument)
+            ? [...acc, ...Object.values(value)]
+            : acc
+        }
+
+        // TDG
+        const subAccountId = String((result as IOrder).sub_account_id)
+        // const subAccountId = String((result as IPositions).sub_account_id)
+        // const subAccountId = String((result as IPrivateTrade).sub_account_id)
+        const kindDef = {
+          [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
+          [EStrategyShort.CALL]: EKind.CALL,
+          [EStrategyShort.PUT]: EKind.PUT,
+          [EStrategyShort.FUTURE]: EKind.FUTURE
+        }
+        const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
+        const feed = this._parseStream({
+          stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
+          params: {
+            subAccountId,
+            kind: kindDef[kind] ?? EKind.PERPETUAL,
+            underlying,
+            quote
+          }
+        })?.feed
+        const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
+        if (tdgFeedPrefix && key.startsWith(`${stream}__${tdgFeedPrefix}`)) {
+          return [...acc, ...Object.values(value)]
+        }
+
+        return acc
+      }, []
+    )
+  }
+
   private _bindWebSocketListeners () {
     this._ws.addEventListener('open', (e: Event) => {
       this._subscribeCurrentPairs()
@@ -104,68 +184,27 @@ export class WS {
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
       const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
-      const stream = message.s as string
+      const stream = message.s as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
       if (!result) {
         // if no entity found and not a subscription message
         if (!(message.s1 as string[])?.length) {
-          console.log('TODO: something went wrong with message', message)
+          console.error('Error: something went wrong with message', message)
         }
         return
       }
-      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<Exclude<TEntities, IOrder>, IOrderState>)?.instrument
       if (!stream) {
-        console.log('TODO: cannot parse stream or feed from message', message)
-        return
-      }
-      if (!instrument) {
-        console.log('TODO: handle IOrderState', message)
+        console.error('Error: cannot parse stream or feed from message', message)
         return
       }
 
-      const consumers = Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
-        (acc, [key, value]) => {
-          if (!key.startsWith(`${stream}__`)) {
-            return acc
-          }
+      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<typeof result, ITransfer | IOrderState>)?.instrument
 
-          // MDG if no subAccountId
-          const isTdg = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
-          if (!isTdg) {
-            return key.includes(instrument)
-              ? [...acc, ...Object.values(value)]
-              : acc
-          }
-
-          // TDG
-          const subAccountId = String((result as IOrder).sub_account_id)
-          // const subAccountId = String((result as IPositions).sub_account_id)
-          // const subAccountId = String((result as IPrivateTrade).sub_account_id)
-          const kindDef = {
-            [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
-            [EStrategyShort.CALL]: EKind.CALL,
-            [EStrategyShort.PUT]: EKind.PUT,
-            [EStrategyShort.FUTURE]: EKind.FUTURE
-          }
-          const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
-          const { feed } = this._parseStream({
-            stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
-            params: {
-              subAccountId,
-              kind: kindDef[kind] ?? EKind.PERPETUAL,
-              underlying,
-              quote
-            }
-          })
-          const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
-          if (tdgFeedPrefix && key.startsWith(`${stream}__${tdgFeedPrefix}`)) {
-            return [...acc, ...Object.values(value)]
-          }
-
-          return acc
-        }, []
-      )
+      /**
+       * Handle subscriptions with instrument
+       */
+      const consumers = instrument ? this._getInstrumentConsumers({ stream, instrument, result }) : this._getNonInstrumentConsumers({ stream, result })
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with by message:', message)
         return
@@ -269,6 +308,18 @@ export class WS {
      * TDG
      */
 
+    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
+      [
+        params.subAccountId,
+        params.kind,
+        params.underlying,
+        params.quote
+      ].filter(Boolean).join('-')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
       [
         params.subAccountId,
@@ -297,17 +348,12 @@ export class WS {
       // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
-      [
-        params.subAccountId,
-        params.kind,
-        params.underlying,
-        params.quote
-      ].filter(Boolean).join('-')
-      // [
-      //   params.createOnly
-      // ].filter(Boolean).join('-')
-    ].filter(Boolean).join('@')
+    const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
+      if (params.subAccountId) {
+        return params.subAccountId
+      }
+      return params.mainAccountId as string
+    }
 
     const { stream, params } = options
     switch (stream) {
@@ -354,8 +400,13 @@ export class WS {
           stream,
           feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
         }
+      case EStream.TRANSFER:
+        return {
+          stream,
+          feed: [transferFeed(params as IWSTdgTransferRequest['params'])]
+        }
       default:
-        throw new Error('Unknown stream')
+        console.error('Unknown stream: ' + stream)
     }
   }
 
@@ -389,8 +440,10 @@ export class WS {
         return (Utils.schemaMap(message, WS_ORDER_STATE_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderStateResponse).f
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
+      case EStream.TRANSFER:
+        return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_DTO_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1DTO).feed
       default:
-        throw new Error('Unknown stream')
+        console.error('Unknown message: ', message)
     }
   }
 
