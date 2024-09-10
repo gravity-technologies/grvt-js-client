@@ -102,7 +102,7 @@ export class WS {
           return acc
         }
 
-        const destinationAccountId = (result as ITransfer).to_account_id?.toString(16) || (result as ITransfer).to_sub_account_id?.toString()
+        const destinationAccountId = (result as ITransfer).to_account_id?.toString(16) ?? (result as ITransfer).to_sub_account_id?.toString()
         switch (stream) {
           case EStream.ORDER:
             // updateOnly
