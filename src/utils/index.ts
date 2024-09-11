@@ -4,20 +4,6 @@ export * from './json.utils'
 export * from './string.utils'
 
 export class Utils {
-  static jsonReplacerBigInt (key: string, value: any) {
-    if (typeof value === 'bigint') {
-      return value.toString()
-    }
-    return value
-  }
-
-  static jsonReviverBigInt (key: string, value: any) {
-    if (typeof value === 'string' && (/^([+-])?\d+$/.test(value) || /^0x[0-9a-fA-F]+$/.test(value))) {
-      return BigInt(value)
-    }
-    return value
-  }
-
   static coverBigInt (field: string, value: any) {
     if (typeof value === 'bigint') {
       const hexStr = value.toString(16)

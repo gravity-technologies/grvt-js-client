@@ -4,8 +4,8 @@ import {
   API_CANDLESTICK_RESPONSE_MAP,
   API_FUNDING_RATE_REQUEST_MAP,
   API_FUNDING_RATE_RESPONSE_MAP,
-  API_GET_INSTRUMENTS_REQUEST_MAP,
-  API_GET_INSTRUMENTS_RESPONSE_MAP,
+  API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP,
+  API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP,
   API_GET_INSTRUMENT_REQUEST_MAP,
   API_GET_INSTRUMENT_RESPONSE_MAP,
   API_MINI_TICKER_REQUEST_MAP,
@@ -27,10 +27,10 @@ import {
   type IApiCandlestickResponse,
   type IApiFundingRateRequest,
   type IApiFundingRateResponse,
+  type IApiGetFilteredInstrumentsRequest,
+  type IApiGetFilteredInstrumentsResponse,
   type IApiGetInstrumentRequest,
   type IApiGetInstrumentResponse,
-  type IApiGetInstrumentsRequest,
-  type IApiGetInstrumentsResponse,
   type IApiMiniTickerResponse,
   type IApiOrderbookLevelsResponse,
   type IApiPublicTradeHistoryRequest,
@@ -75,16 +75,16 @@ export class MDG {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#get-instruments
    */
-  instruments (payload: IApiGetInstrumentsRequest, config?: AxiosRequestConfig) {
+  instruments (payload: IApiGetFilteredInstrumentsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/instruments',
-      Utils.schemaMap(payload, API_GET_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
       {
         ...config,
         withCredentials: false
       }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_GET_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentsResponse
+      return Utils.schemaMap(response.data, API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetFilteredInstrumentsResponse
     })
   }
 

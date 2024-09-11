@@ -9,4 +9,18 @@ export class JsonUtils {
       return _default as T
     }
   }
+
+  static bigintReplacer (key: string, value: any) {
+    if (typeof value === 'bigint') {
+      return value.toString()
+    }
+    return value
+  }
+
+  static bigintReviver (key: string, value: any) {
+    if (typeof value === 'string' && (/^([+-])?\d+$/.test(value) || /^0x[0-9a-fA-F]+$/.test(value))) {
+      return BigInt(value)
+    }
+    return value
+  }
 }

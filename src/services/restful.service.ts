@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { JsonUtils, Utils } from '../utils'
+import { JsonUtils } from '../utils'
 
 // const ensureTruthyArray = <T>(value?: T | T[]): T[] => Array.isArray(value)
 //   ? value
@@ -11,11 +11,11 @@ export const RestfulService = axios.create({
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   transformRequest: [
-    (data, headers) => JSON.stringify(data, Utils.jsonReplacerBigInt)
+    (data, headers) => JSON.stringify(data, JsonUtils.bigintReplacer)
     // ...ensureTruthyArray(axios.defaults.transformRequest)
   ],
   transformResponse: [
-    (data) => JsonUtils.parse(data, Utils.jsonReviverBigInt, data)
+    (data) => JsonUtils.parse(data, JsonUtils.bigintReviver, data)
     // ...ensureTruthyArray(axios.defaults.transformResponse),
   ]
 })
