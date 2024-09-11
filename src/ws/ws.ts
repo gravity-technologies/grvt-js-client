@@ -53,7 +53,6 @@ interface IMessage {
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
 
 interface IOptions {
-  version?: `v${number}`
   url: string | URL
   protocols?: string | string[]
   // timeout in ms
@@ -69,6 +68,7 @@ const SHORT_MONTHS = Object.freeze([
 export class WS {
   private _retries = 0
   private _connecting = false
+  private readonly _version = 'v1'
   private readonly _options: IOptions
 
   private __ws: WebSocket | undefined
@@ -88,10 +88,7 @@ export class WS {
   }
 
   constructor (options: IOptions) {
-    this._options = {
-      ...options,
-      version: options.version ?? 'v1'
-    }
+    this._options = options
   }
 
   private _createWs () {
@@ -207,7 +204,7 @@ export class WS {
         e.data,
         JsonUtils.bigintReviver
       )
-      const stream = message.s = message.s?.replace?.(`${this._options.version}.`, '') as `${EStream}`
+      const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
       if (!result) {
@@ -472,9 +469,7 @@ export class WS {
     if (this._ws.readyState === 1) {
       this._ws.send(JSON.stringify({
         ...payload,
-        stream: this._options.version !== 'v0'
-          ? `${this._options.version}.${payload.stream}`
-          : payload.stream
+        stream: `${this._version}.${payload.stream}`
       }, JsonUtils.bigintReplacer))
     }
   }
@@ -573,7 +568,7 @@ export class WS {
       if (!message?.s || !message?.s1?.length) {
         return
       }
-      const responseStream = message.s?.replace?.(`${this._options.version}.`, '')
+      const responseStream = message.s?.replace?.(`${this._version}.`, '')
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
       const subs = message.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
