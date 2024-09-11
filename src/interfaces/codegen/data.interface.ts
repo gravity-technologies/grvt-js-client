@@ -146,7 +146,7 @@ export enum EOrderRejectReason {
   // the signature is invalid
   BAD_SIGNATURE = 'BAD_SIGNATURE',
   // maker order size is non-zero on an unmatched leg
-  SIZE_NON_ZERO_ON_UNMACHED_LEG = 'SIZE_NON_ZERO_ON_UNMACHED_LEG',
+  SIZE_NON_ZERO_ON_UNMATCHED_LEG = 'SIZE_NON_ZERO_ON_UNMATCHED_LEG',
   // the order trades with another order on the same side
   TRADE_SAME_SIDE = 'TRADE_SAME_SIDE',
   // the order trades with another order but the price does not cross
@@ -341,14 +341,14 @@ export interface IAPISettlementPrice {
   // The settlement timestamp of the settlement price, expressed in unix nanoseconds
   settlement_time?: bigint
   // The settlement price, expressed in `9` decimals
-  settlement_price?: bigint
+  settlement_price?: string
 }
 
 export interface IApiAggregatedAccountSummaryResponse {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
   // Total equity of the account, denominated in USD
-  total_equity?: bigint
+  total_equity?: string
   // The list of spot assets owned by this sub account, and their balances
   spot_balances?: ISpotBalance[]
   // The list of mark prices for the assets owned by this account
@@ -514,7 +514,7 @@ export interface IApiDepositRequest {
   // The token currency to deposit
   token_currency?: ECurrency
   // The number of tokens to deposit, quoted in token_currency decimals
-  num_tokens?: bigint
+  num_tokens?: string
 }
 
 export interface IApiFindEcosystemLeaderboardResponse {
@@ -557,7 +557,7 @@ export interface IApiFundingAccountSummaryResponse {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
   // Total equity of the account, denominated in USD
-  total_equity?: bigint
+  total_equity?: string
   // The list of spot assets owned by this account, and their balances
   spot_balances?: ISpotBalance[]
   // The list of mark prices for the assets owned by this account
@@ -584,6 +584,17 @@ export interface IApiFundingRateRequest {
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
   results?: IFundingRate[]
+}
+
+// Fetch all instruments
+export interface IApiGetAllInstrumentsRequest {
+  // Fetch only active instruments
+  is_active?: boolean
+}
+
+export interface IApiGetAllInstrumentsResponse {
+  // List of instruments
+  instruments?: IInstrument[]
 }
 
 export interface IApiGetEcosystemLeaderboardRequest {
@@ -616,6 +627,25 @@ export interface IApiGetEcosystemReferralStatResponse {
   indirect_invite_trading_volume?: bigint
 }
 
+// Fetch a list of instruments based on the filters provided
+export interface IApiGetFilteredInstrumentsRequest {
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
+  kind?: EKind[]
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
+  underlying?: ECurrency[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
+  quote?: ECurrency[]
+  // Request for active instruments only
+  is_active?: boolean
+  // The limit to query for. Defaults to 500; Max 100000
+  limit?: number
+}
+
+export interface IApiGetFilteredInstrumentsResponse {
+  // The instruments matching the request filter
+  results?: IInstrument[]
+}
+
 // Fetch a single instrument by supplying the asset or instrument name
 export interface IApiGetInstrumentRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
@@ -630,24 +660,6 @@ export interface IApiGetInstrumentRequest {
 export interface IApiGetInstrumentResponse {
   // The instrument matching the request asset
   results?: IInstrument
-}
-
-export interface IApiGetInstrumentsRequest {
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // Request for active instruments only
-  is_active?: boolean
-  // The limit to query for. Defaults to 500; Max 100000
-  limit?: number
-}
-
-export interface IApiGetInstrumentsResponse {
-  // The instruments matching the request filter
-  results?: IInstrument[]
 }
 
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
@@ -765,7 +777,7 @@ export interface IApiOrderHistoryRequest {
   // The expiration time to apply in nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
   expiration?: bigint[]
   // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
-  strike_price?: bigint[]
+  strike_price?: string[]
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -828,7 +840,7 @@ export interface IApiPrivateTradeHistoryRequest {
   // The expiration time to apply in unix nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
   expiration?: bigint
   // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
-  strike_price?: bigint
+  strike_price?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -900,7 +912,7 @@ export interface IApiSettlementPriceRequest {
   // The expiration time to select in unix nanoseconds
   expiration?: bigint
   // The strike price to select
-  strike_price?: bigint
+  strike_price?: string
   // The limit to query for. Defaults to 30; Max 100
   limit?: number
 }
@@ -1062,7 +1074,7 @@ export interface IApiTransferRequest {
   // The token currency to transfer
   token_currency?: ECurrency
   // The number of tokens to transfer, quoted in tokenCurrency decimal units
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the transfer
   signature?: ISignature
 }
@@ -1105,7 +1117,7 @@ export interface IApiWithdrawalRequest {
   // The token currency to withdraw
   token_currency?: ECurrency
   // The number of tokens to withdraw, quoted in tokenCurrency decimal units
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the withdrawal
   signature?: ISignature
 }
@@ -1116,17 +1128,17 @@ export interface ICandlestick {
   // Close time of kline bar in unix nanosecond
   close_time?: bigint
   // The open price, expressed in underlying currency resolution units
-  open?: bigint
+  open?: string
   // The close price, expressed in underlying currency resolution units
-  close?: bigint
+  close?: string
   // The high price, expressed in underlying currency resolution units
-  high?: bigint
+  high?: string
   // The low price, expressed in underlying currency resolution units
-  low?: bigint
+  low?: string
   // The underlying volume transacted, expressed in underlying asset decimal units
-  volume_u?: bigint
+  volume_u?: string
   // The quote volume transacted, expressed in quote asset decimal units
-  volume_q?: bigint
+  volume_q?: string
   // The number of trades transacted
   trades?: number
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
@@ -1157,7 +1169,7 @@ export interface IDepositHistory {
   // The token currency to deposit
   token_currency?: ECurrency
   // The number of tokens to deposit
-  num_tokens?: bigint
+  num_tokens?: string
   // The timestamp of the deposit in unix nanoseconds
   event_time?: bigint
 }
@@ -1255,7 +1267,7 @@ export interface IInstrument {
   // The expiry time of the instrument in unix nanoseconds
   expiry?: bigint
   // The strike price of the instrument, expressed in `9` decimals
-  strike_price?: bigint
+  strike_price?: string
   // Venues that this instrument can be traded at
   venues?: EVenue[]
   // The settlement period of the instrument
@@ -1265,11 +1277,11 @@ export interface IInstrument {
   // The smallest denomination of the quote asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
   quote_decimals?: number
   // The size of a single tick, expressed in quote asset decimal units
-  tick_size?: bigint
+  tick_size?: string
   // The minimum contract size, expressed in underlying asset decimal units
-  min_size?: bigint
+  min_size?: string
   // The minimum block trade size, expressed in underlying asset decimal units
-  min_block_trade_size?: bigint
+  min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
 }
@@ -1278,7 +1290,7 @@ export interface IMarkPrice {
   // The currency you hold a spot balance in
   currency?: ECurrency
   // The mark price of the asset, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
 }
 
 export interface IMiniTicker {
@@ -1290,23 +1302,23 @@ export interface IMiniTicker {
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
   // The index price of the instrument, expressed in `9` decimals
-  index_price?: bigint
+  index_price?: string
   // The last traded price of the instrument (also close price), expressed in `9` decimals
-  last_price?: bigint
+  last_price?: string
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
-  last_size?: bigint
+  last_size?: string
   // The mid price of the instrument, expressed in `9` decimals
-  mid_price?: bigint
+  mid_price?: string
   // The best bid price of the instrument, expressed in `9` decimals
-  best_bid_price?: bigint
+  best_bid_price?: string
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
-  best_bid_size?: bigint
+  best_bid_size?: string
   // The best ask price of the instrument, expressed in `9` decimals
-  best_ask_price?: bigint
+  best_ask_price?: string
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
-  best_ask_size?: bigint
+  best_ask_size?: string
 }
 
 // Order is a typed payload used throughout the GRVT platform to express all orderbook, RFQ, and liquidation orders.
@@ -1371,14 +1383,14 @@ export interface IOrderLeg {
   // The instrument to trade in this leg
   instrument?: string
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
-  size?: bigint
+  size?: string
   // The limit price of the order leg, expressed in `9` decimals.
   // This is the total amount of base currency to pay/receive for all legs.
-  limit_price?: bigint
+  limit_price?: string
   // If a OCO order is specified, this must contain the other limit price
   // User must sign both limit prices. Depending on which trigger condition is activated, a different limit price is used
   // The smart contract will always validate both limit prices, by arranging them in ascending order
-  oco_limit_price?: bigint
+  oco_limit_price?: string
   // Specifies if the order leg is a buy or sell
   is_buying_asset?: boolean
 }
@@ -1406,9 +1418,9 @@ export interface IOrderState {
   // The reason for rejection or cancellation
   reject_reason?: EOrderRejectReason
   // The number of assets available for orderbook/RFQ matching. Sorted in same order as Order.Legs
-  book_size?: bigint[]
+  book_size?: string[]
   // The total number of assets traded. Sorted in same order as Order.Legs
-  traded_size?: bigint[]
+  traded_size?: string[]
   // Time at which the order was updated by GRVT, expressed in unix nanoseconds
   update_time?: bigint
 }
@@ -1422,9 +1434,9 @@ export interface IOrderStateFeed {
 
 export interface IOrderbookLevel {
   // The price of the level, expressed in `9` decimals
-  price?: bigint
+  price?: string
   // The number of assets offered, expressed in underlying asset decimal units
-  size?: bigint
+  size?: string
   // The number of open orders at this level
   num_orders?: number
 }
@@ -1451,31 +1463,31 @@ export interface IPositions {
   // The instrument being represented
   instrument?: string
   // The balance of the position, expressed in underlying asset decimal units. Negative for short positions
-  balance?: bigint
+  balance?: string
   // The value of the position, negative for short assets, expressed in quote asset decimal units
-  value?: bigint
+  value?: string
   // The entry price of the position, expressed in `9` decimals
   // Whenever increasing the balance of a position, the entry price is updated to the new average entry price
   // newEntryPrice = (oldEntryPrice * oldBalance + tradePrice * tradeBalance) / (oldBalance + tradeBalance)
-  entry_price?: bigint
+  entry_price?: string
   // The exit price of the position, expressed in `9` decimals
   // Whenever decreasing the balance of a position, the exit price is updated to the new average exit price
   // newExitPrice = (oldExitPrice * oldExitBalance + tradePrice * tradeBalance) / (oldExitBalance + tradeBalance)
-  exit_price?: bigint
+  exit_price?: string
   // The mark price of the position, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
   // The unrealized PnL of the position, expressed in quote asset decimal units
   // unrealizedPnl = (markPrice - entryPrice) * balance
-  unrealized_pnl?: bigint
+  unrealized_pnl?: string
   // The realized PnL of the position, expressed in quote asset decimal units
   // realizedPnl = (exitPrice - entryPrice) * exitBalance
-  realized_pnl?: bigint
+  realized_pnl?: string
   // The total PnL of the position, expressed in quote asset decimal units
   // totalPnl = realizedPnl + unrealizedPnl
-  pnl?: bigint
+  pnl?: string
   // The ROI of the position, expressed as a percentage
   // roi = (pnl / (entryPrice * balance)) * 100
-  roi?: number
+  roi?: string
 }
 
 export interface IPrivateTrade {
@@ -1490,23 +1502,23 @@ export interface IPrivateTrade {
   // The role that the subaccount took on the trade
   is_taker?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
-  size?: bigint
+  size?: string
   // The traded price, expressed in `9` decimals
-  price?: bigint
+  price?: string
   // The mark price of the instrument at point of trade, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
   // The index price of the instrument at point of trade, expressed in `9` decimals
-  index_price?: bigint
+  index_price?: string
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
-  interest_rate?: number
+  interest_rate?: string
   // [Options] The forward price of the option at point of trade, expressed in `9` decimals
-  forward_price?: bigint
+  forward_price?: string
   // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
-  realized_pnl?: bigint
+  realized_pnl?: string
   // The fees paid on the trade, expressed in quote asset decimal unit (negative if maker rebate applied)
-  fee?: bigint
+  fee?: string
   // The fee rate paid on the trade
-  fee_rate?: number
+  fee_rate?: string
   // A trade identifier
   trade_id?: bigint
   // An order identifier
@@ -1539,17 +1551,17 @@ export interface IPublicTrade {
   // If taker was the buyer on the trade
   is_taker_buyer?: boolean
   // The number of assets being traded, expressed in underlying asset decimal units
-  size?: bigint
+  size?: string
   // The traded price, expressed in `9` decimals
-  price?: bigint
+  price?: string
   // The mark price of the instrument at point of trade, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
   // The index price of the instrument at point of trade, expressed in `9` decimals
-  index_price?: bigint
+  index_price?: string
   // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
-  interest_rate?: number
+  interest_rate?: string
   // [Options] The forward price of the option at point of trade, expressed in `9` decimals
-  forward_price?: bigint
+  forward_price?: string
   // A trade identifier
   trade_id?: bigint
   // The venue where the trade occurred
@@ -1691,7 +1703,7 @@ export interface ISpotBalance {
   // The balance of the asset, expressed in underlying asset decimal units
   // Must take into account the value of all positions with this quote asset
   // ie. for USDT denominated subaccounts, this is is identical to total balance
-  balance?: bigint
+  balance?: string
 }
 
 export interface ISubAccount {
@@ -1707,15 +1719,15 @@ export interface ISubAccount {
   // In the future, when users select a Multi-Currency Margin Type, this will be USD
   quote_currency?: ECurrency
   // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units
-  unrealized_pnl?: bigint
+  unrealized_pnl?: string
   // The total value across all spot assets, or in other words, the current margin
-  total_value?: bigint
+  total_value?: string
   // The initial margin requirement of all positions owned by this vault, denominated in quote currency decimal units
-  initial_margin?: bigint
+  initial_margin?: string
   // The maintanence margin requirement of all positions owned by this vault, denominated in quote currency decimal units
-  maintanence_margin?: bigint
+  maintanence_margin?: string
   // The margin available for withdrawal, denominated in quote currency decimal units
-  available_margin?: bigint
+  available_margin?: string
   // The list of spot assets owned by this sub account, and their balances
   spot_balances?: ISpotBalance[]
   // The list of positions owned by this sub account
@@ -1768,49 +1780,49 @@ export interface ITicker {
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
   // The index price of the instrument, expressed in `9` decimals
-  index_price?: bigint
+  index_price?: string
   // The last traded price of the instrument (also close price), expressed in `9` decimals
-  last_price?: bigint
+  last_price?: string
   // The number of assets traded in the last trade, expressed in underlying asset decimal units
-  last_size?: bigint
+  last_size?: string
   // The mid price of the instrument, expressed in `9` decimals
-  mid_price?: bigint
+  mid_price?: string
   // The best bid price of the instrument, expressed in `9` decimals
-  best_bid_price?: bigint
+  best_bid_price?: string
   // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
-  best_bid_size?: bigint
+  best_bid_size?: string
   // The best ask price of the instrument, expressed in `9` decimals
-  best_ask_price?: bigint
+  best_ask_price?: string
   // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
-  best_ask_size?: bigint
+  best_ask_size?: string
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_h_curr?: number
+  funding_rate_8_h_curr?: string
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_h_avg?: number
+  funding_rate_8_h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
-  interest_rate?: number
+  interest_rate?: string
   // [Options] The forward price of the option, expressed in `9` decimals
-  forward_price?: bigint
+  forward_price?: string
   // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
-  buy_volume_24_h_u?: bigint
+  buy_volume_24_h_u?: string
   // The 24 hour taker sell volume of the instrument, expressed in underlying asset decimal units
-  sell_volume_24_h_u?: bigint
+  sell_volume_24_h_u?: string
   // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
-  buy_volume_24_h_q?: bigint
+  buy_volume_24_h_q?: string
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
-  sell_volume_24_h_q?: bigint
+  sell_volume_24_h_q?: string
   // The 24 hour highest traded price of the instrument, expressed in `9` decimals
-  high_price?: bigint
+  high_price?: string
   // The 24 hour lowest traded price of the instrument, expressed in `9` decimals
-  low_price?: bigint
+  low_price?: string
   // The 24 hour first traded price of the instrument, expressed in `9` decimals
-  open_price?: bigint
+  open_price?: string
   // The open interest in the instrument, expressed in underlying asset decimal units
-  open_interest?: bigint
+  open_interest?: string
   // The ratio of accounts that are net long vs net short on this instrument
-  long_short_ratio?: number
+  long_short_ratio?: string
 }
 
 export interface ITraderLeaderboardUser {
@@ -1862,7 +1874,7 @@ export interface ITransferHistory {
   // The token currency to transfer
   token_currency?: ECurrency
   // The number of tokens to transfer
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the transfer
   signature?: ISignature
   // The timestamp of the transfer in unix nanoseconds
@@ -2054,7 +2066,7 @@ export interface IWSOrderbookLevelsRequest {
   // The expiration time to select in unix nanoseconds
   expiration?: bigint[]
   // The strike price to select
-  strike_price?: bigint[]
+  strike_price?: string[]
 }
 
 export interface IWSOrderbookLevelsResponse {
@@ -2367,7 +2379,7 @@ export interface IWithdrawalHistory {
   // The token currency to withdraw
   token_currency?: ECurrency
   // The number of tokens to withdraw
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the withdrawal
   signature?: ISignature
   // The timestamp of the withdrawal in unix nanoseconds
