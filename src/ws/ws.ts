@@ -43,9 +43,17 @@ import {
   type TWSRequest
 } from './interfaces'
 
+interface IMessage {
+  s: string
+  n: bigint
+  f?: TEntities
+  s1?: Array<string | bigint>
+}
+
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
 
 interface IOptions {
+  version?: `v${number}`
   url: string | URL
   protocols?: string | string[]
   // timeout in ms
@@ -80,7 +88,10 @@ export class WS {
   }
 
   constructor (options: IOptions) {
-    this._options = options
+    this._options = {
+      ...options,
+      version: options.version ?? 'v1'
+    }
   }
 
   private _createWs () {
@@ -192,13 +203,16 @@ export class WS {
     //   this.close()
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JsonUtils.parse(e.data, JsonUtils.bigintReviver)
-      const stream = message.s as `${EStream}`
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
+      const stream = message.s = message.s?.replace?.(`${this._options.version}.`, '') as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
       if (!result) {
         // if no entity found and not a subscription message
-        if (!(message.s1 as string[])?.length) {
+        if (!message.s1?.length) {
           console.error('Error: something went wrong with message', message)
         }
         return
@@ -213,7 +227,9 @@ export class WS {
       /**
        * Handle subscriptions with instrument
        */
-      const consumers = instrument ? this._getInstrumentConsumers({ stream, instrument, result }) : this._getNonInstrumentConsumers({ stream, result })
+      const consumers = instrument
+        ? this._getInstrumentConsumers({ stream, instrument, result })
+        : this._getNonInstrumentConsumers({ stream, result })
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with by message:', message)
         return
@@ -419,11 +435,7 @@ export class WS {
     }
   }
 
-  private _messageLiteToFull (message: {
-    s: string
-    n: string
-    f: TEntities
-  }): undefined | TEntities {
+  private _messageLiteToFull (message: IMessage): undefined | TEntities {
     switch (message.s) {
       case EStream.CANDLE:
         return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
@@ -458,7 +470,12 @@ export class WS {
 
   private _sendMessage (payload: IWSRequestV1) {
     if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify(payload, JsonUtils.bigintReplacer))
+      this._ws.send(JSON.stringify({
+        ...payload,
+        stream: this._options.version !== 'v0'
+          ? `${this._options.version}.${payload.stream}`
+          : payload.stream
+      }, JsonUtils.bigintReplacer))
     }
   }
 
@@ -549,22 +566,25 @@ export class WS {
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const response = JsonUtils.parse<{
-        s: string
-        s1: Array<string | bigint>
-      }>(e.data, JsonUtils.bigintReviver)
-      if (!response?.s || !response?.s1?.length) {
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
+      if (!message?.s || !message?.s1?.length) {
         return
       }
+      const responseStream = message.s?.replace?.(`${this._options.version}.`, '')
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      const subs = response.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
-      const isSubscribed = subs.includes(asset) ||
-                            subs.includes(asset.toLowerCase()) ||
-                            subs.includes(feed) ||
-                            subs.includes(feed.toLowerCase()) ||
-                            subs.includes(StringUtils.toBigint(feed))
-      if (stream === response.s && isSubscribed) {
+      const subs = message.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
+      const isResolved = stream === responseStream && (
+        subs.includes(asset) ||
+        subs.includes(asset.toLowerCase()) ||
+        subs.includes(feed) ||
+        subs.includes(feed.toLowerCase()) ||
+        subs.includes(StringUtils.toBigint(feed))
+      )
+      if (isResolved) {
         _resolve()
       }
     }
