@@ -192,7 +192,7 @@ export class WS {
     //   this.close()
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
+      const message = JsonUtils.parse(e.data, JsonUtils.bigintReviver)
       const stream = message.s as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
@@ -458,7 +458,7 @@ export class WS {
 
   private _sendMessage (payload: IWSRequestV1) {
     if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify(payload, Utils.jsonReplacerBigInt))
+      this._ws.send(JSON.stringify(payload, JsonUtils.bigintReplacer))
     }
   }
 
@@ -552,7 +552,7 @@ export class WS {
       const response = JsonUtils.parse<{
         s: string
         s1: Array<string | bigint>
-      }>(e.data, Utils.jsonReviverBigInt)
+      }>(e.data, JsonUtils.bigintReviver)
       if (!response?.s || !response?.s1?.length) {
         return
       }
