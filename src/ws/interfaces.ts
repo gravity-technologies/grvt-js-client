@@ -27,8 +27,8 @@ export enum EStream {
 
   ORDER = 'order',
   POSITION = 'positions',
-  TRANSFER = 'transfers',
-  // TRADE = 'trade', // Duplicate MDG/TDG
+  FILL = 'fill',
+  TRANSFER = 'transfer',
 }
 
 // const EStrategyShort = Object.freeze({
@@ -175,8 +175,8 @@ export interface IWSTdgPositionRequest {
   onError?: (error: Error) => void
 }
 
-export interface IWSTdgTradeRequest {
-  stream: `${EStream.TRADE}`
+export interface IWSTdgFillRequest {
+  stream: `${EStream.FILL}`
   params: {
     subAccountId: string
     kind: `${EKind}`
@@ -208,5 +208,5 @@ export type TWSRequest =
   | IWSTradeRequest
   | IWSTdgOrderRequest
   | IWSTdgPositionRequest
-  | IWSTdgTradeRequest
+  | IWSTdgFillRequest
   | IWSTdgTransferRequest
