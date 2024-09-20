@@ -33,15 +33,22 @@ import {
   type IWSBookRequest,
   type IWSCandleRequest,
   type IWSMiniRequest,
-  type IWSTdgFillRequest,
   type IWSTdgOrderRequest,
   type IWSTdgPositionRequest,
+  type IWSTdgTradeRequest,
   type IWSTdgTransferRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TMessageHandler,
   type TWSRequest
 } from './interfaces'
+
+interface IMessage {
+  s: string
+  n: bigint
+  f?: TEntities
+  s1?: Array<string | bigint>
+}
 
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
 
@@ -61,6 +68,7 @@ const SHORT_MONTHS = Object.freeze([
 export class WS {
   private _retries = 0
   private _connecting = false
+  private readonly _version = 'v1'
   private readonly _options: IOptions
 
   private __ws: WebSocket | undefined
@@ -136,7 +144,8 @@ export class WS {
           return acc
         }
 
-        const isTdg = [EStream.ORDER, EStream.POSITION, EStream.FILL, EStream.TRANSFER].includes(stream as EStream)
+        // MDG if no subAccountId
+        const isTdg = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
         if (!isTdg) {
           return key.includes(instrument)
             ? [...acc, ...Object.values(value)]
@@ -155,7 +164,7 @@ export class WS {
         }
         const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
         const feed = this._parseStream({
-          stream: stream as EStream.FILL | EStream.ORDER | EStream.POSITION,
+          stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
           params: {
             subAccountId,
             kind: kindDef[kind] ?? EKind.PERPETUAL,
@@ -191,13 +200,16 @@ export class WS {
     //   this.close()
     // })
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JsonUtils.parse(e.data, Utils.jsonReviverBigInt)
-      const stream = message.s as `${EStream}`
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
+      const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
       if (!result) {
         // if no entity found and not a subscription message
-        if (!(message.s1 as string[])?.length) {
+        if (!message.s1?.length) {
           console.error('Error: something went wrong with message', message)
         }
         return
@@ -212,7 +224,9 @@ export class WS {
       /**
        * Handle subscriptions with instrument
        */
-      const consumers = instrument ? this._getInstrumentConsumers({ stream, instrument, result }) : this._getNonInstrumentConsumers({ stream, result })
+      const consumers = instrument
+        ? this._getInstrumentConsumers({ stream, instrument, result })
+        : this._getNonInstrumentConsumers({ stream, result })
       if (!consumers?.length) {
         console.log('TODO: send unsubscribe with by message:', message)
         return
@@ -316,16 +330,16 @@ export class WS {
      * TDG
      */
 
-    const fillFeed = (params: IWSTdgFillRequest['params']): string => [
+    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
       [
         params.subAccountId,
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_')
+      ].filter(Boolean).join('-')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('_')
+      // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
@@ -334,14 +348,14 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_'),
+      ].filter(Boolean).join('-'),
       [
         {
           all: 'a',
           createOnly: 'c',
           updateOnly: 'u'
         }[params.state_filter] || 'a'
-      ].filter(Boolean).join('_')
+      ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
@@ -350,10 +364,10 @@ export class WS {
         params.kind,
         params.underlying,
         params.quote
-      ].filter(Boolean).join('_')
+      ].filter(Boolean).join('-')
       // [
       //   params.createOnly
-      // ].filter(Boolean).join('_')
+      // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
@@ -391,7 +405,12 @@ export class WS {
       case EStream.TRADE:
         return {
           stream,
-          feed: [publicTradesFeed(params as IWSTradeRequest['params'])]
+          feed: [
+            // if no subAccountId then it's public trade
+            !(params as IWSTdgTradeRequest['params'])?.subAccountId
+              ? publicTradesFeed(params as IWSTradeRequest['params'])
+              : privateTradesFeed(params as IWSTdgTradeRequest['params'])
+          ]
         }
       case EStream.ORDER:
         return {
@@ -403,11 +422,6 @@ export class WS {
           stream,
           feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
         }
-      case EStream.FILL:
-        return {
-          stream,
-          feed: [fillFeed(params as IWSTdgFillRequest['params'])]
-        }
       case EStream.TRANSFER:
         return {
           stream,
@@ -418,11 +432,7 @@ export class WS {
     }
   }
 
-  private _messageLiteToFull (message: {
-    s: string
-    n: string
-    f: TEntities
-  }): undefined | TEntities {
+  private _messageLiteToFull (message: IMessage): undefined | TEntities {
     switch (message.s) {
       case EStream.CANDLE:
         return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
@@ -436,7 +446,10 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
-        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+        // if no subAccountId then it's public trade
+        return !(message as any)?.f?.sa
+          ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+          : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.ORDER:
         // if has oi then it's full order
         if ((message as any)?.f?.oi) {
@@ -445,8 +458,6 @@ export class WS {
         return (Utils.schemaMap(message, WS_ORDER_STATE_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderStateResponse).f
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
-      case EStream.FILL:
-        return (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.TRANSFER:
         return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_DTO_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1DTO).feed
       default:
@@ -456,7 +467,10 @@ export class WS {
 
   private _sendMessage (payload: IWSRequestV1) {
     if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify(payload, Utils.jsonReplacerBigInt))
+      this._ws.send(JSON.stringify({
+        ...payload,
+        stream: `${this._version}.${payload.stream}`
+      }, JsonUtils.bigintReplacer))
     }
   }
 
@@ -547,22 +561,25 @@ export class WS {
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const response = JsonUtils.parse<{
-        s: string
-        s1: Array<string | bigint>
-      }>(e.data, Utils.jsonReviverBigInt)
-      if (!response?.s || !response?.s1?.length) {
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
+      if (!message?.s || !message?.s1?.length) {
         return
       }
+      const responseStream = message.s?.replace?.(`${this._version}.`, '')
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      const subs = response.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
-      const isSubscribed = subs.includes(asset) ||
-                            subs.includes(asset.toLowerCase()) ||
-                            subs.includes(feed) ||
-                            subs.includes(feed.toLowerCase()) ||
-                            subs.includes(StringUtils.toBigint(feed))
-      if (stream === response.s && isSubscribed) {
+      const subs = message.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
+      const isResolved = stream === responseStream && (
+        subs.includes(asset) ||
+        subs.includes(asset.toLowerCase()) ||
+        subs.includes(feed) ||
+        subs.includes(feed.toLowerCase()) ||
+        subs.includes(StringUtils.toBigint(feed))
+      )
+      if (isResolved) {
         _resolve()
       }
     }

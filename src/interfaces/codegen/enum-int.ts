@@ -98,7 +98,7 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.SIGNATURE_SIZE_EXCEEDED]: 24,
   [EOrderRejectReason.SUB_ACCOUNT_NOT_FOUND]: 25,
   [EOrderRejectReason.BAD_SIGNATURE]: 26,
-  [EOrderRejectReason.SIZE_NON_ZERO_ON_UNMACHED_LEG]: 27,
+  [EOrderRejectReason.SIZE_NON_ZERO_ON_UNMATCHED_LEG]: 27,
   [EOrderRejectReason.TRADE_SAME_SIDE]: 28,
   [EOrderRejectReason.TRADE_PRICE_DOES_NOT_CROSS]: 29,
   [EOrderRejectReason.NO_LEG]: 30,
