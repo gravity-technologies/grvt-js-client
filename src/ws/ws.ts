@@ -33,9 +33,9 @@ import {
   type IWSBookRequest,
   type IWSCandleRequest,
   type IWSMiniRequest,
+  type IWSTdgFillRequest,
   type IWSTdgOrderRequest,
   type IWSTdgPositionRequest,
-  type IWSTdgTradeRequest,
   type IWSTdgTransferRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
@@ -136,8 +136,7 @@ export class WS {
           return acc
         }
 
-        // MDG if no subAccountId
-        const isTdg = key.match(new RegExp(`${stream}__([0-9]{1,})[-_]`))?.[1]
+        const isTdg = [EStream.ORDER, EStream.POSITION, EStream.FILL, EStream.TRANSFER].includes(stream as EStream)
         if (!isTdg) {
           return key.includes(instrument)
             ? [...acc, ...Object.values(value)]
@@ -156,7 +155,7 @@ export class WS {
         }
         const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
         const feed = this._parseStream({
-          stream: stream as EStream.TRADE | EStream.ORDER | EStream.POSITION,
+          stream: stream as EStream.FILL | EStream.ORDER | EStream.POSITION,
           params: {
             subAccountId,
             kind: kindDef[kind] ?? EKind.PERPETUAL,
@@ -317,7 +316,7 @@ export class WS {
      * TDG
      */
 
-    const privateTradesFeed = (params: IWSTdgTradeRequest['params']): string => [
+    const fillFeed = (params: IWSTdgFillRequest['params']): string => [
       [
         params.subAccountId,
         params.kind,
@@ -392,12 +391,7 @@ export class WS {
       case EStream.TRADE:
         return {
           stream,
-          feed: [
-            // if no subAccountId then it's public trade
-            !(params as IWSTdgTradeRequest['params'])?.subAccountId
-              ? publicTradesFeed(params as IWSTradeRequest['params'])
-              : privateTradesFeed(params as IWSTdgTradeRequest['params'])
-          ]
+          feed: [publicTradesFeed(params as IWSTradeRequest['params'])]
         }
       case EStream.ORDER:
         return {
@@ -408,6 +402,11 @@ export class WS {
         return {
           stream,
           feed: [positionFeed(params as IWSTdgPositionRequest['params'])]
+        }
+      case EStream.FILL:
+        return {
+          stream,
+          feed: [fillFeed(params as IWSTdgFillRequest['params'])]
         }
       case EStream.TRANSFER:
         return {
@@ -437,10 +436,7 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
       case EStream.TRADE:
-        // if no subAccountId then it's public trade
-        return !(message as any)?.f?.sa
-          ? (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
-          : (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
+        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
       case EStream.ORDER:
         // if has oi then it's full order
         if ((message as any)?.f?.oi) {
@@ -449,6 +445,8 @@ export class WS {
         return (Utils.schemaMap(message, WS_ORDER_STATE_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderStateResponse).f
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
+      case EStream.FILL:
+        return (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
       case EStream.TRANSFER:
         return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_DTO_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1DTO).feed
       default:
