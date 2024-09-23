@@ -99,90 +99,50 @@ export enum EOrderRejectReason {
   CLIENT_BULK_CANCEL = 'CLIENT_BULK_CANCEL',
   // client called a Session Cancel API, or set the WebSocket connection to 'cancelOrdersOnTerminate'
   CLIENT_SESSION_END = 'CLIENT_SESSION_END',
-  // instrument is no longer tradable on Gravity. (typically due to a market halt, or instrument expiry)
-  INSTRUMENT_DEACTIVATED = 'INSTRUMENT_DEACTIVATED',
-  // market maker protection triggered
-  MM_PROTECTION = 'MM_PROTECTION',
-  // the order has expired
+  // the market order was cancelled after no/partial fill. Takes precedence over other TimeInForce cancel reasons
+  MARKET_CANCEL = 'MARKET_CANCEL',
+  // the IOC order was cancelled after no/partial fill
+  IOC_CANCEL = 'IOC_CANCEL',
+  // the AON order was cancelled as it could not be fully matched
+  AON_CANCEL = 'AON_CANCEL',
+  // the FOK order was cancelled as it could not be fully matched
+  FOK_CANCEL = 'FOK_CANCEL',
+  // the order was cancelled as it has expired
   EXPIRED = 'EXPIRED',
+  // the post-only order could not be posted into the orderbook
+  FAIL_POST_ONLY = 'FAIL_POST_ONLY',
+  // the reduce-only order would have caused position size to increase
+  FAIL_REDUCE_ONLY = 'FAIL_REDUCE_ONLY',
+  // the order was cancelled due to market maker protection trigger
+  MM_PROTECTION = 'MM_PROTECTION',
+  // the order was cancelled due to self-trade protection trigger
+  SELF_TRADE_PROTECTION = 'SELF_TRADE_PROTECTION',
+  // the order matched with another order from the same sub account
+  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
+  // an active order on your sub account shares the same clientOrderId
+  OVERLAPPING_CLIENT_ORDER_ID = 'OVERLAPPING_CLIENT_ORDER_ID',
   // the order will bring the sub account below initial margin requirement
   BELOW_MARGIN = 'BELOW_MARGIN',
   // the sub account is liquidated (and all open orders are cancelled by Gravity)
   LIQUIDATION = 'LIQUIDATION',
+  // instrument is invalid or not found on Gravity
+  INSTRUMENT_INVALID = 'INSTRUMENT_INVALID',
+  // instrument is no longer tradable on Gravity. (typically due to a market halt, or instrument expiry)
+  INSTRUMENT_DEACTIVATED = 'INSTRUMENT_DEACTIVATED',
   // system failover resulting in loss of order state
   SYSTEM_FAILOVER = 'SYSTEM_FAILOVER',
-  // a previous order shares the same signature hash as your current order (typically when you submit the same signature twice)
-  CONFLICTING_SIGNATURE_HASH = 'CONFLICTING_SIGNATURE_HASH',
-  // an active order on your sub account shares the same clientOrderId
-  OVERLAPPING_CLIENT_ORDER_ID = 'OVERLAPPING_CLIENT_ORDER_ID',
-  // the RFQ has been cancelled
-  RFQ_CANCELLED = 'RFQ_CANCELLED',
-  // the AXE has been cancelled
-  AXE_CANCELLED = 'AXE_CANCELLED',
-  // the order payload contains one or more validation error (Trading Server will reply with a more specific error)
-  INVALID_ORDER = 'INVALID_ORDER',
   // the credentials used (userSession/apiKeySession/walletSignature) is not authorised to perform the action
   UNAUTHORISED = 'UNAUTHORISED',
-  // when post-only order enters orderbook as a taker order
-  FAIL_POST_ONLY = 'FAIL_POST_ONLY',
-  // when reduce-only order causes position size to increase
-  FAIL_REDUCE_ONLY = 'FAIL_REDUCE_ONLY',
-  // trigger price is on the wrong side of the trigger condition
-  INVALID_TRIGGER_PRICE = 'INVALID_TRIGGER_PRICE',
-  // the RFQ has expired
-  RFQ_EXPIRED = 'RFQ_EXPIRED',
-  // the AXE has expired
-  AXE_EXPIRED = 'AXE_EXPIRED',
-  // the FOK order could not be fully matched
-  FAIL_FOK = 'FAIL_FOK',
-  // the AON order could not be fully matched
-  FAIL_AON = 'FAIL_AON',
-  // the order matched with another order from the same sub account
-  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
-  // the signature size exceeds the maximum allowed size
-  SIGNATURE_SIZE_EXCEEDED = 'SIGNATURE_SIZE_EXCEEDED',
+  // the session key used to sign the order expired
+  SESSION_KEY_EXPIRED = 'SESSION_KEY_EXPIRED',
   // the subaccount does not exist
   SUB_ACCOUNT_NOT_FOUND = 'SUB_ACCOUNT_NOT_FOUND',
-  // the signature is invalid
-  BAD_SIGNATURE = 'BAD_SIGNATURE',
-  // maker order size is non-zero on an unmatched leg
-  SIZE_NON_ZERO_ON_UNMATCHED_LEG = 'SIZE_NON_ZERO_ON_UNMATCHED_LEG',
-  // the order trades with another order on the same side
-  TRADE_SAME_SIDE = 'TRADE_SAME_SIDE',
-  // the order trades with another order but the price does not cross
-  TRADE_PRICE_DOES_NOT_CROSS = 'TRADE_PRICE_DOES_NOT_CROSS',
-  // the order has no legs
-  NO_LEG = 'NO_LEG',
-  // market order on maker side
-  MARKET_ORDER_ON_MAKER_SIDE = 'MARKET_ORDER_ON_MAKER_SIDE',
-  // time in force requires taker
-  TIME_IN_FORCE_REQUIRE_TAKER = 'TIME_IN_FORCE_REQUIRE_TAKER',
-  // asset quote not matching
-  ASSET_QUOTE_NOT_MATCHING = 'ASSET_QUOTE_NOT_MATCHING',
-  // missing mark price
-  MISSING_MARK_PRICE = 'MISSING_MARK_PRICE',
-  // missing index price
-  MISSING_INDEX_PRICE = 'MISSING_INDEX_PRICE',
-  // session key expired
-  SESSION_KEY_EXPIRED = 'SESSION_KEY_EXPIRED',
-  // duplicate leg asset
-  DUPLICATE_LEG_ASSET = 'DUPLICATE_LEG_ASSET',
-  // charged fee above signed amount
-  CHARGED_FEE_ABOVE_SIGNED_AMOUNT = 'CHARGED_FEE_ABOVE_SIGNED_AMOUNT',
-  // charged fee below minimum
-  CHARGED_FEE_BELOW_MIN = 'CHARGED_FEE_BELOW_MIN',
-  // no trade permission
+  // the signature used to sign the order has no trade permission
   NO_TRADE_PERMISSION = 'NO_TRADE_PERMISSION',
-  // a maker order without any leg that is matched (size > 0) against at least 1 taker leg
-  NOT_MATCHED_AGAINS_TAKER_LEGS = 'NOT_MATCHED_AGAINS_TAKER_LEGS',
-  // AON/FOK order not fully matched
-  ORDER_NOT_FULLY_MATCHED = 'ORDER_NOT_FULLY_MATCHED',
-  // asset expired
-  ASSET_EXPIRED = 'ASSET_EXPIRED',
-  // number of legs and number of legs mismatch, eg: 2 legs, but sizeMatched is [1,2,3]
-  NUM_LEGS_SIZE_MATCHED_MISMATCH = 'NUM_LEGS_SIZE_MATCHED_MISMATCH',
-  // invalid asset, types = UNSPECIFIED
-  INVALID_ASSET = 'INVALID_ASSET',
+  // the order payload does not contain a supported TimeInForce value
+  UNSUPPORTED_TIME_IN_FORCE = 'UNSUPPORTED_TIME_IN_FORCE',
+  // the order has multiple legs, but multiple legs are not supported by this venue
+  MULTI_LEGGED_ORDER = 'MULTI_LEGGED_ORDER',
 }
 
 export enum EOrderStateFilter {
@@ -207,88 +167,11 @@ export enum EOrderStatus {
   CANCELLED = 'CANCELLED',
 }
 
-export enum ERfqRejectReason {
-  // client called a Cancel API
-  CLIENT_CANCEL = 'CLIENT_CANCEL',
-  // client called a Bulk Cancel API
-  CLIENT_BULK_CANCEL = 'CLIENT_BULK_CANCEL',
-  // client called a Session Cancel API, or set the WebSocket connection to 'cancelRfqsOnTerminate'
-  CLIENT_SESSION_END = 'CLIENT_SESSION_END',
-  // instrument is no longer tradable on Gravity. (typically due to a market halt, or instrument expiry)
-  INSTRUMENT_DEACTIVATED = 'INSTRUMENT_DEACTIVATED',
-  // market maker protection triggered
-  MM_PROTECTION = 'MM_PROTECTION',
-  // the RFQ has expired
-  EXPIRED = 'EXPIRED',
-  // the RFQ will bring the sub account below initial margin requirement
-  BELOW_MARGIN = 'BELOW_MARGIN',
-  // the sub account is liquidated (and all open RFQs are cancelled by Gravity)
-  LIQUIDATION = 'LIQUIDATION',
-  // system failover resulting in loss of RFQ state
-  SYSTEM_FAILOVER = 'SYSTEM_FAILOVER',
-  // the RFQ payload contains one or more validation error (Trading Server will reply with a more specific error)
-  INVALID_RFQ = 'INVALID_RFQ',
-  // the credentials used (userSession/apiKeySession/walletSignature) is not authorised to perform the action
-  UNAUTHORISED = 'UNAUTHORISED',
-}
-
-export enum ERfqStatus {
-  // RFQ is actively matching, could be unfilled, partially filled, or over filled (GRVT allows over filling)
-  OPEN = 'OPEN',
-  // RFQ is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
-  REJECTED = 'REJECTED',
-  // RFQ is cancelled by the user using one of the supported APIs (See OrderRejectReason)
-  CANCELLED = 'CANCELLED',
-}
-
-export enum EStrategy {
-  // Fut, [Long Future] (/)
-  FUTURE = 'FUTURE',
-  // Perp, [Long Perpetual] (/)
-  PERPETUAL = 'PERPETUAL',
-  // Call, [Long Call] (_/)
-  CALL = 'CALL',
-  // Put, [Long Put] (\_)
-  PUT = 'PUT',
-  // CSpd, [Long Call , Short Call] (_/ ̅)
-  CALL_SPREAD = 'CALL_SPREAD',
-  // PSpd, [Short Put , Long Put] ( ̅\_)
-  PUT_SPREAD = 'PUT_SPREAD',
-  // FSpd, [Long Future . Short Future] (/.\)
-  FUTURE_SPREAD = 'FUTURE_SPREAD',
-  // RRc, [Short Put , Long Call] (/-/)
-  RISK_REVERSAL_CALL = 'RISK_REVERSAL_CALL',
-  // RRp, [Long Put , Sell Call] (\-\)
-  RISK_REVERSAL_PUT = 'RISK_REVERSAL_PUT',
-  // CCal, [Long Call . Short Call] (_/.\_)
-  CALL_CALENDAR_SPREAD = 'CALL_CALENDAR_SPREAD',
-  // PCal, [Short Put . Long Put] (_/.\_)
-  PUT_CALENDAR_SPREAD = 'PUT_CALENDAR_SPREAD',
-  // Strd, [Long Call + Long Put] (\/)
-  STRADDLE = 'STRADDLE',
-  // Strg, [Long Put , Long Call]  (\_/)
-  STRANGLE = 'STRANGLE',
-  // CFly, [Long Call , 2 Short Call , Long Call] (_/\_)
-  CALL_BUTTERFLY = 'CALL_BUTTERFLY',
-  // PFly, [Long Put , 2 Short Put , Long Put] (_/\_)
-  PUT_BUTTERFLY = 'PUT_BUTTERFLY',
-  // IFly, [Long Call , Short Call + Short Put , Long Put] (_/\_)
-  IRON_BUTTERFLY = 'IRON_BUTTERFLY',
-  // CCon, [Long Call , Short Call, Short Call , Long Call] (_/ ̅\_)
-  CALL_CONDOR = 'CALL_CONDOR',
-  // PCon, [Long Put , Short Put, Short Put , Long Put] (_/ ̅\_)
-  PUT_CONDOR = 'PUT_CONDOR',
-  // ICon, [Long Put , Short Put, Short Call , Long Call] (_/ ̅\_)
-  IRON_CONDOR = 'IRON_CONDOR',
-  // Cstm - Everything Else
-  CUSTOM = 'CUSTOM',
-}
-
 export enum ESubAccountTradeInterval {
   // 1 month
   SAT_1_MO = 'SAT_1_MO',
-  // Lifetime
-  SAT_LIFETIME = 'SAT_LIFETIME',
+  // 1 day
+  SAT_1_D = 'SAT_1_D',
 }
 
 // |                       | Must Fill All | Can Fill Partial |
@@ -313,26 +196,6 @@ export enum EVenue {
   ORDERBOOK = 'ORDERBOOK',
 }
 
-export interface IAPIMiniTickerRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
-  instrument?: string
-}
-
-export interface IAPIOrderbookLevelsRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
-  instrument?: string
-  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
-  depth?: number
-  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
-  aggregate?: number
-}
-
 export interface IAPISettlementPrice {
   // The underlying currency of the settlement price
   underlying?: ECurrency
@@ -342,6 +205,12 @@ export interface IAPISettlementPrice {
   settlement_time?: bigint
   // The settlement price, expressed in `9` decimals
   settlement_price?: string
+}
+
+// Used to acknowledge a request has been received and will be processed
+export interface IAckResponse {
+  // Gravity has acknowledged that the request has been successfully received and it will process it in the backend
+  acknowledgement?: boolean
 }
 
 export interface IApiAggregatedAccountSummaryResponse {
@@ -355,6 +224,7 @@ export interface IApiAggregatedAccountSummaryResponse {
   mark_prices?: IMarkPrice[]
 }
 
+// Cancel all orders on the orderbook for this trading account. This may not match new orders in flight.
 export interface IApiCancelAllOrdersRequest {
   // The subaccount ID cancelling all orders
   sub_account_id?: bigint
@@ -365,26 +235,7 @@ export interface IApiCancelAllOrdersResponse {
   num_cancelled?: number
 }
 
-export interface IApiCancelAllRfqQuotesRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IApiCancelAllRfqQuotesResponse {
-  // The number of RFQ Quotes cancelled
-  num_cancelled?: number
-}
-
-export interface IApiCancelAllRfqsRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IApiCancelAllRfqsResponse {
-  // The number of RFQs cancelled
-  num_cancelled?: number
-}
-
+// Cancel an order on the orderbook for this trading account.
 export interface IApiCancelOrderRequest {
   // The subaccount ID cancelling the order
   sub_account_id?: bigint
@@ -399,32 +250,7 @@ export interface IApiCancelOrderResponse {
   order?: IOrder
 }
 
-export interface IApiCancelRfqQuoteRequest {
-  // The subaccount ID cancelling the quote
-  sub_account_id?: bigint
-  // Cancel the quote with this `order_id`
-  quote_id?: bigint
-  // Cancel the quote with this `client_order_id`
-  client_quote_id?: number
-}
-
-export interface IApiCancelRfqQuoteResponse {
-  // The cancelled RFQ Quote
-  rfq_quote?: IRfqQuote
-}
-
-export interface IApiCancelRfqRequest {
-  // The subaccount ID cancelling the RFQ
-  sub_account_id?: bigint
-  // Cancel the RFQ with this `rfq_id`
-  rfq_id?: bigint
-}
-
-export interface IApiCancelRfqResponse {
-  // The cancelled RFQ
-  rfq?: IRfq
-}
-
+// Kline/Candlestick bars for an instrument. Klines are uniquely identified by their instrument, type, interval, and open time.
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent candlesticks are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the candlesticks starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the candlesticks ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the candlesticks between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 export interface IApiCandlestickRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
@@ -449,6 +275,7 @@ export interface IApiCandlestickResponse {
   results?: ICandlestick[]
 }
 
+// Create an order on the orderbook for this trading account.
 export interface IApiCreateOrderRequest {
   // The order to create
   order?: IOrder
@@ -459,33 +286,13 @@ export interface IApiCreateOrderResponse {
   order?: IOrder
 }
 
-export interface IApiCreateRfqQuoteRequest {
-  // The RFQ Quote to create
-  rfq_quote?: IRfqQuote
-}
-
-export interface IApiCreateRfqQuoteResponse {
-  // The created RFQ Quote
-  rfq_quote?: IRfqQuote
-}
-
-export interface IApiCreateRfqRequest {
-  // The RFQ to create
-  rfq?: IRfq
-}
-
-export interface IApiCreateRfqResponse {
-  // The created RFQ
-  rfq?: IRfq
-}
-
 // The request to get the historical deposits of an account
 // The history is returned in reverse chronological order
 export interface IApiDepositHistoryRequest {
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
-  // The cursor to indicate when to start the query from
-  cursor?: bigint
+  // The cursor to indicate when to start the next query from
+  cursor?: string
   // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
@@ -498,7 +305,7 @@ export interface IApiDepositHistoryResponse {
   // The total number of deposits matching the request account
   total?: number
   // The cursor to indicate when to start the next query from
-  next?: bigint
+  next?: string
   // The deposit history matching the request account
   results?: IDepositHistory[]
 }
@@ -564,6 +371,7 @@ export interface IApiFundingAccountSummaryResponse {
   mark_prices?: IMarkPrice[]
 }
 
+// Lookup the historical funding rate of various pairs.
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -594,7 +402,7 @@ export interface IApiGetAllInstrumentsRequest {
 
 export interface IApiGetAllInstrumentsResponse {
   // List of instruments
-  instruments?: IInstrument[]
+  results?: IInstrument[]
 }
 
 export interface IApiGetEcosystemLeaderboardRequest {
@@ -607,13 +415,6 @@ export interface IApiGetEcosystemLeaderboardRequest {
 export interface IApiGetEcosystemLeaderboardResponse {
   // The list of ecosystem points
   points?: IEcosystemPoint[]
-}
-
-export interface IApiGetEcosystemReferralStatRequest {
-  // The interval of each sub account trade
-  interval?: ESubAccountTradeInterval
-  // The starting time in unix nanoseconds of a specific interval to query. Required for interval 1 month
-  start_interval?: bigint
 }
 
 export interface IApiGetEcosystemReferralStatResponse {
@@ -653,8 +454,6 @@ export interface IApiGetInstrumentRequest {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
-  // The readable name of the instrument
-  instrument_name?: string
 }
 
 export interface IApiGetInstrumentResponse {
@@ -724,6 +523,15 @@ export interface IApiLatestSnapSubAccountsResponse {
   results?: ISubAccount[]
 }
 
+// Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
+export interface IApiMiniTickerRequest {
+  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
+  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  instrument?: string
+}
+
 export interface IApiMiniTickerResponse {
   // The mini ticker matching the request asset
   results?: IMiniTicker
@@ -740,31 +548,13 @@ export interface IApiOpenOrdersRequest {
   quote?: ECurrency[]
 }
 
+// Retrieves all open orders for the account. This may not match new orders in flight.
 export interface IApiOpenOrdersResponse {
   // The Open Orders matching the request filter
   orders?: IOrder[]
 }
 
-export interface IApiOpenRfqQuotesRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IApiOpenRfqQuotesResponse {
-  // The Open RfqQuotes matching the request filter
-  rfq_quotes?: IRfqQuote[]
-}
-
-export interface IApiOpenRfqsRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IApiOpenRfqsResponse {
-  // The Open RFQs matching the request filter
-  rfqs?: IRfq[]
-}
-
+// Retrieves the order history for the account.
 export interface IApiOrderHistoryRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -787,7 +577,7 @@ export interface IApiOrderHistoryRequest {
 export interface IApiOrderHistoryResponse {
   // The total number of orders matching the request filter
   total?: number
-  // The cursor to indicate when to start the next query from
+  // The cursor to indicate when to start the query from
   next?: string
   // The Open Orders matching the request filter
   orders?: IOrder[]
@@ -807,11 +597,25 @@ export interface IApiOrderStateResponse {
   state?: IOrderState
 }
 
+// Retrieves aggregated price depth for a single instrument, with a maximum depth of 10 levels. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
+export interface IApiOrderbookLevelsRequest {
+  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
+  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
+  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
+  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  instrument?: string
+  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
+  depth?: number
+  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
+  aggregate?: number
+}
+
 export interface IApiOrderbookLevelsResponse {
   // The orderbook levels objects matching the request asset
   results?: IOrderbookLevels
 }
 
+// Query the positions of a sub account
 export interface IApiPositionsRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
@@ -828,6 +632,7 @@ export interface IApiPositionsResponse {
   results?: IPositions[]
 }
 
+// Query for all historical trades made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
 export interface IApiPrivateTradeHistoryRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
@@ -850,12 +655,15 @@ export interface IApiPrivateTradeHistoryRequest {
 export interface IApiPrivateTradeHistoryResponse {
   // The total number of private trades matching the request filter
   total?: number
-  // The cursor to indicate when to start the next query from
+  // The cursor to indicate when to start the query from
   next?: string
   // The private trades matching the request asset
   results?: IPrivateTrade[]
 }
 
+// Perform historical lookup of public trades in any given instrument.
+// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
+// Only data from the last three months will be retained.
 export interface IApiPublicTradeHistoryRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -873,6 +681,8 @@ export interface IApiPublicTradeHistoryResponse {
   results?: IPublicTrade[]
 }
 
+// Retrieves up to 1000 of the most recent public trades in any given instrument. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
+// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
 export interface IApiPublicTradesRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -897,6 +707,7 @@ export interface IApiResolveEpochEcosystemMetricResponse {
   last_calculated_time?: bigint
 }
 
+// Lookup the historical settlement price of various pairs.
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent settlement prices are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the settlement prices starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the settlement prices ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the settlement prices between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
 // The instrument is also optional. When left empty, all perpetual instruments are returned.
@@ -935,14 +746,14 @@ export interface IApiSubAccountHistoryRequest {
   // End time of sub account history in unix nanoseconds
   end_time?: bigint
   // The cursor to indicate when to start the next query from
-  cursor?: bigint
+  cursor?: string
 }
 
 export interface IApiSubAccountHistoryResponse {
   // The total number of sub account snapshots matching the request filter
   total?: number
   // The cursor to indicate when to start the next query from
-  next?: bigint
+  next?: string
   // The sub account history matching the request sub account
   results?: ISubAccount[]
 }
@@ -952,6 +763,7 @@ export interface IApiSubAccountSummaryRequest {
   sub_account_id?: bigint
 }
 
+// Query for sub-account details, including base currency balance, all derivative positions, margin levels, and P&L.
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   results?: ISubAccount
@@ -959,12 +771,20 @@ export interface IApiSubAccountSummaryResponse {
 
 // startTime are optional parameters. The semantics of these parameters are as follows:<ul>
 export interface IApiSubAccountTradeAggregationRequest {
+  // Optional. The limit of the number of results to return
+  limit?: number
   // The interval of each sub account trade
   interval?: ESubAccountTradeInterval
   // The list of sub account ids to query
   sub_account_i_ds?: bigint[]
+  // The sub account id to query greater than
+  sub_account_id_greater_than?: bigint
   // Optional. The starting time in unix nanoseconds of a specific interval to query
   start_interval?: bigint
+  // Optional. Start time in unix nanoseconds
+  start_time?: bigint
+  // Optional. End time in unix nanoseconds
+  end_time?: bigint
 }
 
 export interface IApiSubAccountTradeAggregationResponse {
@@ -996,16 +816,12 @@ export interface IApiSubAccountTradeResponse {
   results?: ISubAccountTrade[]
 }
 
-export interface IApiTDGAckResponse {
-  // Gravity has acknowledged that the request has been successfully received and it will process it in the backend
-  acknowledgement?: boolean
-}
-
 export interface IApiTickerFeedDataV1 {
   // The mini ticker matching the request asset
   results?: ITicker
 }
 
+// Retrieves a single ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
 export interface IApiTickerRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -1019,27 +835,13 @@ export interface IApiTickerResponse {
   results?: ITicker
 }
 
-export interface IApiTradeRfqRequest {
-  // The rfq to trade against
-  rfq_id?: bigint
-  // The taker order to trade against the rfq quotes
-  order?: IOrder
-}
-
-export interface IApiTradeRfqResponse {
-  // The rfq to trade against
-  rfq_id?: bigint
-  // The taker order to trade against the rfq quotes
-  order?: IOrder
-}
-
 // The request to get the historical transfers of an account
 // The history is returned in reverse chronological order
 export interface IApiTransferHistoryRequest {
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
-  // The cursor to indicate when to start the query from
-  cursor?: bigint
+  // The cursor to indicate when to start the next query from
+  cursor?: string
   // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
@@ -1052,7 +854,7 @@ export interface IApiTransferHistoryResponse {
   // The total number of transfers matching the request account
   total?: number
   // The cursor to indicate when to start the next query from
-  next?: bigint
+  next?: string
   // The transfer history matching the request account
   results?: ITransferHistory[]
 }
@@ -1084,8 +886,8 @@ export interface IApiTransferRequest {
 export interface IApiWithdrawalHistoryRequest {
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
-  // The cursor to indicate when to start the query from
-  cursor?: bigint
+  // The cursor to indicate when to start the next query from
+  cursor?: string
   // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
@@ -1098,7 +900,7 @@ export interface IApiWithdrawalHistoryResponse {
   // The total number of withdrawals matching the request account
   total?: number
   // The cursor to indicate when to start the next query from
-  next?: bigint
+  next?: string
   // The withdrawals history matching the request account
   results?: IWithdrawalHistory[]
 }
@@ -1106,7 +908,7 @@ export interface IApiWithdrawalHistoryResponse {
 // Leverage this API to initialize a withdrawal from GRVT's Hyperchain onto Ethereum.
 // Do take note that the bridging process does take time. The GRVT UI will help you keep track of bridging progress, and notify you once its complete.
 //
-// If not withdrawing the entirety of your balance, there is a minimum withdrawal amount. Currently that amount is 100 USDC.
+// If not withdrawing the entirety of your balance, there is a minimum withdrawal amount. Currently that amount is ~25 USDT.
 // Withdrawal fees also apply to cover the cost of the Ethereum transaction.
 // Note that your funds will always remain in self-custory throughout the withdrawal process. At no stage does GRVT gain control over your funds.
 export interface IApiWithdrawalRequest {
@@ -1156,7 +958,7 @@ export interface IDeposit {
   // The token currency to deposit
   token_currency?: ECurrency
   // The number of tokens to deposit
-  num_tokens?: bigint
+  num_tokens?: string
 }
 
 export interface IDepositHistory {
@@ -1570,115 +1372,6 @@ export interface IPublicTrade {
   is_liquidation?: boolean
 }
 
-export interface IRFQBook {
-  // List of all full/AON quotes, sorted from best price to worst
-  full?: IRFQBookQuote[]
-  // List of all levels of partial quotes, sorted from best price to worst
-  partial?: IRFQBookLevel[]
-}
-
-export interface IRFQBookLevel {
-  // The timestamp after which the price quoted in this level expires, expressed in unix nanoseconds
-  // This is the earliest expiration of all partial quotes grouped into this level
-  level_expiration?: bigint
-  // price of the level, expressed in `9` decimals
-  level_price?: bigint
-  // The size of the level. The number of full structures in this level, expressed in base ratio units
-  lots?: number
-  // The list of quotes in this level belonging to each leg
-  legs?: IRFQBookLevelLeg[]
-}
-
-export interface IRFQBookLevelLeg {
-  // The instrument to being traded in this leg
-  instrument?: string
-  // List of all partial/GTT quotes in the level for this leg, sorted from best price to worst
-  quotes?: IRFQBookQuote[]
-}
-
-export interface IRFQBookQuote {
-  // The 128-bit orderID of the RFQ Quote
-  quote_id?: bigint
-  // The clientOrderID of the RFQ Quote
-  client_quote_id?: bigint
-  // The quoter's subaccount
-  quoter_subaccount_id?: bigint
-  // The timestamp after which Gravity expires the quote, expressed in unix nanoseconds.
-  quote_expiration?: bigint
-  // GTT quotes are always quoted based on one standard unit of the leg, expressed in quote asset decimal units
-  // AON quotes are always quoted based on a single lot of the RFQ structure
-  quote_price?: bigint
-  // The total number of assets in this quote, expressed without decimals. Negative size = short
-  size_no_decimal?: number
-}
-
-// There are many features unique to GRVT RFQ. These features are built to maximize RFQ liquidity, and offer traders ultimate configurability, and trading experience.
-//
-// <ul><li>Over Execution</li><ul><li>RFQ Requestors can execute against all quotes made to them, even beyond the requested RFQ size.</li><li>For instance, if the RFQ Requested for three legs at [5 -10 5] sizes, but receives multiple full quotes that the requestor would like to execute against, the Requestor can do so.</li><li>This means the requestor may execute any multiple of [5 -10 5] sizes, as long as there are sufficient quotes.</li><li>When coupled with the GRVT Partial Execution feature, RFQ Requestors may execute in multiples of [1 -2 1] sizes.</li></ul><li>Partial Quoting</li><ul><li>RFQ Requestors can enable partial quoting on their RFQ via setting `rfq.allowPartial = true`.</li><li>When the RFQ has this setting, Quoters are allowed to supply GTT quotes in any size (at or under requested size).</li><li>Quoters can also choose to quote some legs but not others.</li><li>This is helpful for Quoters if they wish to make directional trades, or if they only quote for linear instruments, but not options.</li><li>If Quoters wish to only allow execution against the full quote, they may supply an AON quote instead.</li></ul><li>Partial Execution</li><ul><li>RFQ Requestors can enable partial execution via setting `rfq.allowPartial = true`.</li><li>Partial execution maximized liquidity, and prices. For instance, if the Requestor wishes to simulate a covered call (Buy Perp, Short Call),</li></li><li>they may receive the best Perp (GTT) quote from one Quoter, and best Call (GTT) quote from another Quoter.</li><li>Requestors may choose to execute against this combination, with a better price that no single Quoter can beat.</li><li>It also offers Requestors more sizing flexibility. Even if the RFQ requested for [5 -10 5] sizes, RFQ Requestors may execute in multiples of [1 -2 1] base ratio sizes.</li><li>This pairs with Over Execution well, where Requestors may even execute against [12 -24 12] sizes.</li></ul><li>Anonymity</li><ul><li>This is helpful when the Requestor or Quoter would like to stay anonymous.</li><li>RFQ Requestor Anonymity is supported via the `rfq.isAnonymous` field.</li><li>RFQ Quoter Anonymity is supported via the `rfqQuote.isAnonymous` field.</li></ul><li>Hide Volume (Under Consideration)</li><ul><li>This is helpful for trading without announcing the executed volume to the public.</li><li>Volume will be hidden as long as either the Requestor or Quoter chooses to hide the volume.</li><li>GRVT will apply the stricter privacy policy.</li><li>eg. Requestor trades [10 -20 10] against two Quoters with [5 -10 5] each.</li><li>If Requestor chooses to hide volume, all [10 -20 10] will be hidden from public.</li><li>If only one Quoter chooses to hide volume, the public will see a trade amounting to [5 -10 5]</li></ul></ul>
-export interface IRfq {
-  // [Filled by GRVT Backend] A unique 128-bit identifier for the RFQ, deterministically generated within the GRVT backend
-  rfq_id?: bigint
-  // The subaccount initiating the RFQ
-  sub_account_id?: bigint
-  // The visibility of the RFQ. Is it public or private?
-  is_public?: boolean
-  // The strategy of the RFQ
-  strategy?: EStrategy
-  // The timestamp after which Gravity expires the RFQ, expressed in unix nanoseconds
-  expiry?: bigint
-  // The list of counterparty subaccount IDs. Ignored for public RFQs
-  receipients?: bigint[]
-  // RFQ requestor's anonymity to receipients. Defaults false
-  is_anonymous?: boolean
-  // Allow RFQ Quoter's to supply partial quotes, and allows requestor to execute against partial sizes. Defaults false.
-  // When `allowPartial = false`, all quotes submitted to the RFQ must match RFQ size completely, and have `order.TimeInForce = AON`.
-  // When `allowPartial = true` && the quote's `order.TimeInForce = AON`, the quote must match RFQ size completely.
-  // When `allowPartial = true` && the quote's `order.TimeInForce = GTT`, the quote can be of any size (at or under requested size), and only quote some legs and not others.
-  allow_partial?: boolean
-  // All legs belonging to the RFQ. Leg size may be positive (long) or negative (short)
-  legs?: IRfqLeg[]
-  // [Filled by GRVT Backend] All RFQ bids, sorted from best (lowest) price to worst (highest)
-  bids?: IRFQBook
-  // [Filled by GRVT Backend] All RFQ asks, sorted from best (highest) price to worst (lowest)
-  asks?: IRFQBook
-  // [Filled by GRVT Backend] Time at which the rfq was received by GRVT, expressed in unix nanoseconds
-  create_time?: bigint
-  // [Filled by GRVT Backend] The current state of the rfq
-  state?: IRfqState
-}
-
-export interface IRfqLeg {
-  // The instrument to trade in this leg
-  instrument?: string
-  // The total number of assets to trade in this leg, expressed without decimals. Negative size = short
-  size_no_decimal?: number
-  // [Filled by GRVT Backend] The relative ratio of this leg to the other legs in this RFQ. Base ratio is standardized (divided) by the GCD.
-  // For instance, [5 -10 5] will have a base ratio of [1 -2 1]
-  // For RFQs set to `isPartial = false`, quotes must always quote the full size [5 -10 5]
-  // For RFQs set to `isPartial = true`, quotes can be AON/GTT
-  base_ratio?: number
-  // If the leg is a bid or an ask
-  is_bid?: boolean
-}
-
-export interface IRfqQuote {
-  // A unique 128-bit identifier for the RFQ, deterministically generated within the GRVT backend
-  rfq_id?: bigint
-  // RFQ quoter's anonymity to requestor. Defaults false
-  is_anonymous?: boolean
-  // The signed smart contract order
-  order?: IOrder
-}
-
-export interface IRfqState {
-  // The RFQ status
-  rfq_status?: ERfqStatus
-  // The reason for rejection or cancellation
-  reject_reason?: ERfqRejectReason
-  // Time at which the rfq was updated by GRVT, expressed in unix nanoseconds
-  update_time?: bigint
-}
-
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
   signer?: bigint
@@ -1749,8 +1442,6 @@ export interface ISubAccountTrade {
 
 // Similar to sub-account trade, but not divided by individual assets.
 export interface ISubAccountTradeAggregation {
-  // Start of calculation epoch
-  start_interval?: bigint
   // The sub account id
   sub_account_id?: bigint
   // Total fee paid
@@ -1855,7 +1546,7 @@ export interface ITransfer {
   // The token currency to transfer
   token_currency?: ECurrency
   // The number of tokens to transfer
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the transfer
   signature?: ISignature
 }
@@ -1890,6 +1581,8 @@ export interface IWSCandlestickFeedDataV1 {
   feed?: ICandlestick
 }
 
+// Subscribes to a stream of Kline/Candlestick updates for an instrument. A Kline is uniquely identified by its open time.
+// A new Kline is published every interval (if it exists). Upon subscription, the server will send the 5 most recent Kline for the requested interval.
 export interface IWSCandlestickFeedSelectorV1 {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -1902,28 +1595,8 @@ export interface IWSCandlestickFeedSelectorV1 {
   type?: ECandlestickType
 }
 
-export interface IWSCandlestickRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
-  instrument?: string
-  // The interval of each candlestick
-  interval?: ECandlestickInterval
-  // The type of candlestick data to retrieve
-  type?: ECandlestickType
-}
-
-export interface IWSCandlestickResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A candlestick entry matching the request filters
-  f?: ICandlestick
-}
-
-export interface IWSDepositFeedDataV1DTO {
+// Subscribes to a feed of deposit updates.
+export interface IWSDepositFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
   // A running sequence number that determines global message order within the specific stream
@@ -1941,6 +1614,12 @@ export interface IWSMiniTickerFeedDataV1 {
   feed?: IMiniTicker
 }
 
+// Subscribes to a mini ticker feed for a single instrument. The `mini.s` channel offers simpler integration. To experience higher publishing rates, please use the `mini.d` channel.
+// Unlike the `mini.d` channel which publishes an initial snapshot, then only streams deltas after, the `mini.s` channel publishes full snapshots at each feed.
+//
+// The Delta feed will work as follows:<ul><li>On subscription, the server will send a full snapshot of the mini ticker.</li><li>After the snapshot, the server will only send deltas of the mini ticker.</li><li>The server will send a delta if any of the fields in the mini ticker have changed.</li></ul>
+//
+// Field Semantics:<ul><li>[DeltaOnly] If a field is not updated, {}</li><li>If a field is updated, {field: '123'}</li><li>If a field is set to zero, {field: '0'}</li><li>If a field is set to null, {field: ''}</li></ul>
 export interface IWSMiniTickerFeedSelectorV1 {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -1953,32 +1632,6 @@ export interface IWSMiniTickerFeedSelectorV1 {
   rate?: number
 }
 
-export interface IWSMiniTickerRequest {
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (raw, 50, 100, 200, 500, 1000, 5000)
-  // Snapshot (200, 500, 1000, 5000)
-  rate?: number
-  // The expiration time to select in unix nanoseconds
-  expiration?: bigint[]
-  // The strike price to select
-  strike_price?: bigint[]
-}
-
-export interface IWSMiniTickerResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A mini ticker matching the request filter
-  f?: IMiniTicker
-}
-
 export interface IWSOrderFeedDataV1 {
   // Stream name
   stream?: string
@@ -1988,6 +1641,9 @@ export interface IWSOrderFeedDataV1 {
   feed?: IOrder
 }
 
+// Subscribes to a feed of order updates pertaining to orders made by your account.
+// Each Order can be uniquely identified by its `order_id` or `client_order_id` (if client designs well).
+// Use `stateFilter = c` to only receive create events, `stateFilter = u` to only receive update events, and `stateFilter = a` to receive both.
 export interface IWSOrderFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -2010,6 +1666,10 @@ export interface IWSOrderStateFeedDataV1 {
   feed?: IOrderStateFeed
 }
 
+// Subscribes to a feed of order updates pertaining to orders made by your account.
+// Unlike the Order Stream, this only streams state updates, drastically improving throughput, and latency.
+// Each Order can be uniquely identified by its `order_id` or `client_order_id` (if client designs well).
+// Use `stateFilter = c` to only receive create events, `stateFilter = u` to only receive update events, and `stateFilter = a` to receive both.
 export interface IWSOrderStateFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -2032,6 +1692,12 @@ export interface IWSOrderbookLevelsFeedDataV1 {
   feed?: IOrderbookLevels
 }
 
+// Subscribes to aggregated orderbook updates for a single instrument. The `book.s` channel offers simpler integration. To experience higher publishing rates, please use the `book.d` channel.
+// Unlike the `book.d` channel which publishes an initial snapshot, then only streams deltas after, the `book.s` channel publishes full snapshots at each feed.
+//
+// The Delta feed will work as follows:<ul><li>On subscription, the server will send a full snapshot of all levels of the Orderbook.</li><li>After the snapshot, the server will only send levels that have changed in value.</li></ul>
+//
+// Field Semantics:<ul><li>[DeltaOnly] If a level is not updated, level not published</li><li>If a level is updated, {size: '123'}</li><li>If a level is set to zero, {size: '0'}</li><li>Incoming levels will be published as soon as price moves</li><li>Outgoing levels will be published with `size = 0`</li></ul>
 export interface IWSOrderbookLevelsFeedSelectorV1 {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -2048,36 +1714,6 @@ export interface IWSOrderbookLevelsFeedSelectorV1 {
   aggregate?: number
 }
 
-export interface IWSOrderbookLevelsRequest {
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (100, 200, 500, 1000, 5000)
-  // Snapshot (500, 1000, 5000)
-  rate?: number
-  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
-  depth?: number
-  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
-  aggregate?: number
-  // The expiration time to select in unix nanoseconds
-  expiration?: bigint[]
-  // The strike price to select
-  strike_price?: string[]
-}
-
-export interface IWSOrderbookLevelsResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // An orderbook levels object matching the request filter
-  f?: IOrderbookLevels
-}
-
 export interface IWSPositionsFeedDataV1 {
   // Stream name
   stream?: string
@@ -2087,6 +1723,7 @@ export interface IWSPositionsFeedDataV1 {
   feed?: IPositions
 }
 
+// Subscribes to a feed of position updates. This happens when a trade is executed.
 export interface IWSPositionsFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -2096,26 +1733,6 @@ export interface IWSPositionsFeedSelectorV1 {
   underlying?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
-}
-
-export interface IWSPositionsRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-}
-
-export interface IWSPositionsResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A Position being created or updated matching the request filter
-  f?: IPositions
 }
 
 export interface IWSPrivateTradeFeedDataV1 {
@@ -2138,26 +1755,6 @@ export interface IWSPrivateTradeFeedSelectorV1 {
   quote?: ECurrency
 }
 
-export interface IWSPrivateTradeRequest {
-  // The sub account ID to request for
-  sub_account_id?: bigint
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-}
-
-export interface IWSPrivateTradeResponse {
-  // The websocket channel to which the response is sent
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A private trade matching the request filter
-  f?: IPrivateTrade
-}
-
 export interface IWSPublicTradesFeedDataV1 {
   // Stream name
   stream?: string
@@ -2167,6 +1764,7 @@ export interface IWSPublicTradesFeedDataV1 {
   feed?: IPublicTrade
 }
 
+// Subscribes to a stream of Public Trades for an instrument.
 export interface IWSPublicTradesFeedSelectorV1 {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -2175,32 +1773,6 @@ export interface IWSPublicTradesFeedSelectorV1 {
   instrument?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
-}
-
-export interface IWSPublicTradesRequest {
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // Filter query by venue where trade occured
-  venue?: EVenue[]
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The expiration time to select in unix nanoseconds
-  expiration?: bigint[]
-  // The strike price to select
-  strike_price?: bigint[]
-}
-
-export interface IWSPublicTradesResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A public trade matching the request filter
-  f?: IPublicTrade
 }
 
 export interface IWSRequestV1 {
@@ -2223,74 +1795,6 @@ export interface IWSResponseV1 {
   unsubs?: string[]
 }
 
-export interface IWSRfqFeedDataV1 {
-  // Stream name
-  stream?: string
-  // A running sequence number that determines global message order within the specific stream
-  sequence_number?: bigint
-  // The Rfq being created or updated
-  feed?: IRfq
-}
-
-export interface IWSRfqFeedSelectorV1 {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
-}
-
-export interface IWSRfqQuoteFeedDataV1 {
-  // Stream name
-  stream?: string
-  // A running sequence number that determines global message order within the specific stream
-  sequence_number?: bigint
-  // The RfqQuote being created or updated
-  feed?: IRfqQuote
-}
-
-export interface IWSRfqQuoteFeedSelectorV1 {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
-}
-
-export interface IWSRfqQuoteRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IWSRfqQuoteResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // The RfqQuote being created or updated
-  f?: IRfqQuote
-}
-
-export interface IWSRfqRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-}
-
-export interface IWSRfqResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // The Rfq being created or updated
-  f?: IRfq
-}
-
 export interface IWSTickerFeedDataV1 {
   // Stream name
   stream?: string
@@ -2300,6 +1804,12 @@ export interface IWSTickerFeedDataV1 {
   feed?: ITicker
 }
 
+// Subscribes to a ticker feed for a single instrument. The `ticker.s` channel offers simpler integration. To experience higher publishing rates, please use the `ticker.d` channel.
+// Unlike the `ticker.d` channel which publishes an initial snapshot, then only streams deltas after, the `ticker.s` channel publishes full snapshots at each feed.
+//
+// The Delta feed will work as follows:<ul><li>On subscription, the server will send a full snapshot of the ticker.</li><li>After the snapshot, the server will only send deltas of the ticker.</li><li>The server will send a delta if any of the fields in the ticker have changed.</li></ul>
+//
+// Field Semantics:<ul><li>[DeltaOnly] If a field is not updated, {}</li><li>If a field is updated, {field: '123'}</li><li>If a field is set to zero, {field: '0'}</li><li>If a field is set to null, {field: ''}</li></ul>
 export interface IWSTickerFeedSelectorV1 {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -2312,33 +1822,8 @@ export interface IWSTickerFeedSelectorV1 {
   rate?: number
 }
 
-export interface IWSTickerRequest {
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (100, 200, 500, 1000, 5000)
-  // Snapshot (500, 1000, 5000)
-  rate?: number
-  // The expiration time to select in unix nanoseconds
-  expiration?: bigint[]
-  // The strike price to select
-  strike_price?: bigint[]
-}
-
-export interface IWSTickerResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // A ticker matching the request filter
-  f?: ITicker
-}
-
-export interface IWSTransferFeedDataV1DTO {
+// Subscribes to a feed of transfer updates.
+export interface IWSTransferFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
   // A running sequence number that determines global message order within the specific stream
@@ -2347,7 +1832,8 @@ export interface IWSTransferFeedDataV1DTO {
   feed?: ITransfer
 }
 
-export interface IWSWithdrawalFeedDataV1DTO {
+// Subscribes to a feed of withdrawal updates.
+export interface IWSWithdrawalFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
   // A running sequence number that determines global message order within the specific stream
@@ -2364,7 +1850,7 @@ export interface IWithdrawal {
   // The token currency to withdraw
   token_currency?: ECurrency
   // The number of tokens to withdraw
-  num_tokens?: bigint
+  num_tokens?: string
   // The signature of the withdrawal
   signature?: ISignature
 }
@@ -2384,48 +1870,4 @@ export interface IWithdrawalHistory {
   signature?: ISignature
   // The timestamp of the withdrawal in unix nanoseconds
   event_time?: bigint
-}
-
-export interface IWsOrderRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // Only streams created orders in this stream. If false, updated orders will also be streamed
-  create_only?: boolean
-}
-
-export interface IWsOrderResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // The order object being created or updated
-  f?: IOrder
-}
-
-export interface IWsOrderStateRequest {
-  // The subaccount ID to filter by
-  sub_account_id?: bigint
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // Only streams updated orders in this stream. If false, created orders will also reflect here
-  update_only?: boolean
-}
-
-export interface IWsOrderStateResponse {
-  // Stream name
-  s?: string
-  // A running sequence number that determines global message order within the specific stream
-  n?: bigint
-  // The order state object being created or updated
-  f?: IOrderState
 }

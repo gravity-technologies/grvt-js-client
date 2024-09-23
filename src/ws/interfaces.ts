@@ -12,7 +12,11 @@ import {
   type IPrivateTrade,
   type IPublicTrade,
   type ITicker,
-  type ITransfer
+  type ITransfer,
+  type IWSMiniTickerFeedSelectorV1,
+  type IWSOrderbookLevelsFeedSelectorV1,
+  type IWSPublicTradesFeedSelectorV1,
+  type IWSTickerFeedSelectorV1
 } from '../interfaces'
 
 export enum EStream {
@@ -100,8 +104,8 @@ export interface IWSMiniRequest {
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
-  }
+    // rate?: number
+  } & Pick<IWSMiniTickerFeedSelectorV1, 'rate'>
   onData?: TMessageHandler<IMiniTicker>
   onError?: (error: Error) => void
 }
@@ -114,10 +118,10 @@ export interface IWSBookRequest {
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
-    depth?: number
-    aggregate?: number
-  }
+    // rate?: number
+    // depth?: number
+    // aggregate?: number
+  } & Pick<IWSOrderbookLevelsFeedSelectorV1, 'rate' | 'depth' | 'aggregate'>
   onData?: TMessageHandler<IOrderbookLevels>
   onError?: (error: Error) => void
 }
@@ -130,8 +134,8 @@ export interface IWSTickerRequest {
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    rate?: number
-  }
+    // rate?: number
+  } & Pick<IWSTickerFeedSelectorV1, 'rate'>
   onData?: TMessageHandler<ITicker>
   onError?: (error: Error) => void
 }
@@ -144,8 +148,8 @@ export interface IWSTradeRequest {
     strategy: `${EStrategyShort}`
     expiration?: Date
     strikePrice?: bigint
-    limit?: number
-  }
+    // limit?: number
+  } & Pick<IWSPublicTradesFeedSelectorV1, 'limit'>
   onData?: TMessageHandler<IPublicTrade>
   onError?: (error: Error) => void
 }
