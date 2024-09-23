@@ -586,6 +586,17 @@ export interface IApiFundingRateResponse {
   results?: IFundingRate[]
 }
 
+// Fetch all instruments
+export interface IApiGetAllInstrumentsRequest {
+  // Fetch only active instruments
+  is_active?: boolean
+}
+
+export interface IApiGetAllInstrumentsResponse {
+  // List of instruments
+  results?: IInstrument[]
+}
+
 export interface IApiGetEcosystemLeaderboardRequest {
   // Start time of the epoch - phase
   calculate_from?: bigint
