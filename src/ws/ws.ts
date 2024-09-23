@@ -1,30 +1,29 @@
 import {
   ECurrency,
   EKind,
-  WS_CANDLESTICK_RESPONSE_MAP,
-  WS_MINI_TICKER_RESPONSE_MAP,
-  WS_ORDERBOOK_LEVELS_RESPONSE_MAP,
-  WS_ORDER_RESPONSE_MAP,
-  WS_ORDER_STATE_RESPONSE_MAP,
-  WS_POSITIONS_RESPONSE_MAP,
-  WS_PRIVATE_TRADE_RESPONSE_MAP,
-  WS_PUBLIC_TRADES_RESPONSE_MAP,
-  WS_TICKER_RESPONSE_MAP,
-  WS_TRANSFER_FEED_DATA_V_1_DTO_MAP,
+  WS_CANDLESTICK_FEED_DATA_V_1_MAP,
+  WS_MINI_TICKER_FEED_DATA_V_1_MAP,
+  WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP,
+  WS_ORDER_FEED_DATA_V_1_MAP,
+  WS_ORDER_STATE_FEED_DATA_V_1_MAP,
+  WS_POSITIONS_FEED_DATA_V_1_MAP,
+  WS_PRIVATE_TRADE_FEED_DATA_V_1_MAP,
+  WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP,
+  WS_TICKER_FEED_DATA_V_1_MAP,
+  WS_TRANSFER_FEED_DATA_V_1_MAP,
   type IOrder,
   type IOrderState,
   type ITransfer,
-  type IWSCandlestickResponse,
-  type IWSMiniTickerResponse,
-  type IWSOrderbookLevelsResponse,
-  type IWSPositionsResponse,
-  type IWSPrivateTradeResponse,
-  type IWSPublicTradesResponse,
+  type IWSCandlestickFeedDataV1,
+  type IWSMiniTickerFeedDataV1,
+  type IWSOrderFeedDataV1,
+  type IWSOrderStateFeedDataV1,
+  type IWSPositionsFeedDataV1,
+  type IWSPrivateTradeFeedDataV1,
+  type IWSPublicTradesFeedDataV1,
   type IWSRequestV1,
-  type IWSTickerResponse,
-  type IWSTransferFeedDataV1DTO,
-  type IWsOrderResponse,
-  type IWsOrderStateResponse
+  type IWSTickerFeedDataV1,
+  type IWSTransferFeedDataV1
 } from '../interfaces'
 import { JsonUtils, StringUtils, Utils } from '../utils'
 import {
@@ -434,30 +433,30 @@ export class WS {
   private _messageLiteToFull (message: IMessage): undefined | TEntities {
     switch (message.s) {
       case EStream.CANDLE:
-        return (Utils.schemaMap(message, WS_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IWSCandlestickResponse).f
+        return (Utils.schemaMap(message, WS_CANDLESTICK_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSCandlestickFeedDataV1).feed
       case EStream.ORDERBOOK_DELTA:
       case EStream.ORDERBOOK_SNAP:
-        return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IWSOrderbookLevelsResponse).f
+        return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
       case EStream.MINI_DELTA:
       case EStream.MINI_SNAP:
-        return (Utils.schemaMap(message, WS_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSMiniTickerResponse).f
+        return (Utils.schemaMap(message, WS_MINI_TICKER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSMiniTickerFeedDataV1).feed
       case EStream.TICKER_DELTA:
       case EStream.TICKER_SNAP:
-        return (Utils.schemaMap(message, WS_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IWSTickerResponse).f
+        return (Utils.schemaMap(message, WS_TICKER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTickerFeedDataV1).feed
       case EStream.TRADE:
-        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IWSPublicTradesResponse).f
+        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPublicTradesFeedDataV1).feed
       case EStream.ORDER:
         // if has oi then it's full order
         if ((message as any)?.f?.oi) {
-          return (Utils.schemaMap(message, WS_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderResponse).f
+          return (Utils.schemaMap(message, WS_ORDER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
         }
-        return (Utils.schemaMap(message, WS_ORDER_STATE_RESPONSE_MAP.LITE_TO_FULL) as IWsOrderStateResponse).f
+        return (Utils.schemaMap(message, WS_ORDER_STATE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderStateFeedDataV1).feed
       case EStream.POSITION:
-        return (Utils.schemaMap(message, WS_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IWSPositionsResponse).f
+        return (Utils.schemaMap(message, WS_POSITIONS_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPositionsFeedDataV1).feed
       case EStream.FILL:
-        return (Utils.schemaMap(message, WS_PRIVATE_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IWSPrivateTradeResponse).f
+        return (Utils.schemaMap(message, WS_PRIVATE_TRADE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPrivateTradeFeedDataV1).feed
       case EStream.TRANSFER:
-        return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_DTO_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1DTO).feed
+        return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1).feed
       default:
         console.error('Unknown message: ', message)
     }

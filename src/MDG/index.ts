@@ -4,6 +4,8 @@ import {
   API_CANDLESTICK_RESPONSE_MAP,
   API_FUNDING_RATE_REQUEST_MAP,
   API_FUNDING_RATE_RESPONSE_MAP,
+  API_GET_ALL_INSTRUMENTS_REQUEST_MAP,
+  API_GET_ALL_INSTRUMENTS_RESPONSE_MAP,
   API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP,
   API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP,
   API_GET_INSTRUMENT_REQUEST_MAP,
@@ -21,17 +23,19 @@ import {
   API_TICKER_REQUEST_MAP,
   API_TICKER_RESPONSE_MAP,
   validConfig,
-  type IAPIMiniTickerRequest,
-  type IAPIOrderbookLevelsRequest,
   type IApiCandlestickRequest,
   type IApiCandlestickResponse,
   type IApiFundingRateRequest,
   type IApiFundingRateResponse,
+  type IApiGetAllInstrumentsRequest,
+  type IApiGetAllInstrumentsResponse,
   type IApiGetFilteredInstrumentsRequest,
   type IApiGetFilteredInstrumentsResponse,
   type IApiGetInstrumentRequest,
   type IApiGetInstrumentResponse,
+  type IApiMiniTickerRequest,
   type IApiMiniTickerResponse,
+  type IApiOrderbookLevelsRequest,
   type IApiOrderbookLevelsResponse,
   type IApiPublicTradeHistoryRequest,
   type IApiPublicTradeHistoryResponse,
@@ -89,9 +93,25 @@ export class MDG {
   }
 
   /**
+   * @see https://api-docs.grvt.io/market_data_api/#get-all-instruments
+   */
+  allInstruments (payload: IApiGetAllInstrumentsRequest, config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/all_instruments',
+      Utils.schemaMap(payload, API_GET_ALL_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
+      {
+        ...config,
+        withCredentials: false
+      }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ALL_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetAllInstrumentsResponse
+    })
+  }
+
+  /**
    * @see https://docs.gravitymarkets.io/market_data_api/#mini-ticker
    */
-  miniTicker (payload: IAPIMiniTickerRequest, config?: AxiosRequestConfig) {
+  miniTicker (payload: IApiMiniTickerRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/mini',
       Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
@@ -123,7 +143,7 @@ export class MDG {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
    */
-  orderBook (payload: IAPIOrderbookLevelsRequest, config?: AxiosRequestConfig) {
+  orderBook (payload: IApiOrderbookLevelsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/book',
       Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),

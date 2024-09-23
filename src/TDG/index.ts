@@ -1,34 +1,19 @@
 import { type AxiosRequestConfig } from 'axios'
 import {
+  ACK_RESPONSE_MAP,
   API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_CANCEL_ALL_ORDERS_REQUEST_MAP,
   API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
-  API_CANCEL_ALL_RFQS_REQUEST_MAP,
-  API_CANCEL_ALL_RFQS_RESPONSE_MAP,
-  API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP,
-  API_CANCEL_ALL_RFQ_QUOTES_RESPONSE_MAP,
   API_CANCEL_ORDER_REQUEST_MAP,
   API_CANCEL_ORDER_RESPONSE_MAP,
-  API_CANCEL_RFQ_QUOTE_REQUEST_MAP,
-  API_CANCEL_RFQ_QUOTE_RESPONSE_MAP,
-  API_CANCEL_RFQ_REQUEST_MAP,
-  API_CANCEL_RFQ_RESPONSE_MAP,
   API_CREATE_ORDER_REQUEST_MAP,
   API_CREATE_ORDER_RESPONSE_MAP,
-  API_CREATE_RFQ_QUOTE_REQUEST_MAP,
-  API_CREATE_RFQ_QUOTE_RESPONSE_MAP,
-  API_CREATE_RFQ_REQUEST_MAP,
-  API_CREATE_RFQ_RESPONSE_MAP,
   API_DEPOSIT_HISTORY_REQUEST_MAP,
   API_DEPOSIT_HISTORY_RESPONSE_MAP,
   API_DEPOSIT_REQUEST_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
   API_OPEN_ORDERS_RESPONSE_MAP,
-  API_OPEN_RFQS_REQUEST_MAP,
-  API_OPEN_RFQS_RESPONSE_MAP,
-  API_OPEN_RFQ_QUOTES_REQUEST_MAP,
-  API_OPEN_RFQ_QUOTES_RESPONSE_MAP,
   API_ORDER_HISTORY_REQUEST_MAP,
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
@@ -39,9 +24,6 @@ import {
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_TDG_ACK_RESPONSE_MAP,
-  API_TRADE_RFQ_REQUEST_MAP,
-  API_TRADE_RFQ_RESPONSE_MAP,
   API_TRANSFER_HISTORY_REQUEST_MAP,
   API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
@@ -52,32 +34,16 @@ import {
   type IApiAggregatedAccountSummaryResponse,
   type IApiCancelAllOrdersRequest,
   type IApiCancelAllOrdersResponse,
-  type IApiCancelAllRfqQuotesRequest,
-  type IApiCancelAllRfqQuotesResponse,
-  type IApiCancelAllRfqsRequest,
-  type IApiCancelAllRfqsResponse,
   type IApiCancelOrderRequest,
   type IApiCancelOrderResponse,
-  type IApiCancelRfqQuoteRequest,
-  type IApiCancelRfqQuoteResponse,
-  type IApiCancelRfqRequest,
-  type IApiCancelRfqResponse,
   type IApiCreateOrderRequest,
   type IApiCreateOrderResponse,
-  type IApiCreateRfqQuoteRequest,
-  type IApiCreateRfqQuoteResponse,
-  type IApiCreateRfqRequest,
-  type IApiCreateRfqResponse,
   type IApiDepositHistoryRequest,
   type IApiDepositHistoryResponse,
   type IApiDepositRequest,
   type IApiFundingAccountSummaryResponse,
   type IApiOpenOrdersRequest,
   type IApiOpenOrdersResponse,
-  type IApiOpenRfqQuotesRequest,
-  type IApiOpenRfqQuotesResponse,
-  type IApiOpenRfqsRequest,
-  type IApiOpenRfqsResponse,
   type IApiOrderHistoryRequest,
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
@@ -88,8 +54,6 @@ import {
   type IApiSubAccountHistoryResponse,
   type IApiSubAccountSummaryRequest,
   type IApiSubAccountSummaryResponse,
-  type IApiTradeRfqRequest,
-  type IApiTradeRfqResponse,
   type IApiTransferHistoryRequest,
   type IApiTransferHistoryResponse,
   type IApiTransferRequest,
@@ -123,7 +87,7 @@ export class TDG {
       Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
   }
 
@@ -150,7 +114,7 @@ export class TDG {
       Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
   }
 
@@ -177,7 +141,7 @@ export class TDG {
       Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_TDG_ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
     })
   }
 
@@ -321,143 +285,6 @@ export class TDG {
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
     })
-  }
-
-  /** ===== RFQ ===== */
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#create-rfq
-   */
-  createRfq (payload: IApiCreateRfqRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/create_rfq',
-      Utils.schemaMap(payload, API_CREATE_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CREATE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq
-   */
-  cancelRfq (payload: IApiCancelRfqRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/cancel_rfq',
-      Utils.schemaMap(payload, API_CANCEL_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CANCEL_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfqs
-   */
-  cancelAllRfqs (payload: IApiCancelAllRfqsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/cancel_all_rfqs',
-      Utils.schemaMap(payload, API_CANCEL_ALL_RFQS_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqsResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#trade-rfq
-   */
-  tradeRfq (payload: IApiTradeRfqRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/trade_rfq',
-      Utils.schemaMap(payload, API_TRADE_RFQ_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_TRADE_RFQ_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeRfqResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#open-rfqs
-   */
-  openRfqs (payload: IApiOpenRfqsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/open_rfqs',
-      Utils.schemaMap(payload, API_OPEN_RFQS_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_OPEN_RFQS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqsResponse
-    })
-  }
-
-  /**
-   * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#rfq-history
-   */
-  rfqHistory () {
-    throw new Error('Error: Historical data is served through our DB and may not match new data in flight, see https://docs.gravitymarkets.io/trading_api/#rfq-history')
-  }
-
-  /** ===== QUOTE ===== */
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#create-rfq-quote
-   */
-  createQuote (payload: IApiCreateRfqQuoteRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/quote_rfq',
-      Utils.schemaMap(payload, API_CREATE_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CREATE_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateRfqQuoteResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-rfq-quote
-   */
-  cancelQuote (payload: IApiCancelRfqQuoteRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/cancel_rfq_quote',
-      Utils.schemaMap(payload, API_CANCEL_RFQ_QUOTE_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CANCEL_RFQ_QUOTE_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelRfqQuoteResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-rfq-quotes
-   */
-  cancelAllQuotes (payload: IApiCancelAllRfqQuotesRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/cancel_all_rfq_quotes',
-      Utils.schemaMap(payload, API_CANCEL_ALL_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_CANCEL_ALL_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllRfqQuotesResponse
-    })
-  }
-
-  /**
-   * @see https://docs.gravitymarkets.io/trading_api/#open-rfq-quotes
-   */
-  openQuotes (payload: IApiOpenRfqQuotesRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/open_rfq_quotes',
-      Utils.schemaMap(payload, API_OPEN_RFQ_QUOTES_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_OPEN_RFQ_QUOTES_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenRfqQuotesResponse
-    })
-  }
-
-  /**
-   * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#rfq-quote-history
-   */
-  quoteHistory () {
-    throw new Error('Error: Historical data is served through our DB and may not match new data in flight, see https://docs.gravitymarkets.io/trading_api/#rfq-quote-history')
   }
 
   /**
