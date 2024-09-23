@@ -26,7 +26,7 @@ export enum EStream {
   TRADE = 'trade',
 
   ORDER = 'order',
-  POSITION = 'positions',
+  POSITION = 'position',
   FILL = 'fill',
   TRANSFER = 'transfer',
 }
