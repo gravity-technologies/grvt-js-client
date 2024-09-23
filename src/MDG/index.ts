@@ -27,6 +27,8 @@ import {
   type IApiCandlestickResponse,
   type IApiFundingRateRequest,
   type IApiFundingRateResponse,
+  type IApiGetAllInstrumentsRequest,
+  type IApiGetAllInstrumentsResponse,
   type IApiGetInstrumentRequest,
   type IApiGetInstrumentResponse,
   type IApiGetInstrumentsRequest,
@@ -43,6 +45,8 @@ import {
   type IApiTickerResponse,
   type IConfig
 } from '../interfaces'
+import { API_GET_ALL_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_all_instruments_request'
+import { API_GET_ALL_INSTRUMENTS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_all_instruments_response'
 import { RestfulService } from '../services'
 import { Utils } from '../utils'
 
@@ -85,6 +89,22 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentsResponse
+    })
+  }
+
+  /**
+   * @see https://api-docs.grvt.io/market_data_api/#get-all-instruments
+   */
+  allInstruments (payload: IApiGetAllInstrumentsRequest, config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/all_instruments',
+      Utils.schemaMap(payload, API_GET_ALL_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
+      {
+        ...config,
+        withCredentials: false
+      }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ALL_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetAllInstrumentsResponse
     })
   }
 
