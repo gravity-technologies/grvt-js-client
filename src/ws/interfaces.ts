@@ -13,6 +13,7 @@ import {
   type IPublicTrade,
   type ITicker,
   type ITransfer,
+  type IWSCandlestickFeedSelectorV1,
   type IWSMiniTickerFeedSelectorV1,
   type IWSOrderbookLevelsFeedSelectorV1,
   type IWSPublicTradesFeedSelectorV1,
@@ -58,98 +59,65 @@ export enum EStream {
 //   [EStrategy.CUSTOM]: 'Cstm',
 // }) as Readonly<Record<EStrategy, string>>
 
-export enum EStrategyShort {
-  FUTURE = 'Fut',
-  PERPETUAL = 'Perp',
-  CALL = 'Call',
-  PUT = 'Put',
-  CALL_SPREAD = 'CSpd',
-  PUT_SPREAD = 'PSpd',
-  FUTURE_SPREAD = 'FSpd',
-  RISK_REVERSAL_CALL = 'RRc',
-  RISK_REVERSAL_PUT = 'RRp',
-  CALL_CALENDAR_SPREAD = 'CCal',
-  PUT_CALENDAR_SPREAD = 'PCal',
-  STRADDLE = 'Strd',
-  STRANGLE = 'Strg',
-  CALL_BUTTERFLY = 'CFly',
-  PUT_BUTTERFLY = 'PFly',
-  IRON_BUTTERFLY = 'IFly',
-  CALL_CONDOR = 'CCon',
-  PUT_CONDOR = 'PCon',
-  IRON_CONDOR = 'ICon',
-  CUSTOM = 'Cstm',
-}
+// export enum EStrategyShort {
+//   FUTURE = 'Fut',
+//   PERPETUAL = 'Perp',
+//   CALL = 'Call',
+//   PUT = 'Put',
+//   CALL_SPREAD = 'CSpd',
+//   PUT_SPREAD = 'PSpd',
+//   FUTURE_SPREAD = 'FSpd',
+//   RISK_REVERSAL_CALL = 'RRc',
+//   RISK_REVERSAL_PUT = 'RRp',
+//   CALL_CALENDAR_SPREAD = 'CCal',
+//   PUT_CALENDAR_SPREAD = 'PCal',
+//   STRADDLE = 'Strd',
+//   STRANGLE = 'Strg',
+//   CALL_BUTTERFLY = 'CFly',
+//   PUT_BUTTERFLY = 'PFly',
+//   IRON_BUTTERFLY = 'IFly',
+//   CALL_CONDOR = 'CCon',
+//   PUT_CONDOR = 'PCon',
+//   IRON_CONDOR = 'ICon',
+//   CUSTOM = 'Cstm',
+// }
 
 export type TMessageHandler<T> = (data: T) => void
 
 export interface IWSCandleRequest {
   stream: `${EStream.CANDLE}`
   params: {
-    underlying: `${ECurrency}`
-    quote: `${ECurrency}`
-    strategy: `${EStrategyShort}`
     interval: `${ECandlestickInterval}`
     type: `${ECandlestickType}`
-  }
+  } & Pick<IWSCandlestickFeedSelectorV1, 'instrument'>
   onData?: TMessageHandler<ICandlestick>
   onError?: (error: Error) => void
 }
 
 export interface IWSMiniRequest {
   stream: `${EStream.MINI_DELTA}` | `${EStream.MINI_SNAP}`
-  params: {
-    underlying: `${ECurrency}`
-    quote: `${ECurrency}`
-    strategy: `${EStrategyShort}`
-    expiration?: Date
-    strikePrice?: bigint
-    // rate?: number
-  } & Pick<IWSMiniTickerFeedSelectorV1, 'rate'>
+  params: IWSMiniTickerFeedSelectorV1
   onData?: TMessageHandler<IMiniTicker>
   onError?: (error: Error) => void
 }
 
 export interface IWSBookRequest {
   stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}`
-  params: {
-    underlying: `${ECurrency}`
-    quote: `${ECurrency}`
-    strategy: `${EStrategyShort}`
-    expiration?: Date
-    strikePrice?: bigint
-    // rate?: number
-    // depth?: number
-    // aggregate?: number
-  } & Pick<IWSOrderbookLevelsFeedSelectorV1, 'rate' | 'depth' | 'aggregate'>
+  params: IWSOrderbookLevelsFeedSelectorV1
   onData?: TMessageHandler<IOrderbookLevels>
   onError?: (error: Error) => void
 }
 
 export interface IWSTickerRequest {
   stream: `${EStream.TICKER_DELTA}` | `${EStream.TICKER_SNAP}`
-  params: {
-    underlying: `${ECurrency}`
-    quote: `${ECurrency}`
-    strategy: `${EStrategyShort}`
-    expiration?: Date
-    strikePrice?: bigint
-    // rate?: number
-  } & Pick<IWSTickerFeedSelectorV1, 'rate'>
+  params: IWSTickerFeedSelectorV1
   onData?: TMessageHandler<ITicker>
   onError?: (error: Error) => void
 }
 
 export interface IWSTradeRequest {
   stream: `${EStream.TRADE}`
-  params: {
-    underlying: `${ECurrency}`
-    quote: `${ECurrency}`
-    strategy: `${EStrategyShort}`
-    expiration?: Date
-    strikePrice?: bigint
-    // limit?: number
-  } & Pick<IWSPublicTradesFeedSelectorV1, 'limit'>
+  params: IWSPublicTradesFeedSelectorV1
   onData?: TMessageHandler<IPublicTrade>
   onError?: (error: Error) => void
 }

@@ -1,5 +1,4 @@
 import {
-  ECurrency,
   EKind,
   WS_CANDLESTICK_FEED_DATA_V_1_MAP,
   WS_MINI_TICKER_FEED_DATA_V_1_MAP,
@@ -11,6 +10,7 @@ import {
   WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP,
   WS_TICKER_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
+  type ECurrency,
   type IOrder,
   type IOrderState,
   type ITransfer,
@@ -27,7 +27,6 @@ import {
 } from '../interfaces'
 import { JsonUtils, StringUtils, Utils } from '../utils'
 import {
-  EStrategyShort,
   EStream,
   type IWSBookRequest,
   type IWSCandleRequest,
@@ -58,11 +57,6 @@ interface IOptions {
   timeout?: number
   reconnectStrategy?: ((retries: number) => number | Error)
 }
-
-const SHORT_MONTHS = Object.freeze([
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-])
 
 export class WS {
   private _retries = 0
@@ -155,10 +149,10 @@ export class WS {
         // const subAccountId = String((result as IPositions).sub_account_id)
         // const subAccountId = String((result as IPrivateTrade).sub_account_id)
         const kindDef = {
-          [EStrategyShort.PERPETUAL]: EKind.PERPETUAL,
-          [EStrategyShort.CALL]: EKind.CALL,
-          [EStrategyShort.PUT]: EKind.PUT,
-          [EStrategyShort.FUTURE]: EKind.FUTURE
+          Perp: EKind.PERPETUAL,
+          Call: EKind.CALL,
+          Put: EKind.PUT,
+          Fut: EKind.FUTURE
         }
         const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
         const feed = this._parseStream({
@@ -237,33 +231,9 @@ export class WS {
     })
   }
 
-  private _parseExpiration (expiration?: Date): string {
-    if (!expiration) {
-      return ''
-    }
-    const dd = `0${expiration.getDate()}`.slice(-2)
-    const mmm = SHORT_MONTHS[expiration.getMonth()]
-    const yy = expiration.getFullYear().toString().slice(-2)
-    return `${dd}${mmm}${yy}`
-  }
-
-  private _parseStrikePrice (strikePrice?: bigint, underlying?: `${ECurrency}`): string {
-    if (!strikePrice || !underlying) {
-      return ''
-    }
-    const multiplierRegex = [ECurrency.BTC, ECurrency.ETH].includes(underlying as ECurrency)
-      ? /(\d{9})$/
-      : /(\d{6})$/
-    return strikePrice.toString().replace(multiplierRegex, '')
-  }
-
   private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
     const candleFeed = (params: IWSCandleRequest['params']): string => [
-      [
-        params.underlying,
-        params.quote,
-        params.strategy
-      ].filter(Boolean).join('_'),
+      params.instrument,
       [
         params.interval.toLowerCase().replace(/_/g, ''),
         params.type.toLowerCase()
@@ -271,13 +241,7 @@ export class WS {
     ].filter(Boolean).join('@')
 
     const bookFeed = (params: IWSBookRequest['params']): string => [
-      [
-        params.underlying,
-        params.quote,
-        params.strategy,
-        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
-        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join('_'),
+      params.instrument,
       [
         params.rate ?? 1000,
         params.depth ?? 10,
@@ -286,39 +250,21 @@ export class WS {
     ].filter(Boolean).join('@')
 
     const miniFeed = (params: IWSMiniRequest['params']): string => [
-      [
-        params.underlying,
-        params.quote,
-        params.strategy,
-        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
-        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join('_'),
+      params.instrument,
       [
         params.rate ?? 1000
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const tickerFeed = (params: IWSTickerRequest['params']): string => [
-      [
-        params.underlying,
-        params.quote,
-        params.strategy,
-        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
-        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join('_'),
+      params.instrument,
       [
         params.rate ?? 1000
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const publicTradesFeed = (params: IWSTradeRequest['params']): string => [
-      [
-        params.underlying,
-        params.quote,
-        params.strategy,
-        [EStrategyShort.CALL, EStrategyShort.PUT, EStrategyShort.FUTURE].includes(params.strategy as EStrategyShort) && this._parseExpiration(params.expiration),
-        [EStrategyShort.CALL, EStrategyShort.PUT].includes(params.strategy as EStrategyShort) && this._parseStrikePrice(params.strikePrice, params.underlying)
-      ].filter(Boolean).join('_'),
+      params.instrument,
       [
         params.limit ?? 500
       ].filter(Boolean).join('-')
