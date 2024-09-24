@@ -8,26 +8,28 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     event_time: 'et',
     sub_account_id: 'sa',
     margin_type: 'mt',
-    quote_currency: 'qc',
+    settle_currency: 'sc',
     unrealized_pnl: 'up',
-    total_value: 'tv',
+    total_equity: 'te',
     initial_margin: 'im',
-    maintanence_margin: 'mm',
-    available_margin: 'am',
+    maintenance_margin: 'mm',
+    available_balance: 'ab',
     spot_balances: ['sb', [SPOT_BALANCE_MAP.FULL_TO_LITE]],
-    positions: ['p', [POSITIONS_MAP.FULL_TO_LITE]]
+    positions: ['p', [POSITIONS_MAP.FULL_TO_LITE]],
+    settle_index_price: 'si'
   },
   LITE_TO_FULL: {
     et: 'event_time',
     sa: 'sub_account_id',
     mt: 'margin_type',
-    qc: 'quote_currency',
+    sc: 'settle_currency',
     up: 'unrealized_pnl',
-    tv: 'total_value',
+    te: 'total_equity',
     im: 'initial_margin',
-    mm: 'maintanence_margin',
-    am: 'available_margin',
+    mm: 'maintenance_margin',
+    ab: 'available_balance',
     sb: ['spot_balances', [SPOT_BALANCE_MAP.LITE_TO_FULL]],
-    p: ['positions', [POSITIONS_MAP.LITE_TO_FULL]]
+    p: ['positions', [POSITIONS_MAP.LITE_TO_FULL]],
+    si: 'settle_index_price'
   }
 })
