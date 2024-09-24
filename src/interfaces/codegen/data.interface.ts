@@ -344,6 +344,7 @@ export interface IAPISettlementPrice {
   settlement_price?: bigint
 }
 
+// The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
 export interface IApiAggregatedAccountSummaryResponse {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
@@ -351,8 +352,6 @@ export interface IApiAggregatedAccountSummaryResponse {
   total_equity?: bigint
   // The list of spot assets owned by this sub account, and their balances
   spot_balances?: ISpotBalance[]
-  // The list of mark prices for the assets owned by this account
-  mark_prices?: IMarkPrice[]
 }
 
 export interface IApiCancelAllOrdersRequest {
@@ -553,15 +552,15 @@ export interface IApiFindTraderLeaderboardResponse {
   users?: ITraderLeaderboardUser[]
 }
 
+// The funding account summary, that reports the total equity and spot balances of a funding (main) account
 export interface IApiFundingAccountSummaryResponse {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
-  // Total equity of the account, denominated in USD
-  total_equity?: bigint
   // The list of spot assets owned by this account, and their balances
+  // Total equity of the main account, denominated in USD
+  total_equity?: bigint
+  // The list of spot assets owned by this main account, and their balances
   spot_balances?: ISpotBalance[]
-  // The list of mark prices for the assets owned by this account
-  mark_prices?: IMarkPrice[]
 }
 
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
@@ -1222,6 +1221,10 @@ export interface IEcosystemPoint {
   rank?: number
 }
 
+// Used for requests that do not require any parameters
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IEmptyRequest {}
+
 export interface IFlatReferral {
   // The off chain account id
   account_id?: string
@@ -1461,32 +1464,34 @@ export interface IPositions {
   sub_account_id?: bigint
   // The instrument being represented
   instrument?: string
-  // The balance of the position, expressed in underlying asset decimal units. Negative for short positions
-  balance?: bigint
-  // The value of the position, negative for short assets, expressed in quote asset decimal units
-  value?: bigint
+  // The size of the position, expressed in underlying asset decimal units. Negative for short positions
+  size?: bigint
+  // The notional value of the position, negative for short assets, expressed in quote asset decimal units
+  notional?: bigint
   // The entry price of the position, expressed in `9` decimals
-  // Whenever increasing the balance of a position, the entry price is updated to the new average entry price
-  // newEntryPrice = (oldEntryPrice * oldBalance + tradePrice * tradeBalance) / (oldBalance + tradeBalance)
+  // Whenever increasing the size of a position, the entry price is updated to the new average entry price
+  // `new_entry_price = (old_entry_price * old_size + trade_price * trade_size) / (old_size + trade_size)`
   entry_price?: bigint
   // The exit price of the position, expressed in `9` decimals
-  // Whenever decreasing the balance of a position, the exit price is updated to the new average exit price
-  // newExitPrice = (oldExitPrice * oldExitBalance + tradePrice * tradeBalance) / (oldExitBalance + tradeBalance)
+  // Whenever decreasing the size of a position, the exit price is updated to the new average exit price
+  // `new_exit_price = (old_exit_price * old_exit_trade_size + trade_price * trade_size) / (old_exit_trade_size + trade_size)`
   exit_price?: bigint
   // The mark price of the position, expressed in `9` decimals
   mark_price?: bigint
   // The unrealized PnL of the position, expressed in quote asset decimal units
-  // unrealizedPnl = (markPrice - entryPrice) * balance
+  // `unrealized_pnl = (mark_price - entry_price) * size`
   unrealized_pnl?: bigint
   // The realized PnL of the position, expressed in quote asset decimal units
-  // realizedPnl = (exitPrice - entryPrice) * exitBalance
+  // `realized_pnl = (exit_price - entry_price) * exit_trade_size`
   realized_pnl?: bigint
   // The total PnL of the position, expressed in quote asset decimal units
-  // totalPnl = realizedPnl + unrealizedPnl
-  pnl?: bigint
+  // `total_pnl = realized_pnl + unrealized_pnl`
+  total_pnl?: bigint
   // The ROI of the position, expressed as a percentage
-  // roi = (pnl / (entryPrice * balance)) * 100
+  // `roi = (total_pnl / (entry_price * abs(size))) * 100^`
   roi?: number
+  // The index price of the quote currency. (reported in `USD`)
+  quote_index_price?: string
 }
 
 export interface IPrivateTrade {
@@ -1699,10 +1704,10 @@ export interface ISignature {
 export interface ISpotBalance {
   // The currency you hold a spot balance in
   currency?: ECurrency
-  // The balance of the asset, expressed in underlying asset decimal units
-  // Must take into account the value of all positions with this quote asset
-  // ie. for USDT denominated subaccounts, this is is identical to total balance
+  // This currency's balance in this trading account.
   balance?: bigint
+  // The index price of this currency. (reported in `USD`)
+  index_price?: bigint
 }
 
 export interface ISubAccount {
@@ -1712,25 +1717,40 @@ export interface ISubAccount {
   sub_account_id?: bigint
   // The type of margin algorithm this subaccount uses
   margin_type?: EMarginType
-  // The Quote Currency that this Sub Account is denominated in
-  // This subaccount can only open derivative positions denominated in this quote currency
-  // All other assets are converted to this quote currency for the purpose of calculating margin
+  // The settlement, margin, and reporting currency of this account.
+  // This subaccount can only open positions quoted in this currency
+  //
   // In the future, when users select a Multi-Currency Margin Type, this will be USD
   quote_currency?: ECurrency
-  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units
-  unrealized_pnl?: bigint
   // The total value across all spot assets, or in other words, the current margin
   total_value?: bigint
-  // The initial margin requirement of all positions owned by this vault, denominated in quote currency decimal units
-  initial_margin?: bigint
   // The maintanence margin requirement of all positions owned by this vault, denominated in quote currency decimal units
   maintanence_margin?: bigint
   // The margin available for withdrawal, denominated in quote currency decimal units
   available_margin?: bigint
+  // All other assets are converted to this currency for the purpose of calculating margin
+  settle_currency?: ECurrency
+  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
+  // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
+  unrealized_pnl?: bigint
+  // The notional value of your account if all positions are closed, excluding trading fees (reported in `settle_currency`).
+  // `total_equity = sum(spot_balance.balance * spot_balance.index_price) / settle_index_price + unrealized_pnl`
+  total_equity?: bigint
+  // The `total_equity` required to open positions in the account (reported in `settle_currency`).
+  // Computation is different depending on account's `margin_type`
+  initial_margin?: bigint
+  // The `total_equity` required to avoid liquidation of positions in the account (reported in `settle_currency`).
+  // Computation is different depending on account's `margin_type`
+  maintenance_margin?: bigint
+  // The notional value available to transfer out of the trading account into the funding account (reported in `settle_currency`).
+  // `available_balance = total_equity - initial_margin - min(unrealized_pnl, 0)`
+  available_balance?: bigint
   // The list of spot assets owned by this sub account, and their balances
   spot_balances?: ISpotBalance[]
   // The list of positions owned by this sub account
   positions?: IPositions[]
+  // The index price of the settle currency. (reported in `USD`)
+  settle_index_price?: bigint
 }
 
 export interface ISubAccountTrade {

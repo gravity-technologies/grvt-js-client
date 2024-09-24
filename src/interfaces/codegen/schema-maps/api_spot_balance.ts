@@ -4,10 +4,12 @@ import { type SchemaPairMap } from './types'
 export const SPOT_BALANCE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     currency: 'c',
-    balance: 'b'
+    balance: 'b',
+    index_price: 'ip'
   },
   LITE_TO_FULL: {
     c: 'currency',
-    b: 'balance'
+    b: 'balance',
+    ip: 'index_price'
   }
 })
