@@ -7,8 +7,8 @@ export const API_PRIVATE_TRADE_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freez
     kind: 'k',
     underlying: 'u',
     quote: 'q',
-    expiration: 'e',
-    strike_price: 'sp',
+    start_time: 'st',
+    end_time: 'et',
     limit: 'l',
     cursor: 'c'
   },
@@ -17,8 +17,8 @@ export const API_PRIVATE_TRADE_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freez
     k: 'kind',
     u: 'underlying',
     q: 'quote',
-    e: 'expiration',
-    sp: 'strike_price',
+    st: 'start_time',
+    et: 'end_time',
     l: 'limit',
     c: 'cursor'
   }

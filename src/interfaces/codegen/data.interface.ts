@@ -50,6 +50,8 @@ export enum ECandlestickType {
 
 // The list of Currencies that are supported on the GRVT exchange
 export enum ECurrency {
+  // the USD fiat currency
+  USD = 'USD',
   // the USDC token
   USDC = 'USDC',
   // the USDT token
@@ -61,7 +63,7 @@ export enum ECurrency {
 }
 
 export enum EInstrumentSettlementPeriod {
-  // Instrument settles through perpetual hourly funding cycles
+  // Instrument settles through perpetual funding cycles
   PERPETUAL = 'PERPETUAL',
   // Instrument settles at an expiry date, marked as a daily instrument
   DAILY = 'DAILY',
@@ -93,6 +95,8 @@ export enum EMarginType {
 }
 
 export enum EOrderRejectReason {
+  // order is not cancelled or rejected
+  UNSPECIFIED = 'UNSPECIFIED',
   // client called a Cancel API
   CLIENT_CANCEL = 'CLIENT_CANCEL',
   // client called a Bulk Cancel API
@@ -194,6 +198,8 @@ export enum ETimeInForce {
 export enum EVenue {
   // the trade is cleared on the orderbook venue
   ORDERBOOK = 'ORDERBOOK',
+  // the trade is cleared on the RFQ venue
+  RFQ = 'RFQ',
 }
 
 export interface IAPISettlementPrice {
@@ -234,7 +240,7 @@ export interface IApiCancelAllOrdersResponse {
   num_cancelled?: number
 }
 
-// Cancel an order on the orderbook for this trading account.
+// Cancel an order on the orderbook for this trading account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiCancelOrderRequest {
   // The subaccount ID cancelling the order
   sub_account_id?: bigint
@@ -250,7 +256,8 @@ export interface IApiCancelOrderResponse {
 }
 
 // Kline/Candlestick bars for an instrument. Klines are uniquely identified by their instrument, type, interval, and open time.
-// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent candlesticks are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the candlesticks starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the candlesticks ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the candlesticks between `startTime` and `endTime` are returned up to `limit`.</li></ul>
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiCandlestickRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -265,13 +272,17 @@ export interface IApiCandlestickRequest {
   start_time?: bigint
   // End time of kline data in unix nanoseconds
   end_time?: bigint
-  // The limit to query for. Defaults to 500; Max 1500
+  // The limit to query for. Defaults to 500; Max 1000
   limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
 }
 
 export interface IApiCandlestickResponse {
   // The candlestick result set for given interval
   results?: ICandlestick[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // Create an order on the orderbook for this trading account.
@@ -287,26 +298,26 @@ export interface IApiCreateOrderResponse {
 
 // The request to get the historical deposits of an account
 // The history is returned in reverse chronological order
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiDepositHistoryRequest {
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The cursor to indicate when to start the next query from
-  cursor?: string
   // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
   end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the next query from
+  cursor?: string
 }
 
 export interface IApiDepositHistoryResponse {
-  // The total number of deposits matching the request account
-  total?: number
-  // The cursor to indicate when to start the next query from
-  next?: string
   // The deposit history matching the request account
   results?: IDepositHistory[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // GRVT runs on a ZKSync Hyperchain which settles directly onto Ethereum.
@@ -369,10 +380,9 @@ export interface IApiFundingAccountSummaryResponse {
   spot_balances?: ISpotBalance[]
 }
 
-// Lookup the historical funding rate of various pairs.
-// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent funding rates are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the funding rates starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the funding rates ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the funding rates between `startTime` and `endTime` are returned up to `limit`.</li></ul>
+// Lookup the historical funding rate of a perpetual future.
 //
-// The instrument is also optional. When left empty, all perpetual instruments are returned.
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiFundingRateRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
@@ -383,13 +393,17 @@ export interface IApiFundingRateRequest {
   start_time?: bigint
   // End time of funding rate in unix nanoseconds
   end_time?: bigint
-  // The limit to query for. Defaults to 90; Max 300
+  // The limit to query for. Defaults to 500; Max 1000
   limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
 }
 
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
   results?: IFundingRate[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // Fetch all instruments
@@ -459,6 +473,50 @@ export interface IApiGetInstrumentResponse {
   results?: IInstrument
 }
 
+export interface IApiGetLPLeaderboardRequest {
+  // Start time of the epoch - phase
+  start_interval?: bigint
+  // The number of accounts to return
+  limit?: number
+  // The kind filter to apply
+  kind?: EKind
+  // The underlying filter to apply
+  underlying?: ECurrency
+}
+
+export interface IApiGetLPLeaderboardResponse {
+  // The list of LP points
+  points?: ILPPoint[]
+}
+
+export interface IApiGetLPPointRequest {
+  // Start time of the epoch - phase
+  start_interval?: bigint
+  // The kind filter to apply
+  kind?: EKind
+  // The underlying filter to apply
+  underlying?: ECurrency
+}
+
+export interface IApiGetLPPointResponse {
+  // LP points of user
+  point?: ILPPoint
+  // The number of maker
+  maker_count?: number
+}
+
+export interface IApiGetLatestLPSnapshotRequest {
+  // The kind filter to apply
+  kind?: EKind
+  // The underlying filter to apply
+  underlying?: ECurrency
+}
+
+export interface IApiGetLatestLPSnapshotResponse {
+  // The latest LP snapshot
+  snapshot?: ILPSnapshot
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
 export interface IApiGetListFlatReferralRequest {
   // The off chain referrer account id to get all flat referrals
@@ -476,6 +534,7 @@ export interface IApiGetListFlatReferralResponse {
   flat_referrals?: IFlatReferral[]
 }
 
+// Retrieve the order for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiGetOrderRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -553,6 +612,8 @@ export interface IApiOpenOrdersResponse {
 }
 
 // Retrieves the order history for the account.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiOrderHistoryRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -562,10 +623,10 @@ export interface IApiOrderHistoryRequest {
   underlying?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
-  // The expiration time to apply in nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
-  expiration?: bigint[]
-  // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
-  strike_price?: string[]
+  // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -573,14 +634,13 @@ export interface IApiOrderHistoryRequest {
 }
 
 export interface IApiOrderHistoryResponse {
-  // The total number of orders matching the request filter
-  total?: number
-  // The cursor to indicate when to start the query from
-  next?: string
   // The Open Orders matching the request filter
   orders?: IOrder[]
+  // The cursor to indicate when to start the query from
+  next?: string
 }
 
+// Retrieve the order state for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiOrderStateRequest {
   // The subaccount ID to filter by
   sub_account_id?: bigint
@@ -631,6 +691,8 @@ export interface IApiPositionsResponse {
 }
 
 // Query for all historical trades made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiPrivateTradeHistoryRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
@@ -640,10 +702,10 @@ export interface IApiPrivateTradeHistoryRequest {
   underlying?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
-  // The expiration time to apply in unix nanoseconds. If nil, this defaults to all expirations. Otherwise, only entries matching the filter will be returned
-  expiration?: bigint
-  // The strike price to apply. If nil, this defaults to all strike prices. Otherwise, only entries matching the filter will be returned
-  strike_price?: string
+  // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -651,23 +713,27 @@ export interface IApiPrivateTradeHistoryRequest {
 }
 
 export interface IApiPrivateTradeHistoryResponse {
-  // The total number of private trades matching the request filter
-  total?: number
-  // The cursor to indicate when to start the query from
-  next?: string
   // The private trades matching the request asset
   results?: IPrivateTrade[]
+  // The cursor to indicate when to start the query from
+  next?: string
 }
 
 // Perform historical lookup of public trades in any given instrument.
 // This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
 // Only data from the last three months will be retained.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiPublicTradeHistoryRequest {
   // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
   // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
+  // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -677,6 +743,8 @@ export interface IApiPublicTradeHistoryRequest {
 export interface IApiPublicTradeHistoryResponse {
   // The public trades matching the request asset
   results?: IPublicTrade[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // Retrieves up to 1000 of the most recent public trades in any given instrument. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
@@ -706,36 +774,36 @@ export interface IApiResolveEpochEcosystemMetricResponse {
 }
 
 // Lookup the historical settlement price of various pairs.
-// startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul><li>If both `startTime` and `endTime` are not set, the most recent settlement prices are returned up to `limit`.</li><li>If `startTime` is set and `endTime` is not set, the settlement prices starting from `startTime` are returned up to `limit`.</li><li>If `startTime` is not set and `endTime` is set, the settlement prices ending at `endTime` are returned up to `limit`.</li><li>If both `startTime` and `endTime` are set, the settlement prices between `startTime` and `endTime` are returned up to `limit`.</li></ul>
 //
-// The instrument is also optional. When left empty, all perpetual instruments are returned.
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiSettlementPriceRequest {
   // The underlying currency to select
   underlying?: ECurrency
   // The quote currency to select
   quote?: ECurrency
-  // Start time of kline data in unix nanoseconds
+  // Start time of settlement price in unix nanoseconds
   start_time?: bigint
-  // End time of kline data in unix nanoseconds
+  // End time of settlement price in unix nanoseconds
   end_time?: bigint
-  // The expiration time to select in unix nanoseconds
-  expiration?: bigint
-  // The strike price to select
-  strike_price?: string
-  // The limit to query for. Defaults to 30; Max 100
+  // The limit to query for. Defaults to 500; Max 1000
   limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
 }
 
 export interface IApiSettlementPriceResponse {
   // The funding rate result set for given interval
   results?: IAPISettlementPrice[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // The request to get the history of a sub account
 // SubAccount Summary values are snapshotted once every hour
 // No snapshots are taken if the sub account has no activity in the hourly window
-// The history is returned in reverse chronological order
 // History is preserved only for the last 30 days
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiSubAccountHistoryRequest {
   // The sub account ID to request for
   sub_account_id?: bigint
@@ -743,17 +811,17 @@ export interface IApiSubAccountHistoryRequest {
   start_time?: bigint
   // End time of sub account history in unix nanoseconds
   end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
 }
 
 export interface IApiSubAccountHistoryResponse {
-  // The total number of sub account snapshots matching the request filter
-  total?: number
-  // The cursor to indicate when to start the next query from
-  next?: string
   // The sub account history matching the request sub account
   results?: ISubAccount[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 export interface IApiSubAccountSummaryRequest {
@@ -783,11 +851,15 @@ export interface IApiSubAccountTradeAggregationRequest {
   start_time?: bigint
   // Optional. End time in unix nanoseconds
   end_time?: bigint
+  // The cursor to indicate when to start the next query from
+  cursor?: string
 }
 
 export interface IApiSubAccountTradeAggregationResponse {
   // The sub account trade aggregation result set for given interval
   results?: ISubAccountTradeAggregation[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // startTime are optional parameters. The semantics of these parameters are as follows:<ul>
@@ -835,26 +907,26 @@ export interface IApiTickerResponse {
 
 // The request to get the historical transfers of an account
 // The history is returned in reverse chronological order
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiTransferHistoryRequest {
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The cursor to indicate when to start the next query from
-  cursor?: string
   // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
   end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the next query from
+  cursor?: string
 }
 
 export interface IApiTransferHistoryResponse {
-  // The total number of transfers matching the request account
-  total?: number
-  // The cursor to indicate when to start the next query from
-  next?: string
   // The transfer history matching the request account
   results?: ITransferHistory[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // This API allows you to transfer funds in multiple different ways<ul>
@@ -881,26 +953,26 @@ export interface IApiTransferRequest {
 
 // The request to get the historical withdrawals of an account
 // The history is returned in reverse chronological order
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiWithdrawalHistoryRequest {
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The cursor to indicate when to start the next query from
-  cursor?: string
   // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
   token_currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
   end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the next query from
+  cursor?: string
 }
 
 export interface IApiWithdrawalHistoryResponse {
-  // The total number of withdrawals matching the request account
-  total?: number
-  // The cursor to indicate when to start the next query from
-  next?: string
   // The withdrawals history matching the request account
   results?: IWithdrawalHistory[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // Leverage this API to initialize a withdrawal from GRVT's Hyperchain onto Ethereum.
@@ -1023,10 +1095,6 @@ export interface IEcosystemPoint {
   rank?: number
 }
 
-// Used for requests that do not require any parameters
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IEmptyRequest {}
-
 export interface IFlatReferral {
   // The off chain account id
   account_id?: string
@@ -1062,6 +1130,8 @@ export interface IInstrument {
   // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
   // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
   instrument?: string
+  // The asset ID used for instrument signing.
+  asset_id?: bigint
   // The underlying currency
   underlying?: ECurrency
   // The quote currency
@@ -1088,6 +1158,38 @@ export interface IInstrument {
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
+}
+
+export interface ILPPoint {
+  // The main account id
+  main_account_id?: bigint
+  // The LP Asset
+  lp_asset?: bigint
+  // Start time of the epoch - phase
+  start_interval?: bigint
+  // Liquidty score
+  liquidity_score?: bigint
+  // The rank of user in the LP leaderboard
+  rank?: number
+}
+
+export interface ILPSnapshot {
+  // The main account id
+  main_account_id?: bigint
+  // The LP Asset
+  lp_asset?: bigint
+  // Underlying multiplier
+  underlying_multiplier?: bigint
+  // Market share multiplier
+  market_share_multiplier?: bigint
+  // Fast market multiplier
+  bid_fast_market_multiplier?: number
+  // Fast market multiplier
+  ask_fast_market_multiplier?: number
+  // Liquidty score
+  liquidity_score?: bigint
+  // The time when the snapshot was calculated
+  calculate_at?: bigint
 }
 
 export interface IMiniTicker {
@@ -1142,13 +1244,6 @@ export interface IOrder {
   // </ul>Exchange only supports (GTT, IOC, FOK)
   // RFQ Maker only supports (GTT, AON), RFQ Taker only supports (FOK)
   time_in_force?: ETimeInForce
-  // The taker fee percentage cap signed by the order.
-  // This is the maximum taker fee percentage the order sender is willing to pay for the order.
-  // Expressed in 1/100th of a basis point. Eg. 100 = 1bps, 10,000 = 1%
-  //
-  taker_fee_percentage_cap?: number
-  // Same as TakerFeePercentageCap, but for the maker fee. Negative for maker rebates
-  maker_fee_percentage_cap?: number
   // If True, Order must be a maker order. It has to fill the orderbook instead of match it.
   // If False, Order can be either a maker or taker order.
   //
@@ -1182,12 +1277,9 @@ export interface IOrderLeg {
   // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
   size?: string
   // The limit price of the order leg, expressed in `9` decimals.
-  // This is the total amount of base currency to pay/receive for all legs.
+  // This is the number of quote currency units to pay/receive for this leg.
+  // This should be `null/0` if the order is a market order
   limit_price?: string
-  // If a OCO order is specified, this must contain the other limit price
-  // User must sign both limit prices. Depending on which trigger condition is activated, a different limit price is used
-  // The smart contract will always validate both limit prices, by arranging them in ascending order
-  oco_limit_price?: string
   // Specifies if the order leg is a buy or sell
   is_buying_asset?: boolean
 }
@@ -1336,6 +1428,8 @@ export interface IPrivateTrade {
   //
   // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
   client_order_id?: bigint
+  // A trade index
+  trade_index?: number
 }
 
 // All private RFQs and Private AXEs will be filtered out from the responses
@@ -1367,6 +1461,8 @@ export interface IPublicTrade {
   venue?: EVenue
   // If the trade was a liquidation
   is_liquidation?: boolean
+  // A trade index
+  trade_index?: number
 }
 
 export interface ISignature {
@@ -1580,6 +1676,8 @@ export interface ITransferHistory {
 export interface IWSCandlestickFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A candlestick entry matching the request filters
@@ -1604,6 +1702,8 @@ export interface IWSCandlestickFeedSelectorV1 {
 export interface IWSDepositFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // The Deposit object
@@ -1613,6 +1713,8 @@ export interface IWSDepositFeedDataV1 {
 export interface IWSMiniTickerFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A mini ticker matching the request filter
@@ -1640,6 +1742,8 @@ export interface IWSMiniTickerFeedSelectorV1 {
 export interface IWSOrderFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // The order object being created or updated
@@ -1665,6 +1769,8 @@ export interface IWSOrderFeedSelectorV1 {
 export interface IWSOrderStateFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // The Order State Feed
@@ -1691,6 +1797,8 @@ export interface IWSOrderStateFeedSelectorV1 {
 export interface IWSOrderbookLevelsFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // An orderbook levels object matching the request filter
@@ -1722,6 +1830,8 @@ export interface IWSOrderbookLevelsFeedSelectorV1 {
 export interface IWSPositionsFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A Position being created or updated matching the request filter
@@ -1743,6 +1853,8 @@ export interface IWSPositionsFeedSelectorV1 {
 export interface IWSPrivateTradeFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A private trade matching the request filter
@@ -1763,6 +1875,8 @@ export interface IWSPrivateTradeFeedSelectorV1 {
 export interface IWSPublicTradesFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A public trade matching the request filter
@@ -1803,6 +1917,8 @@ export interface IWSResponseV1 {
 export interface IWSTickerFeedDataV1 {
   // Stream name
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // A ticker matching the request filter
@@ -1831,6 +1947,8 @@ export interface IWSTickerFeedSelectorV1 {
 export interface IWSTransferFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // The Transfer object
@@ -1841,6 +1959,8 @@ export interface IWSTransferFeedDataV1 {
 export interface IWSWithdrawalFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
+  // Primary selector
+  selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
   // The Withdrawal object

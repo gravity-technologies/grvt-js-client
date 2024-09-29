@@ -42,6 +42,7 @@ export const ECandlestickTypeInt: Record<ECandlestickType, number> = Object.free
 })
 
 export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
+  [ECurrency.USD]: 1,
   [ECurrency.USDC]: 2,
   [ECurrency.USDT]: 3,
   [ECurrency.ETH]: 4,
@@ -69,6 +70,7 @@ export const EMarginTypeInt: Record<EMarginType, number> = Object.freeze({
 })
 
 export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.freeze({
+  [EOrderRejectReason.UNSPECIFIED]: 0,
   [EOrderRejectReason.CLIENT_CANCEL]: 1,
   [EOrderRejectReason.CLIENT_BULK_CANCEL]: 2,
   [EOrderRejectReason.CLIENT_SESSION_END]: 3,
@@ -123,5 +125,6 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({
-  [EVenue.ORDERBOOK]: 1
+  [EVenue.ORDERBOOK]: 1,
+  [EVenue.RFQ]: 2
 })

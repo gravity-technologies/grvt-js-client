@@ -5,11 +5,13 @@ import { ORDERBOOK_LEVELS_MAP } from './snap_orderbook_levels'
 export const WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     stream: 's',
+    selector: 's1',
     sequence_number: 'sn',
     feed: ['f', ORDERBOOK_LEVELS_MAP.FULL_TO_LITE]
   },
   LITE_TO_FULL: {
     s: 'stream',
+    s1: 'selector',
     sn: 'sequence_number',
     f: ['feed', ORDERBOOK_LEVELS_MAP.LITE_TO_FULL]
   }

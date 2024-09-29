@@ -21,7 +21,8 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
     order_id: 'oi',
     venue: 'v',
     is_liquidation: 'il',
-    client_order_id: 'co'
+    client_order_id: 'co',
+    trade_index: 'ti1'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -42,6 +43,7 @@ export const PRIVATE_TRADE_MAP: SchemaPairMap = Object.freeze({
     oi: 'order_id',
     v: 'venue',
     il: 'is_liquidation',
-    co: 'client_order_id'
+    co: 'client_order_id',
+    ti1: 'trade_index'
   }
 })
