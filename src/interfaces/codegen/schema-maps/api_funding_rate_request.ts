@@ -6,12 +6,14 @@ export const API_FUNDING_RATE_REQUEST_MAP: SchemaPairMap = Object.freeze({
     instrument: 'i',
     start_time: 'st',
     end_time: 'et',
-    limit: 'l'
+    limit: 'l',
+    cursor: 'c'
   },
   LITE_TO_FULL: {
     i: 'instrument',
     st: 'start_time',
     et: 'end_time',
-    l: 'limit'
+    l: 'limit',
+    c: 'cursor'
   }
 })

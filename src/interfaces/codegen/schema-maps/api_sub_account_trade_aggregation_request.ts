@@ -9,7 +9,8 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     sub_account_id_greater_than: 'sa1',
     start_interval: 'si',
     start_time: 'st',
-    end_time: 'et'
+    end_time: 'et',
+    cursor: 'c'
   },
   LITE_TO_FULL: {
     l: 'limit',
@@ -18,6 +19,7 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     sa1: 'sub_account_id_greater_than',
     si: 'start_interval',
     st: 'start_time',
-    et: 'end_time'
+    et: 'end_time',
+    c: 'cursor'
   }
 })

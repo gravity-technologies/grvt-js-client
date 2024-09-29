@@ -8,7 +8,8 @@ export const API_CANDLESTICK_REQUEST_MAP: SchemaPairMap = Object.freeze({
     type: 't',
     start_time: 'st',
     end_time: 'et',
-    limit: 'l'
+    limit: 'l',
+    cursor: 'c'
   },
   LITE_TO_FULL: {
     i: 'instrument',
@@ -16,6 +17,7 @@ export const API_CANDLESTICK_REQUEST_MAP: SchemaPairMap = Object.freeze({
     t: 'type',
     st: 'start_time',
     et: 'end_time',
-    l: 'limit'
+    l: 'limit',
+    c: 'cursor'
   }
 })
