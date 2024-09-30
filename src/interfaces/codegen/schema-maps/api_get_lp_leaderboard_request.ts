@@ -6,12 +6,12 @@ export const API_GET_LP_LEADERBOARD_REQUEST_MAP: SchemaPairMap = Object.freeze({
     start_interval: 'si',
     limit: 'l',
     kind: 'k',
-    underlying: 'u'
+    base: 'b'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
     l: 'limit',
     k: 'kind',
-    u: 'underlying'
+    b: 'base'
   }
 })

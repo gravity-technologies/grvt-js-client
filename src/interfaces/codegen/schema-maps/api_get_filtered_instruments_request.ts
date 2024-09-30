@@ -4,14 +4,14 @@ import { type SchemaPairMap } from './types'
 export const API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     kind: 'k',
-    underlying: 'u',
+    base: 'b',
     quote: 'q',
     is_active: 'ia',
     limit: 'l'
   },
   LITE_TO_FULL: {
     k: 'kind',
-    u: 'underlying',
+    b: 'base',
     q: 'quote',
     ia: 'is_active',
     l: 'limit'

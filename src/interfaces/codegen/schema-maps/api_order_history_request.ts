@@ -5,7 +5,7 @@ export const API_ORDER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
     kind: 'k',
-    underlying: 'u',
+    base: 'b',
     quote: 'q',
     start_time: 'st',
     end_time: 'et',
@@ -15,7 +15,7 @@ export const API_ORDER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
   LITE_TO_FULL: {
     sa: 'sub_account_id',
     k: 'kind',
-    u: 'underlying',
+    b: 'base',
     q: 'quote',
     st: 'start_time',
     et: 'end_time',

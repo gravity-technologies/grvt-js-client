@@ -203,8 +203,8 @@ export enum EVenue {
 }
 
 export interface IAPISettlementPrice {
-  // The underlying currency of the settlement price
-  underlying?: ECurrency
+  // The base currency of the settlement price
+  base?: ECurrency
   // The quote currency of the settlement price
   quote?: ECurrency
   // The settlement timestamp of the settlement price, expressed in unix nanoseconds
@@ -233,6 +233,12 @@ export interface IApiAggregatedAccountSummaryResponse {
 export interface IApiCancelAllOrdersRequest {
   // The subaccount ID cancelling all orders
   sub_account_id?: bigint
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be cancelled
+  kind?: EKind[]
+  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be cancelled
+  underlying?: ECurrency[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be cancelled
+  quote?: ECurrency[]
 }
 
 export interface IApiCancelAllOrdersResponse {
@@ -259,10 +265,7 @@ export interface IApiCancelOrderResponse {
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiCandlestickRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
@@ -384,10 +387,7 @@ export interface IApiFundingAccountSummaryResponse {
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiFundingRateRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // Start time of funding rate in unix nanoseconds
   start_time?: bigint
@@ -444,8 +444,8 @@ export interface IApiGetEcosystemReferralStatResponse {
 export interface IApiGetFilteredInstrumentsRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // Request for active instruments only
@@ -461,10 +461,7 @@ export interface IApiGetFilteredInstrumentsResponse {
 
 // Fetch a single instrument by supplying the asset or instrument name
 export interface IApiGetInstrumentRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
 }
 
@@ -480,8 +477,8 @@ export interface IApiGetLPLeaderboardRequest {
   limit?: number
   // The kind filter to apply
   kind?: EKind
-  // The underlying filter to apply
-  underlying?: ECurrency
+  // The base filter to apply
+  base?: ECurrency
 }
 
 export interface IApiGetLPLeaderboardResponse {
@@ -494,8 +491,8 @@ export interface IApiGetLPPointRequest {
   start_interval?: bigint
   // The kind filter to apply
   kind?: EKind
-  // The underlying filter to apply
-  underlying?: ECurrency
+  // The base filter to apply
+  base?: ECurrency
 }
 
 export interface IApiGetLPPointResponse {
@@ -508,8 +505,8 @@ export interface IApiGetLPPointResponse {
 export interface IApiGetLatestLPSnapshotRequest {
   // The kind filter to apply
   kind?: EKind
-  // The underlying filter to apply
-  underlying?: ECurrency
+  // The base filter to apply
+  base?: ECurrency
 }
 
 export interface IApiGetLatestLPSnapshotResponse {
@@ -582,10 +579,7 @@ export interface IApiLatestSnapSubAccountsResponse {
 
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
 export interface IApiMiniTickerRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
 }
 
@@ -599,8 +593,8 @@ export interface IApiOpenOrdersRequest {
   sub_account_id?: bigint
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
@@ -619,8 +613,8 @@ export interface IApiOrderHistoryRequest {
   sub_account_id?: bigint
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
@@ -657,12 +651,9 @@ export interface IApiOrderStateResponse {
 
 // Retrieves aggregated price depth for a single instrument, with a maximum depth of 10 levels. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
 export interface IApiOrderbookLevelsRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
-  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
+  // Depth of the order book to be retrieved (10, 40, 200, 500)
   depth?: number
   // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
   aggregate?: number
@@ -679,8 +670,8 @@ export interface IApiPositionsRequest {
   sub_account_id?: bigint
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
 }
@@ -698,8 +689,8 @@ export interface IApiPrivateTradeHistoryRequest {
   sub_account_id?: bigint
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be returned
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
@@ -725,10 +716,7 @@ export interface IApiPrivateTradeHistoryResponse {
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiPublicTradeHistoryRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
   start_time?: bigint
@@ -750,10 +738,7 @@ export interface IApiPublicTradeHistoryResponse {
 // Retrieves up to 1000 of the most recent public trades in any given instrument. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
 // This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
 export interface IApiPublicTradesRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
@@ -777,8 +762,8 @@ export interface IApiResolveEpochEcosystemMetricResponse {
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiSettlementPriceRequest {
-  // The underlying currency to select
-  underlying?: ECurrency
+  // The base currency to select
+  base?: ECurrency
   // The quote currency to select
   quote?: ECurrency
   // Start time of settlement price in unix nanoseconds
@@ -864,10 +849,7 @@ export interface IApiSubAccountTradeAggregationResponse {
 
 // startTime are optional parameters. The semantics of these parameters are as follows:<ul>
 export interface IApiSubAccountTradeRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The interval of each sub account trade
   interval?: ESubAccountTradeInterval
@@ -893,10 +875,7 @@ export interface IApiTickerFeedDataV1 {
 
 // Retrieves a single ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
 export interface IApiTickerRequest {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
 }
 
@@ -1007,16 +986,13 @@ export interface ICandlestick {
   high?: string
   // The low price, expressed in underlying currency resolution units
   low?: string
-  // The underlying volume transacted, expressed in underlying asset decimal units
+  // The underlying volume transacted, expressed in base asset decimal units
   volume_u?: string
   // The quote volume transacted, expressed in quote asset decimal units
   volume_q?: string
   // The number of trades transacted
   trades?: number
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
 }
 
@@ -1111,10 +1087,7 @@ export interface IFlatReferral {
 }
 
 export interface IFundingRate {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The funding rate of the instrument, expressed in centibeeps
   funding_rate?: number
@@ -1125,15 +1098,12 @@ export interface IFundingRate {
 }
 
 export interface IInstrument {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The asset ID used for instrument signing.
   asset_id?: bigint
-  // The underlying currency
-  underlying?: ECurrency
+  // The base currency
+  base?: ECurrency
   // The quote currency
   quote?: ECurrency
   // The kind of instrument
@@ -1146,15 +1116,15 @@ export interface IInstrument {
   venues?: EVenue[]
   // The settlement period of the instrument
   settlement_period?: EInstrumentSettlementPeriod
-  // The smallest denomination of the underlying asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
+  // The smallest denomination of the base asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
   underlying_decimals?: number
   // The smallest denomination of the quote asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
   quote_decimals?: number
   // The size of a single tick, expressed in quote asset decimal units
   tick_size?: string
-  // The minimum contract size, expressed in underlying asset decimal units
+  // The minimum contract size, expressed in base asset decimal units
   min_size?: string
-  // The minimum block trade size, expressed in underlying asset decimal units
+  // The minimum block trade size, expressed in base asset decimal units
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
@@ -1195,10 +1165,7 @@ export interface ILPSnapshot {
 export interface IMiniTicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
   mark_price?: string
@@ -1206,17 +1173,17 @@ export interface IMiniTicker {
   index_price?: string
   // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: string
-  // The number of assets traded in the last trade, expressed in underlying asset decimal units
+  // The number of assets traded in the last trade, expressed in base asset decimal units
   last_size?: string
   // The mid price of the instrument, expressed in `9` decimals
   mid_price?: string
   // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: string
-  // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
+  // The number of assets offered on the best bid price of the instrument, expressed in base asset decimal units
   best_bid_size?: string
   // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: string
-  // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
+  // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
 }
 
@@ -1274,7 +1241,7 @@ export interface IOrder {
 export interface IOrderLeg {
   // The instrument to trade in this leg
   instrument?: string
-  // The total number of assets to trade in this leg, expressed in underlying asset decimal units.
+  // The total number of assets to trade in this leg, expressed in base asset decimal units.
   size?: string
   // The limit price of the order leg, expressed in `9` decimals.
   // This is the number of quote currency units to pay/receive for this leg.
@@ -1324,7 +1291,7 @@ export interface IOrderStateFeed {
 export interface IOrderbookLevel {
   // The price of the level, expressed in `9` decimals
   price?: string
-  // The number of assets offered, expressed in underlying asset decimal units
+  // The number of assets offered, expressed in base asset decimal units
   size?: string
   // The number of open orders at this level
   num_orders?: number
@@ -1333,10 +1300,7 @@ export interface IOrderbookLevel {
 export interface IOrderbookLevels {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The list of best bids up till query depth
   bids?: IOrderbookLevel[]
@@ -1351,7 +1315,7 @@ export interface IPositions {
   sub_account_id?: bigint
   // The instrument being represented
   instrument?: string
-  // The size of the position, expressed in underlying asset decimal units. Negative for short positions
+  // The size of the position, expressed in base asset decimal units. Negative for short positions
   size?: string
   // The notional value of the position, negative for short assets, expressed in quote asset decimal units
   notional?: string
@@ -1392,7 +1356,7 @@ export interface IPrivateTrade {
   is_buyer?: boolean
   // The role that the subaccount took on the trade
   is_taker?: boolean
-  // The number of assets being traded, expressed in underlying asset decimal units
+  // The number of assets being traded, expressed in base asset decimal units
   size?: string
   // The traded price, expressed in `9` decimals
   price?: string
@@ -1436,14 +1400,11 @@ export interface IPrivateTrade {
 export interface IPublicTrade {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // If taker was the buyer on the trade
   is_taker_buyer?: boolean
-  // The number of assets being traded, expressed in underlying asset decimal units
+  // The number of assets being traded, expressed in base asset decimal units
   size?: string
   // The traded price, expressed in `9` decimals
   price?: string
@@ -1566,10 +1527,7 @@ export interface ISubAccountTradeAggregation {
 export interface ITicker {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
   mark_price?: string
@@ -1577,17 +1535,17 @@ export interface ITicker {
   index_price?: string
   // The last traded price of the instrument (also close price), expressed in `9` decimals
   last_price?: string
-  // The number of assets traded in the last trade, expressed in underlying asset decimal units
+  // The number of assets traded in the last trade, expressed in base asset decimal units
   last_size?: string
   // The mid price of the instrument, expressed in `9` decimals
   mid_price?: string
   // The best bid price of the instrument, expressed in `9` decimals
   best_bid_price?: string
-  // The number of assets offered on the best bid price of the instrument, expressed in underlying asset decimal units
+  // The number of assets offered on the best bid price of the instrument, expressed in base asset decimal units
   best_bid_size?: string
   // The best ask price of the instrument, expressed in `9` decimals
   best_ask_price?: string
-  // The number of assets offered on the best ask price of the instrument, expressed in underlying asset decimal units
+  // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
   funding_rate_8_h_curr?: string
@@ -1597,9 +1555,9 @@ export interface ITicker {
   interest_rate?: string
   // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: string
-  // The 24 hour taker buy volume of the instrument, expressed in underlying asset decimal units
+  // The 24 hour taker buy volume of the instrument, expressed in base asset decimal units
   buy_volume_24_h_u?: string
-  // The 24 hour taker sell volume of the instrument, expressed in underlying asset decimal units
+  // The 24 hour taker sell volume of the instrument, expressed in base asset decimal units
   sell_volume_24_h_u?: string
   // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
   buy_volume_24_h_q?: string
@@ -1611,7 +1569,7 @@ export interface ITicker {
   low_price?: string
   // The 24 hour first traded price of the instrument, expressed in `9` decimals
   open_price?: string
-  // The open interest in the instrument, expressed in underlying asset decimal units
+  // The open interest in the instrument, expressed in base asset decimal units
   open_interest?: string
   // The ratio of accounts that are net long vs net short on this instrument
   long_short_ratio?: string
@@ -1687,10 +1645,7 @@ export interface IWSCandlestickFeedDataV1 {
 // Subscribes to a stream of Kline/Candlestick updates for an instrument. A Kline is uniquely identified by its open time.
 // A new Kline is published every interval (if it exists). Upon subscription, the server will send the 5 most recent Kline for the requested interval.
 export interface IWSCandlestickFeedSelectorV1 {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The interval of each candlestick
   interval?: ECandlestickInterval
@@ -1728,13 +1683,10 @@ export interface IWSMiniTickerFeedDataV1 {
 //
 // Field Semantics:<ul><li>[DeltaOnly] If a field is not updated, {}</li><li>If a field is updated, {field: '123'}</li><li>If a field is set to zero, {field: '0'}</li><li>If a field is set to null, {field: ''}</li></ul>
 export interface IWSMiniTickerFeedSelectorV1 {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (raw, 50, 100, 200, 500, 1000, 5000)
+  // Delta (0, 40, 100, 200, 500, 1000, 5000)
   // Snapshot (200, 500, 1000, 5000)
   rate?: number
 }
@@ -1758,8 +1710,8 @@ export interface IWSOrderFeedSelectorV1 {
   sub_account_id?: bigint
   // The kind filter to apply.
   kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
+  // The base filter to apply.
+  base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
   // create only, update only, all
@@ -1786,8 +1738,8 @@ export interface IWSOrderStateFeedSelectorV1 {
   sub_account_id?: bigint
   // The kind filter to apply.
   kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
+  // The base filter to apply.
+  base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
   // create only, update only, all
@@ -1812,16 +1764,13 @@ export interface IWSOrderbookLevelsFeedDataV1 {
 //
 // Field Semantics:<ul><li>[DeltaOnly] If a level is not updated, level not published</li><li>If a level is updated, {size: '123'}</li><li>If a level is set to zero, {size: '0'}</li><li>Incoming levels will be published as soon as price moves</li><li>Outgoing levels will be published with `size = 0`</li></ul>
 export interface IWSOrderbookLevelsFeedSelectorV1 {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (100, 200, 500, 1000, 5000)
+  // Delta (40, 100, 200, 500, 1000, 5000)
   // Snapshot (500, 1000, 5000)
   rate?: number
-  // Depth of the order book to be retrieved (API/Snapshot max is 100, Delta max is 1000)
+  // Depth of the order book to be retrieved (10, 40, 200, 500)
   depth?: number
   // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
   aggregate?: number
@@ -1844,8 +1793,8 @@ export interface IWSPositionsFeedSelectorV1 {
   sub_account_id?: bigint
   // The kind filter to apply.
   kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
+  // The base filter to apply.
+  base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
 }
@@ -1866,8 +1815,8 @@ export interface IWSPrivateTradeFeedSelectorV1 {
   sub_account_id?: bigint
   // The kind filter to apply.
   kind?: EKind
-  // The underlying filter to apply.
-  underlying?: ECurrency
+  // The base filter to apply.
+  base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
 }
@@ -1885,10 +1834,7 @@ export interface IWSPublicTradesFeedDataV1 {
 
 // Subscribes to a stream of Public Trades for an instrument.
 export interface IWSPublicTradesFeedSelectorV1 {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
@@ -1932,10 +1878,7 @@ export interface IWSTickerFeedDataV1 {
 //
 // Field Semantics:<ul><li>[DeltaOnly] If a field is not updated, {}</li><li>If a field is updated, {field: '123'}</li><li>If a field is set to zero, {field: '0'}</li><li>If a field is set to null, {field: ''}</li></ul>
 export interface IWSTickerFeedSelectorV1 {
-  // The readable name of the instrument. For Perpetual: ETH_USDT_Perp [Underlying Quote Perp]
-  // For Future: BTC_USDT_Fut_20Oct23 [Underlying Quote Fut DateFormat]
-  // For Call: ETH_USDT_Call_20Oct23_4123 [Underlying Quote Call DateFormat StrikePrice]
-  // For Put: ETH_USDT_Put_20Oct23_4123 [Underlying Quote Put DateFormat StrikePrice]
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The minimal rate at which we publish feeds (in milliseconds)
   // Delta (100, 200, 500, 1000, 5000)
