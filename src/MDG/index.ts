@@ -157,11 +157,11 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#public-trades
+   * @see https://api-docs.grvt.io/market_data_api/#trade_1
    */
-  trades (payload: IApiTradeRequest, config?: AxiosRequestConfig) {
+  trade (payload: IApiTradeRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
-      this._liteUrl + '/trades',
+      this._liteUrl + '/trade',
       Utils.schemaMap(payload, API_TRADE_REQUEST_MAP.FULL_TO_LITE, true),
       {
         ...config,
@@ -173,7 +173,15 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#public-trade-history
+   * @deprecated
+   * Use `trade` instead
+   */
+  trades (...args: Parameters<MDG['trade']>) {
+    return this.trade(...args)
+  }
+
+  /**
+   * @see https://api-docs.grvt.io/market_data_api/#trade-history
    */
   tradesHistory (payload: IApiTradeHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(

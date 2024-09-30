@@ -200,16 +200,24 @@ export class TDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#trade-history
+   * @see https://api-docs.grvt.io/market_data_api/#trade-history
    */
-  tradeHistory (payload: IApiFillHistoryRequest, config?: AxiosRequestConfig) {
+  fillHistory (payload: IApiFillHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
-      this._liteUrl + '/trade_history',
+      this._liteUrl + '/fill_history',
       Utils.schemaMap(payload, API_FILL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_FILL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiFillHistoryResponse
     })
+  }
+
+  /**
+   * @deprecated
+   * Use `fillHistory` instead
+   */
+  tradeHistory (...args: Parameters<TDG['fillHistory']>) {
+    return this.fillHistory(...args)
   }
 
   /** ===== ORDER ===== */
