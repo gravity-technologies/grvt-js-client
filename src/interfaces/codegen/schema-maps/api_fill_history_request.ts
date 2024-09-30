@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'API_PRIVATE_TRADE_HISTORY_REQUEST' struct.
-export const API_PRIVATE_TRADE_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'API_FILL_HISTORY_REQUEST' struct.
+export const API_FILL_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
     kind: 'k',

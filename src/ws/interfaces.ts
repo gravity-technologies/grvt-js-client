@@ -1,26 +1,25 @@
 import {
   type ECandlestickInterval,
   type ECandlestickType,
-  type ECurrency,
-  type EKind,
   type ICandlestick,
+  type IFill,
   type IMiniTicker,
   type IOrder,
   type IOrderState,
   type IOrderbookLevels,
   type IPositions,
-  type IPrivateTrade,
-  type IPublicTrade,
   type ITicker,
+  type ITrade,
   type ITransfer,
   type IWSCandlestickFeedSelectorV1,
+  type IWSFillFeedSelectorV1,
   type IWSMiniTickerFeedSelectorV1,
   type IWSOrderFeedSelectorV1,
+  type IWSOrderStateFeedSelectorV1,
   type IWSOrderbookLevelsFeedSelectorV1,
   type IWSPositionsFeedSelectorV1,
-  type IWSPrivateTradeFeedSelectorV1,
-  type IWSPublicTradesFeedSelectorV1,
-  type IWSTickerFeedSelectorV1
+  type IWSTickerFeedSelectorV1,
+  type IWSTradeFeedSelectorV1
 } from '../interfaces'
 
 export enum EStream {
@@ -34,6 +33,7 @@ export enum EStream {
   TRADE = 'trade',
 
   ORDER = 'order',
+  STATE = 'state',
   POSITION = 'position',
   FILL = 'fill',
   TRANSFER = 'transfer',
@@ -120,31 +120,34 @@ export interface IWSTickerRequest {
 
 export interface IWSTradeRequest {
   stream: `${EStream.TRADE}`
-  params: IWSPublicTradesFeedSelectorV1
-  onData?: TMessageHandler<IPublicTrade>
+  params: IWSTradeFeedSelectorV1
+  onData?: TMessageHandler<ITrade>
   onError?: (error: Error) => void
 }
 
 export interface IWSTdgOrderRequest {
   stream: `${EStream.ORDER}`
   params: {
-    subAccountId: string
-    kind: `${EKind}`
-    base: `${ECurrency}`
-    quote: `${ECurrency}`
-  } & Omit<IWSOrderFeedSelectorV1, keyof IWSOrderFeedSelectorV1>
-  onData?: TMessageHandler<IOrder | IOrderState>
+    sub_account_id: string
+  } & Pick<IWSOrderFeedSelectorV1, 'instrument'>
+  onData?: TMessageHandler<IOrder>
+  onError?: (error: Error) => void
+}
+
+export interface IWSTdgOrderStateRequest {
+  stream: `${EStream.STATE}`
+  params: {
+    sub_account_id: string
+  } & Pick<IWSOrderStateFeedSelectorV1, 'instrument'>
+  onData?: TMessageHandler<IOrderState>
   onError?: (error: Error) => void
 }
 
 export interface IWSTdgPositionRequest {
   stream: `${EStream.POSITION}`
   params: {
-    subAccountId: string
-    kind: `${EKind}`
-    base: `${ECurrency}`
-    quote: `${ECurrency}`
-  } & Omit<IWSPositionsFeedSelectorV1, keyof IWSPositionsFeedSelectorV1>
+    sub_account_id: string
+  } & Pick<IWSPositionsFeedSelectorV1, 'instrument'>
   onData?: TMessageHandler<IPositions>
   onError?: (error: Error) => void
 }
@@ -152,12 +155,9 @@ export interface IWSTdgPositionRequest {
 export interface IWSTdgFillRequest {
   stream: `${EStream.FILL}`
   params: {
-    subAccountId: string
-    kind: `${EKind}`
-    base: `${ECurrency}`
-    quote: `${ECurrency}`
-  } & Omit<IWSPrivateTradeFeedSelectorV1, keyof IWSPrivateTradeFeedSelectorV1>
-  onData?: TMessageHandler<IPrivateTrade>
+    sub_account_id: string
+  } & Pick<IWSFillFeedSelectorV1, 'instrument'>
+  onData?: TMessageHandler<IFill>
   onError?: (error: Error) => void
 }
 
@@ -181,6 +181,7 @@ export type TWSRequest =
   | IWSTickerRequest
   | IWSTradeRequest
   | IWSTdgOrderRequest
+  | IWSTdgOrderStateRequest
   | IWSTdgPositionRequest
   | IWSTdgFillRequest
   | IWSTdgTransferRequest

@@ -14,14 +14,14 @@ import {
   API_MINI_TICKER_RESPONSE_MAP,
   API_ORDERBOOK_LEVELS_REQUEST_MAP,
   API_ORDERBOOK_LEVELS_RESPONSE_MAP,
-  API_PUBLIC_TRADES_REQUEST_MAP,
-  API_PUBLIC_TRADES_RESPONSE_MAP,
-  API_PUBLIC_TRADE_HISTORY_REQUEST_MAP,
-  API_PUBLIC_TRADE_HISTORY_RESPONSE_MAP,
   API_SETTLEMENT_PRICE_REQUEST_MAP,
   API_SETTLEMENT_PRICE_RESPONSE_MAP,
   API_TICKER_REQUEST_MAP,
   API_TICKER_RESPONSE_MAP,
+  API_TRADE_HISTORY_REQUEST_MAP,
+  API_TRADE_HISTORY_RESPONSE_MAP,
+  API_TRADE_REQUEST_MAP,
+  API_TRADE_RESPONSE_MAP,
   validConfig,
   type IApiCandlestickRequest,
   type IApiCandlestickResponse,
@@ -37,14 +37,14 @@ import {
   type IApiMiniTickerResponse,
   type IApiOrderbookLevelsRequest,
   type IApiOrderbookLevelsResponse,
-  type IApiPublicTradeHistoryRequest,
-  type IApiPublicTradeHistoryResponse,
-  type IApiPublicTradesRequest,
-  type IApiPublicTradesResponse,
   type IApiSettlementPriceRequest,
   type IApiSettlementPriceResponse,
   type IApiTickerRequest,
   type IApiTickerResponse,
+  type IApiTradeHistoryRequest,
+  type IApiTradeHistoryResponse,
+  type IApiTradeRequest,
+  type IApiTradeResponse,
   type IConfig
 } from '../interfaces'
 import { RestfulService } from '../services'
@@ -159,32 +159,32 @@ export class MDG {
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#public-trades
    */
-  trades (payload: IApiPublicTradesRequest, config?: AxiosRequestConfig) {
+  trades (payload: IApiTradeRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/trades',
-      Utils.schemaMap(payload, API_PUBLIC_TRADES_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_TRADE_REQUEST_MAP.FULL_TO_LITE, true),
       {
         ...config,
         withCredentials: false
       }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_PUBLIC_TRADES_RESPONSE_MAP.LITE_TO_FULL) as IApiPublicTradesResponse
+      return Utils.schemaMap(response.data, API_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeResponse
     })
   }
 
   /**
    * @see https://docs.gravitymarkets.io/market_data_api/#public-trade-history
    */
-  tradesHistory (payload: IApiPublicTradeHistoryRequest, config?: AxiosRequestConfig) {
+  tradesHistory (payload: IApiTradeHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/trade_history',
-      Utils.schemaMap(payload, API_PUBLIC_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       {
         ...config,
         withCredentials: false
       }
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_PUBLIC_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiPublicTradeHistoryResponse
+      return Utils.schemaMap(response.data, API_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeHistoryResponse
     })
   }
 

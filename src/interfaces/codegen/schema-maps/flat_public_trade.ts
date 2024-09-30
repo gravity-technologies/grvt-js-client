@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'PUBLIC_TRADE' struct.
-export const PUBLIC_TRADE_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'TRADE' struct.
+export const TRADE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
     instrument: 'i',

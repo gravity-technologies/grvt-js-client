@@ -1,28 +1,26 @@
 import {
-  EKind,
   WS_CANDLESTICK_FEED_DATA_V_1_MAP,
+  WS_FILL_FEED_DATA_V_1_MAP,
   WS_MINI_TICKER_FEED_DATA_V_1_MAP,
   WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP,
   WS_ORDER_FEED_DATA_V_1_MAP,
   WS_ORDER_STATE_FEED_DATA_V_1_MAP,
   WS_POSITIONS_FEED_DATA_V_1_MAP,
-  WS_PRIVATE_TRADE_FEED_DATA_V_1_MAP,
-  WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP,
   WS_TICKER_FEED_DATA_V_1_MAP,
+  WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
-  type ECurrency,
   type IOrder,
   type IOrderState,
   type ITransfer,
   type IWSCandlestickFeedDataV1,
+  type IWSFillFeedDataV1,
   type IWSMiniTickerFeedDataV1,
   type IWSOrderFeedDataV1,
   type IWSOrderStateFeedDataV1,
   type IWSPositionsFeedDataV1,
-  type IWSPrivateTradeFeedDataV1,
-  type IWSPublicTradesFeedDataV1,
   type IWSRequestV1,
   type IWSTickerFeedDataV1,
+  type IWSTradeFeedDataV1,
   type IWSTransferFeedDataV1
 } from '../interfaces'
 import { JsonUtils, StringUtils, Utils } from '../utils'
@@ -33,6 +31,7 @@ import {
   type IWSMiniRequest,
   type IWSTdgFillRequest,
   type IWSTdgOrderRequest,
+  type IWSTdgOrderStateRequest,
   type IWSTdgPositionRequest,
   type IWSTdgTransferRequest,
   type IWSTickerRequest,
@@ -91,7 +90,8 @@ export class WS {
   }
 
   /**
-   * Only use for ITransfer | IOrderState
+   * Only use for TDG
+   * IOrderState | ITransfer
    */
   private _getNonInstrumentConsumers ({ result, stream }: {
     result: TEntities
@@ -105,12 +105,8 @@ export class WS {
 
         const destinationAccountId = (result as ITransfer).to_account_id?.toString(16) ?? (result as ITransfer).to_sub_account_id?.toString()
         switch (stream) {
-          case EStream.ORDER:
-            // updateOnly
-            if (key.endsWith('@u')) {
-              return [...acc, ...Object.values(value)]
-            }
-            break
+          case EStream.STATE:
+            return [...acc, ...Object.values(value)]
           case EStream.TRANSFER:
             if (destinationAccountId && key.endsWith(destinationAccountId)) {
               return [...acc, ...Object.values(value)]
@@ -124,6 +120,7 @@ export class WS {
   }
 
   /**
+   * Only use for TDG
    * Use for TEntities not ITransfer | IOrderState
    */
   private _getInstrumentConsumers ({ result, stream, instrument }: {
@@ -148,20 +145,11 @@ export class WS {
         const subAccountId = String((result as IOrder).sub_account_id)
         // const subAccountId = String((result as IPositions).sub_account_id)
         // const subAccountId = String((result as IPrivateTrade).sub_account_id)
-        const kindDef = {
-          Perp: EKind.PERPETUAL,
-          Call: EKind.CALL,
-          Put: EKind.PUT,
-          Fut: EKind.FUTURE
-        }
-        const [base, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
         const feed = this._parseStream({
           stream: stream as EStream.FILL | EStream.ORDER | EStream.POSITION,
           params: {
             subAccountId,
-            kind: kindDef[kind] ?? EKind.PERPETUAL,
-            base,
-            quote
+            instrument
           }
         })?.feed
         const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
@@ -210,7 +198,7 @@ export class WS {
         return
       }
 
-      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<typeof result, ITransfer | IOrderState>)?.instrument
+      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<typeof result, IOrder | ITransfer | IOrderState>)?.instrument
 
       /**
        * Handle subscriptions with instrument
@@ -275,10 +263,8 @@ export class WS {
 
     const fillFeed = (params: IWSTdgFillRequest['params']): string => [
       [
-        params.subAccountId,
-        params.kind,
-        params.base,
-        params.quote
+        params.sub_account_id,
+        params.instrument
       ].filter(Boolean).join('-')
       // [
       //   params.createOnly
@@ -287,10 +273,22 @@ export class WS {
 
     const orderFeed = (params: IWSTdgOrderRequest['params']): string => [
       [
-        params.subAccountId,
-        params.kind,
-        params.base,
-        params.quote
+        params.sub_account_id,
+        params.instrument
+      ].filter(Boolean).join('-')
+      // [
+      //   {
+      //     all: 'a',
+      //     createOnly: 'c',
+      //     updateOnly: 'u'
+      //   }[params.state_filter] || 'a'
+      // ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const orderStateFeed = (params: IWSTdgOrderStateRequest['params']): string => [
+      [
+        params.sub_account_id,
+        params.instrument
       ].filter(Boolean).join('-')
       // [
       //   {
@@ -303,10 +301,8 @@ export class WS {
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
       [
-        params.subAccountId,
-        params.kind,
-        params.base,
-        params.quote
+        params.sub_account_id,
+        params.instrument
       ].filter(Boolean).join('-')
       // [
       //   params.createOnly
@@ -355,6 +351,11 @@ export class WS {
           stream,
           feed: [orderFeed(params as IWSTdgOrderRequest['params'])]
         }
+      case EStream.STATE:
+        return {
+          stream,
+          feed: [orderStateFeed(params as IWSTdgOrderStateRequest['params'])]
+        }
       case EStream.POSITION:
         return {
           stream,
@@ -389,17 +390,15 @@ export class WS {
       case EStream.TICKER_SNAP:
         return (Utils.schemaMap(message, WS_TICKER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTickerFeedDataV1).feed
       case EStream.TRADE:
-        return (Utils.schemaMap(message, WS_PUBLIC_TRADES_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPublicTradesFeedDataV1).feed
+        return (Utils.schemaMap(message, WS_TRADE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTradeFeedDataV1).feed
       case EStream.ORDER:
-        // if has oi then it's full order
-        if ((message as any)?.f?.oi) {
-          return (Utils.schemaMap(message, WS_ORDER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
-        }
+        return (Utils.schemaMap(message, WS_ORDER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
+      case EStream.STATE:
         return (Utils.schemaMap(message, WS_ORDER_STATE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderStateFeedDataV1).feed
       case EStream.POSITION:
         return (Utils.schemaMap(message, WS_POSITIONS_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPositionsFeedDataV1).feed
       case EStream.FILL:
-        return (Utils.schemaMap(message, WS_PRIVATE_TRADE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPrivateTradeFeedDataV1).feed
+        return (Utils.schemaMap(message, WS_FILL_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSFillFeedDataV1).feed
       case EStream.TRANSFER:
         return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1).feed
       default:

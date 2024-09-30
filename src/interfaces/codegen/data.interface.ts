@@ -328,6 +328,35 @@ export interface IApiDepositRequest {
   num_tokens?: string
 }
 
+// Query for all historical fills made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
+export interface IApiFillHistoryRequest {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
+  kind?: EKind[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: ECurrency[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
+  quote?: ECurrency[]
+  // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiFillHistoryResponse {
+  // The private trades matching the request asset
+  results?: IFill[]
+  // The cursor to indicate when to start the query from
+  next?: string
+}
+
 export interface IApiFindEcosystemLeaderboardResponse {
   // The list of ecosystem leaderboard users
   users?: IEcosystemLeaderboardUser[]
@@ -672,74 +701,6 @@ export interface IApiPositionsResponse {
   results?: IPositions[]
 }
 
-// Query for all historical trades made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
-//
-// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
-export interface IApiPrivateTradeHistoryRequest {
-  // The sub account ID to request for
-  sub_account_id?: bigint
-  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
-  kind?: EKind[]
-  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
-  base?: ECurrency[]
-  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
-  // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
-  // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The cursor to indicate when to start the query from
-  cursor?: string
-}
-
-export interface IApiPrivateTradeHistoryResponse {
-  // The private trades matching the request asset
-  results?: IPrivateTrade[]
-  // The cursor to indicate when to start the query from
-  next?: string
-}
-
-// Perform historical lookup of public trades in any given instrument.
-// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
-// Only data from the last three months will be retained.
-//
-// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
-export interface IApiPublicTradeHistoryRequest {
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
-  instrument?: string
-  // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
-  // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-  // The cursor to indicate when to start the query from
-  cursor?: string
-}
-
-export interface IApiPublicTradeHistoryResponse {
-  // The public trades matching the request asset
-  results?: IPublicTrade[]
-  // The cursor to indicate when to start the next query from
-  next?: string
-}
-
-// Retrieves up to 1000 of the most recent public trades in any given instrument. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
-// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
-export interface IApiPublicTradesRequest {
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
-  instrument?: string
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
-}
-
-export interface IApiPublicTradesResponse {
-  // The public trades matching the request asset
-  results?: IPublicTrade[]
-}
-
 export interface IApiResolveEpochEcosystemMetricResponse {
   // The name of the epoch
   epoch_name?: string
@@ -873,6 +834,45 @@ export interface IApiTickerRequest {
 export interface IApiTickerResponse {
   // The mini ticker matching the request asset
   results?: ITicker
+}
+
+// Perform historical lookup of public trades in any given instrument.
+// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
+// Only data from the last three months will be retained.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
+export interface IApiTradeHistoryRequest {
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  instrument?: string
+  // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiTradeHistoryResponse {
+  // The public trades matching the request asset
+  results?: ITrade[]
+  // The cursor to indicate when to start the next query from
+  next?: string
+}
+
+// Retrieves up to 1000 of the most recent trades in any given instrument. Do not use this to poll for data -- a websocket subscription is much more performant, and useful.
+// This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
+export interface IApiTradeRequest {
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  instrument?: string
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+}
+
+export interface IApiTradeResponse {
+  // The public trades matching the request asset
+  results?: ITrade[]
 }
 
 // The request to get the historical transfers of an account
@@ -1060,6 +1060,57 @@ export interface IEcosystemPoint {
   calculate_to?: bigint
   // The rank of the account in the ecosystem
   rank?: number
+}
+
+export interface IFill {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The sub account ID that participated in the trade
+  sub_account_id?: bigint
+  // The instrument being represented
+  instrument?: string
+  // The side that the subaccount took on the trade
+  is_buyer?: boolean
+  // The role that the subaccount took on the trade
+  is_taker?: boolean
+  // The number of assets being traded, expressed in base asset decimal units
+  size?: string
+  // The traded price, expressed in `9` decimals
+  price?: string
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
+  mark_price?: string
+  // The index price of the instrument at point of trade, expressed in `9` decimals
+  index_price?: string
+  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
+  interest_rate?: string
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
+  forward_price?: string
+  // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
+  realized_pnl?: string
+  // The fees paid on the trade, expressed in quote asset decimal unit (negative if maker rebate applied)
+  fee?: string
+  // The fee rate paid on the trade
+  fee_rate?: string
+  // A trade identifier
+  trade_id?: bigint
+  // An order identifier
+  order_id?: bigint
+  // The venue where the trade occurred
+  venue?: EVenue
+  // If the trade was a liquidation
+  is_liquidation?: boolean
+  // A unique identifier for the active order within a subaccount, specified by the client
+  // This is used to identify the order in the client's system
+  // This field can be used for order amendment/cancellation, but has no bearing on the smart contract layer
+  // This field will not be propagated to the smart contract, and should not be signed by the client
+  // This value must be unique for all active orders in a subaccount, or amendment/cancellation will not work as expected
+  // Gravity UI will generate a random clientOrderID for each order in the range [0, 2^63 - 1]
+  // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
+  //
+  // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
+  client_order_id?: bigint
+  // A trade index
+  trade_index?: number
 }
 
 export interface IFlatReferral {
@@ -1338,87 +1389,6 @@ export interface IPositions {
   quote_index_price?: string
 }
 
-export interface IPrivateTrade {
-  // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
-  // The sub account ID that participated in the trade
-  sub_account_id?: bigint
-  // The instrument being represented
-  instrument?: string
-  // The side that the subaccount took on the trade
-  is_buyer?: boolean
-  // The role that the subaccount took on the trade
-  is_taker?: boolean
-  // The number of assets being traded, expressed in base asset decimal units
-  size?: string
-  // The traded price, expressed in `9` decimals
-  price?: string
-  // The mark price of the instrument at point of trade, expressed in `9` decimals
-  mark_price?: string
-  // The index price of the instrument at point of trade, expressed in `9` decimals
-  index_price?: string
-  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
-  interest_rate?: string
-  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
-  forward_price?: string
-  // The realized PnL of the trade, expressed in quote asset decimal units (0 if increasing position size)
-  realized_pnl?: string
-  // The fees paid on the trade, expressed in quote asset decimal unit (negative if maker rebate applied)
-  fee?: string
-  // The fee rate paid on the trade
-  fee_rate?: string
-  // A trade identifier
-  trade_id?: bigint
-  // An order identifier
-  order_id?: bigint
-  // The venue where the trade occurred
-  venue?: EVenue
-  // If the trade was a liquidation
-  is_liquidation?: boolean
-  // A unique identifier for the active order within a subaccount, specified by the client
-  // This is used to identify the order in the client's system
-  // This field can be used for order amendment/cancellation, but has no bearing on the smart contract layer
-  // This field will not be propagated to the smart contract, and should not be signed by the client
-  // This value must be unique for all active orders in a subaccount, or amendment/cancellation will not work as expected
-  // Gravity UI will generate a random clientOrderID for each order in the range [0, 2^63 - 1]
-  // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
-  //
-  // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
-  client_order_id?: bigint
-  // A trade index
-  trade_index?: number
-}
-
-// All private RFQs and Private AXEs will be filtered out from the responses
-export interface IPublicTrade {
-  // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
-  instrument?: string
-  // If taker was the buyer on the trade
-  is_taker_buyer?: boolean
-  // The number of assets being traded, expressed in base asset decimal units
-  size?: string
-  // The traded price, expressed in `9` decimals
-  price?: string
-  // The mark price of the instrument at point of trade, expressed in `9` decimals
-  mark_price?: string
-  // The index price of the instrument at point of trade, expressed in `9` decimals
-  index_price?: string
-  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
-  interest_rate?: string
-  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
-  forward_price?: string
-  // A trade identifier
-  trade_id?: bigint
-  // The venue where the trade occurred
-  venue?: EVenue
-  // If the trade was a liquidation
-  is_liquidation?: boolean
-  // A trade index
-  trade_index?: number
-}
-
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
   signer?: bigint
@@ -1568,6 +1538,36 @@ export interface ITicker {
   long_short_ratio?: string
 }
 
+// All private RFQs and Private AXEs will be filtered out from the responses
+export interface ITrade {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  instrument?: string
+  // If taker was the buyer on the trade
+  is_taker_buyer?: boolean
+  // The number of assets being traded, expressed in base asset decimal units
+  size?: string
+  // The traded price, expressed in `9` decimals
+  price?: string
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
+  mark_price?: string
+  // The index price of the instrument at point of trade, expressed in `9` decimals
+  index_price?: string
+  // The interest rate of the underlying at point of trade, expressed in centibeeps (1/100th of a basis point)
+  interest_rate?: string
+  // [Options] The forward price of the option at point of trade, expressed in `9` decimals
+  forward_price?: string
+  // A trade identifier
+  trade_id?: bigint
+  // The venue where the trade occurred
+  venue?: EVenue
+  // If the trade was a liquidation
+  is_liquidation?: boolean
+  // A trade index
+  trade_index?: number
+}
+
 export interface ITraderLeaderboardUser {
   // The off chain account id
   account_id?: string
@@ -1658,6 +1658,27 @@ export interface IWSDepositFeedDataV1 {
   feed?: IDeposit
 }
 
+export interface IWSFillFeedDataV1 {
+  // The websocket channel to which the response is sent
+  stream?: string
+  // Primary selector
+  selector?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A private trade matching the request filter
+  feed?: IFill
+}
+
+// Subscribes to a feed of private trade updates. This happens when a trade is executed.
+// To subscribe to all private trades, specify an empty `instrument` (eg. `2345123`).
+// Otherwise, specify the `instrument` to only receive private trades for that instrument (eg. `2345123-BTC_USDT_Perp`).
+export interface IWSFillFeedSelectorV1 {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // The instrument filter to apply.
+  instrument?: string
+}
+
 export interface IWSMiniTickerFeedDataV1 {
   // Stream name
   stream?: string
@@ -1696,17 +1717,14 @@ export interface IWSOrderFeedDataV1 {
 }
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
-// Each Order can be uniquely identified by its `order_id` or `client_order_id` (if client designs well).
-// Use `stateFilter = c` to only receive create events, `stateFilter = u` to only receive update events, and `stateFilter = a` to receive both.
+// Each Order can be uniquely identified by its `order_id` or `client_order_id`.
+// To subscribe to all orders, specify an empty `instrument` (eg. `2345123`).
+// Otherwise, specify the `instrument` to only receive orders for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSOrderFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The base filter to apply.
-  base?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
+  // The instrument filter to apply.
+  instrument?: string
 }
 
 export interface IWSOrderStateFeedDataV1 {
@@ -1722,17 +1740,14 @@ export interface IWSOrderStateFeedDataV1 {
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
 // Unlike the Order Stream, this only streams state updates, drastically improving throughput, and latency.
-// Each Order can be uniquely identified by its `order_id` or `client_order_id` (if client designs well).
-// Use `stateFilter = c` to only receive create events, `stateFilter = u` to only receive update events, and `stateFilter = a` to receive both.
+// Each Order can be uniquely identified by its `order_id` or `client_order_id`.
+// To subscribe to all orders, specify an empty `instrument` (eg. `2345123`).
+// Otherwise, specify the `instrument` to only receive orders for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSOrderStateFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The base filter to apply.
-  base?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
+  // The instrument filter to apply.
+  instrument?: string
 }
 
 export interface IWSOrderbookLevelsFeedDataV1 {
@@ -1777,56 +1792,13 @@ export interface IWSPositionsFeedDataV1 {
 }
 
 // Subscribes to a feed of position updates. This happens when a trade is executed.
+// To subscribe to all positions, specify an empty `instrument` (eg. `2345123`).
+// Otherwise, specify the `instrument` to only receive positions for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSPositionsFeedSelectorV1 {
   // The subaccount ID to filter by
   sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The base filter to apply.
-  base?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
-}
-
-export interface IWSPrivateTradeFeedDataV1 {
-  // The websocket channel to which the response is sent
-  stream?: string
-  // Primary selector
-  selector?: string
-  // A running sequence number that determines global message order within the specific stream
-  sequence_number?: bigint
-  // A private trade matching the request filter
-  feed?: IPrivateTrade
-}
-
-export interface IWSPrivateTradeFeedSelectorV1 {
-  // The sub account ID to request for
-  sub_account_id?: bigint
-  // The kind filter to apply.
-  kind?: EKind
-  // The base filter to apply.
-  base?: ECurrency
-  // The quote filter to apply.
-  quote?: ECurrency
-}
-
-export interface IWSPublicTradesFeedDataV1 {
-  // Stream name
-  stream?: string
-  // Primary selector
-  selector?: string
-  // A running sequence number that determines global message order within the specific stream
-  sequence_number?: bigint
-  // A public trade matching the request filter
-  feed?: IPublicTrade
-}
-
-// Subscribes to a stream of Public Trades for an instrument.
-export interface IWSPublicTradesFeedSelectorV1 {
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  // The instrument filter to apply.
   instrument?: string
-  // The limit to query for. Defaults to 500; Max 1000
-  limit?: number
 }
 
 export interface IWSRequestV1 {
@@ -1873,6 +1845,25 @@ export interface IWSTickerFeedSelectorV1 {
   // Delta (100, 200, 500, 1000, 5000)
   // Snapshot (500, 1000, 5000)
   rate?: number
+}
+
+export interface IWSTradeFeedDataV1 {
+  // Stream name
+  stream?: string
+  // Primary selector
+  selector?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // A public trade matching the request filter
+  feed?: ITrade
+}
+
+// Subscribes to a stream of Public Trades for an instrument.
+export interface IWSTradeFeedSelectorV1 {
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  instrument?: string
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
 }
 
 // Subscribes to a feed of transfer updates.

@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'API_PUBLIC_TRADES_REQUEST' struct.
-export const API_PUBLIC_TRADES_REQUEST_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_TRADE_FEED_SELECTOR_V_1' struct.
+export const WS_TRADE_FEED_SELECTOR_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
     limit: 'l'
