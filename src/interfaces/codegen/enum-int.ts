@@ -6,7 +6,6 @@ import {
   EKind,
   EMarginType,
   EOrderRejectReason,
-  EOrderStateFilter,
   EOrderStatus,
   ESubAccountTradeInterval,
   ETimeInForce,
@@ -96,12 +95,6 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.NO_TRADE_PERMISSION]: 23,
   [EOrderRejectReason.UNSUPPORTED_TIME_IN_FORCE]: 24,
   [EOrderRejectReason.MULTI_LEGGED_ORDER]: 25
-})
-
-export const EOrderStateFilterInt: Record<EOrderStateFilter, number> = Object.freeze({
-  [EOrderStateFilter.C]: 1,
-  [EOrderStateFilter.U]: 2,
-  [EOrderStateFilter.A]: 3
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({

@@ -4,16 +4,10 @@ import { type SchemaPairMap } from './types'
 export const WS_ORDER_STATE_FEED_SELECTOR_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
-    kind: 'k',
-    base: 'b',
-    quote: 'q',
-    state_filter: 'sf'
+    instrument: 'i'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
-    k: 'kind',
-    b: 'base',
-    q: 'quote',
-    sf: 'state_filter'
+    i: 'instrument'
   }
 })

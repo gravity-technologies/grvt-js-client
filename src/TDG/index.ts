@@ -11,6 +11,8 @@ import {
   API_DEPOSIT_HISTORY_REQUEST_MAP,
   API_DEPOSIT_HISTORY_RESPONSE_MAP,
   API_DEPOSIT_REQUEST_MAP,
+  API_FILL_HISTORY_REQUEST_MAP,
+  API_FILL_HISTORY_RESPONSE_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
   API_OPEN_ORDERS_RESPONSE_MAP,
@@ -18,8 +20,6 @@ import {
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
-  API_PRIVATE_TRADE_HISTORY_REQUEST_MAP,
-  API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
@@ -41,6 +41,8 @@ import {
   type IApiDepositHistoryRequest,
   type IApiDepositHistoryResponse,
   type IApiDepositRequest,
+  type IApiFillHistoryRequest,
+  type IApiFillHistoryResponse,
   type IApiFundingAccountSummaryResponse,
   type IApiOpenOrdersRequest,
   type IApiOpenOrdersResponse,
@@ -48,8 +50,6 @@ import {
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
-  type IApiPrivateTradeHistoryRequest,
-  type IApiPrivateTradeHistoryResponse,
   type IApiSubAccountHistoryRequest,
   type IApiSubAccountHistoryResponse,
   type IApiSubAccountSummaryRequest,
@@ -202,13 +202,13 @@ export class TDG {
   /**
    * @see https://docs.gravitymarkets.io/trading_api/#trade-history
    */
-  tradeHistory (payload: IApiPrivateTradeHistoryRequest, config?: AxiosRequestConfig) {
+  tradeHistory (payload: IApiFillHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
       this._liteUrl + '/trade_history',
-      Utils.schemaMap(payload, API_PRIVATE_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_FILL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_PRIVATE_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiPrivateTradeHistoryResponse
+      return Utils.schemaMap(response.data, API_FILL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiFillHistoryResponse
     })
   }
 

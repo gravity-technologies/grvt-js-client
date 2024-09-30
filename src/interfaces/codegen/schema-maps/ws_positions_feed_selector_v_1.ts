@@ -4,14 +4,10 @@ import { type SchemaPairMap } from './types'
 export const WS_POSITIONS_FEED_SELECTOR_V_1_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     sub_account_id: 'sa',
-    kind: 'k',
-    base: 'b',
-    quote: 'q'
+    instrument: 'i'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
-    k: 'kind',
-    b: 'base',
-    q: 'quote'
+    i: 'instrument'
   }
 })

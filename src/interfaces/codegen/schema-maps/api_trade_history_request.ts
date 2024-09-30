@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'API_PUBLIC_TRADE_HISTORY_REQUEST' struct.
-export const API_PUBLIC_TRADE_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'API_TRADE_HISTORY_REQUEST' struct.
+export const API_TRADE_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
     start_time: 'st',
