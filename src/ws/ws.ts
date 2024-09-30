@@ -291,14 +291,14 @@ export class WS {
         params.kind,
         params.base,
         params.quote
-      ].filter(Boolean).join('-'),
-      [
-        {
-          all: 'a',
-          createOnly: 'c',
-          updateOnly: 'u'
-        }[params.state_filter] || 'a'
       ].filter(Boolean).join('-')
+      // [
+      //   {
+      //     all: 'a',
+      //     createOnly: 'c',
+      //     updateOnly: 'u'
+      //   }[params.state_filter] || 'a'
+      // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [

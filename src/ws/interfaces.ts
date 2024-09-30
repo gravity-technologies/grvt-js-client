@@ -132,7 +132,6 @@ export interface IWSTdgOrderRequest {
     kind: `${EKind}`
     base: `${ECurrency}`
     quote: `${ECurrency}`
-    state_filter: 'all' | 'createOnly' | 'updateOnly' // a / c / u
   } & Omit<IWSOrderFeedSelectorV1, keyof IWSOrderFeedSelectorV1>
   onData?: TMessageHandler<IOrder | IOrderState>
   onError?: (error: Error) => void
