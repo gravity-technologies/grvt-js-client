@@ -15,7 +15,10 @@ import {
   type ITransfer,
   type IWSCandlestickFeedSelectorV1,
   type IWSMiniTickerFeedSelectorV1,
+  type IWSOrderFeedSelectorV1,
   type IWSOrderbookLevelsFeedSelectorV1,
+  type IWSPositionsFeedSelectorV1,
+  type IWSPrivateTradeFeedSelectorV1,
   type IWSPublicTradesFeedSelectorV1,
   type IWSTickerFeedSelectorV1
 } from '../interfaces'
@@ -127,10 +130,10 @@ export interface IWSTdgOrderRequest {
   params: {
     subAccountId: string
     kind: `${EKind}`
-    underlying: `${ECurrency}`
+    base: `${ECurrency}`
     quote: `${ECurrency}`
     state_filter: 'all' | 'createOnly' | 'updateOnly' // a / c / u
-  }
+  } & Omit<IWSOrderFeedSelectorV1, keyof IWSOrderFeedSelectorV1>
   onData?: TMessageHandler<IOrder | IOrderState>
   onError?: (error: Error) => void
 }
@@ -140,9 +143,9 @@ export interface IWSTdgPositionRequest {
   params: {
     subAccountId: string
     kind: `${EKind}`
-    underlying: `${ECurrency}`
+    base: `${ECurrency}`
     quote: `${ECurrency}`
-  }
+  } & Omit<IWSPositionsFeedSelectorV1, keyof IWSPositionsFeedSelectorV1>
   onData?: TMessageHandler<IPositions>
   onError?: (error: Error) => void
 }
@@ -152,9 +155,9 @@ export interface IWSTdgFillRequest {
   params: {
     subAccountId: string
     kind: `${EKind}`
-    underlying: `${ECurrency}`
+    base: `${ECurrency}`
     quote: `${ECurrency}`
-  }
+  } & Omit<IWSPrivateTradeFeedSelectorV1, keyof IWSPrivateTradeFeedSelectorV1>
   onData?: TMessageHandler<IPrivateTrade>
   onError?: (error: Error) => void
 }

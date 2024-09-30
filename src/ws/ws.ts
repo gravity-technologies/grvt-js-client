@@ -154,13 +154,13 @@ export class WS {
           Put: EKind.PUT,
           Fut: EKind.FUTURE
         }
-        const [underlying, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
+        const [base, quote, kind] = instrument.split('_') as [ECurrency, ECurrency, keyof typeof kindDef]
         const feed = this._parseStream({
           stream: stream as EStream.FILL | EStream.ORDER | EStream.POSITION,
           params: {
             subAccountId,
             kind: kindDef[kind] ?? EKind.PERPETUAL,
-            underlying,
+            base,
             quote
           }
         })?.feed
@@ -277,7 +277,7 @@ export class WS {
       [
         params.subAccountId,
         params.kind,
-        params.underlying,
+        params.base,
         params.quote
       ].filter(Boolean).join('-')
       // [
@@ -289,7 +289,7 @@ export class WS {
       [
         params.subAccountId,
         params.kind,
-        params.underlying,
+        params.base,
         params.quote
       ].filter(Boolean).join('-'),
       [
@@ -305,7 +305,7 @@ export class WS {
       [
         params.subAccountId,
         params.kind,
-        params.underlying,
+        params.base,
         params.quote
       ].filter(Boolean).join('-')
       // [
