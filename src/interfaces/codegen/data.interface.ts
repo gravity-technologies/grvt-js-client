@@ -149,15 +149,6 @@ export enum EOrderRejectReason {
   MULTI_LEGGED_ORDER = 'MULTI_LEGGED_ORDER',
 }
 
-export enum EOrderStateFilter {
-  // create only filter
-  C = 'C',
-  // update only filter
-  U = 'U',
-  // create and update filter
-  A = 'A',
-}
-
 export enum EOrderStatus {
   // Order is waiting for Trigger Condition to be hit
   PENDING = 'PENDING',
@@ -235,8 +226,8 @@ export interface IApiCancelAllOrdersRequest {
   sub_account_id?: bigint
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be cancelled
   kind?: EKind[]
-  // The underlying filter to apply. If nil, this defaults to all underlyings. Otherwise, only entries matching the filter will be cancelled
-  underlying?: ECurrency[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be cancelled
+  base?: ECurrency[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be cancelled
   quote?: ECurrency[]
 }
@@ -1284,6 +1275,8 @@ export interface IOrderState {
 export interface IOrderStateFeed {
   // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
   order_id?: bigint
+  // A unique identifier for the active order within a subaccount, specified by the client
+  client_order_id?: bigint
   // The order state object being created or updated
   order_state?: IOrderState
 }
@@ -1454,7 +1447,7 @@ export interface ISpotBalance {
 }
 
 export interface ISubAccount {
-  // Time at which the event was emitted in unix nanoseconds
+  // Time at which the event was emitted in uix nanoseconds
   event_time?: bigint
   // The sub account ID this entry refers to
   sub_account_id?: bigint
@@ -1714,8 +1707,6 @@ export interface IWSOrderFeedSelectorV1 {
   base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
-  // create only, update only, all
-  state_filter?: EOrderStateFilter
 }
 
 export interface IWSOrderStateFeedDataV1 {
@@ -1742,8 +1733,6 @@ export interface IWSOrderStateFeedSelectorV1 {
   base?: ECurrency
   // The quote filter to apply.
   quote?: ECurrency
-  // create only, update only, all
-  state_filter?: EOrderStateFilter
 }
 
 export interface IWSOrderbookLevelsFeedDataV1 {
