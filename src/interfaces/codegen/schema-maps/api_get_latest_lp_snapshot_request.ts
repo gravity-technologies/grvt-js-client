@@ -4,10 +4,10 @@ import { type SchemaPairMap } from './types'
 export const API_GET_LATEST_LP_SNAPSHOT_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     kind: 'k',
-    underlying: 'u'
+    base: 'b'
   },
   LITE_TO_FULL: {
     k: 'kind',
-    u: 'underlying'
+    b: 'base'
   }
 })

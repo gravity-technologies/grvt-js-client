@@ -175,10 +175,7 @@ export class WS {
   }
 
   private _bindWebSocketListeners () {
-    this._ws.addEventListener('open', (e: Event) => {
-      this._subscribeCurrentPairs()
-    })
-    this._ws.addEventListener('close', (e: CloseEvent) => {
+    const reconnect = (e: CloseEvent | Event) => {
       if (!this._connecting) {
         return
       }
@@ -187,10 +184,12 @@ export class WS {
         return setTimeout(this._createWs.bind(this), retryTimeout)
       }
       throw retryTimeout
+    }
+    this._ws.addEventListener('open', (e: Event) => {
+      this._subscribeCurrentPairs()
     })
-    // this._ws.addEventListener('error', (e: Event) => {
-    //   this.close()
-    // })
+    this._ws.addEventListener('close', reconnect)
+    this._ws.addEventListener('error', reconnect)
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
       const message = JsonUtils.parse<IMessage>(
         e.data,

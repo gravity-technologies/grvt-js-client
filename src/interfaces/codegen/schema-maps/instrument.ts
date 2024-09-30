@@ -5,7 +5,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
     asset_id: 'ai',
-    underlying: 'u',
+    base: 'b',
     quote: 'q',
     kind: 'k',
     expiry: 'e',
@@ -22,7 +22,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
   LITE_TO_FULL: {
     i: 'instrument',
     ai: 'asset_id',
-    u: 'underlying',
+    b: 'base',
     q: 'quote',
     k: 'kind',
     e: 'expiry',
