@@ -210,14 +210,19 @@ export interface IAckResponse {
   acknowledgement?: boolean
 }
 
-// The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
-export interface IApiAggregatedAccountSummaryResponse {
+export interface IAggregatedAccountSummary {
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
   // Total equity of the main (+ sub) account, denominated in USD
   total_equity?: string
   // The list of spot assets owned by this main (+ sub) account, and their balances
   spot_balances?: ISpotBalance[]
+}
+
+// The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
+export interface IApiAggregatedAccountSummaryResponse {
+  // The aggregated account summary
+  result?: IAggregatedAccountSummary
 }
 
 // Cancel all orders on the orderbook for this trading account. This may not match new orders in flight.
@@ -1417,7 +1422,7 @@ export interface ISpotBalance {
 }
 
 export interface ISubAccount {
-  // Time at which the event was emitted in uix nanoseconds
+  // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
   // The sub account ID this entry refers to
   sub_account_id?: bigint
@@ -1801,7 +1806,13 @@ export interface IWSPositionsFeedSelectorV1 {
   instrument?: string
 }
 
+// All V1 Websocket Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
+// If a `request_id` is supplied in this JSON RPC request, it will be propagated back to any relevant JSON RPC responses (including error).
+// When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
 export interface IWSRequestV1 {
+  // Optional Field which is used to match the response by the client.
+  // If not passed, this field will not be returned
+  request_id?: number
   // The channel to subscribe to (eg: ticker.s / ticker.d
   stream?: string
   // The list of feeds to subscribe to (eg:
@@ -1812,7 +1823,13 @@ export interface IWSRequestV1 {
   is_full?: boolean
 }
 
+// All V1 Websocket Responses are housed in this wrapper. It returns .
+// If a `request_id` is supplied in the JSON RPC request, it will be propagated back in this JSON RPC response.
+// When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
 export interface IWSResponseV1 {
+  // Optional Field which is used to match the response by the client.
+  // If not passed, this field will not be returned
+  request_id?: number
   // The channel to subscribe to (eg: ticker.s / ticker.d
   stream?: string
   // The list of feeds subscribed to

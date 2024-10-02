@@ -1,5 +1,6 @@
 export * from './api_settlement_price'
 export * from './ack_response'
+export * from './aggregated_account_summary'
 export * from './api_aggregated_account_summary_response'
 export * from './api_cancel_all_orders_request'
 export * from './api_cancel_all_orders_response'
