@@ -9,8 +9,10 @@ import {
   WS_TICKER_FEED_DATA_V_1_MAP,
   WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
+  type IFill,
   type IOrder,
   type IOrderState,
+  type IPositions,
   type ITransfer,
   type IWSCandlestickFeedDataV1,
   type IWSFillFeedDataV1,
@@ -134,7 +136,13 @@ export class WS {
           return acc
         }
 
-        const isTdg = [EStream.ORDER, EStream.POSITION, EStream.FILL, EStream.TRANSFER].includes(stream as EStream)
+        const isTdg = [
+          EStream.ORDER,
+          // EStream.STATE,
+          EStream.POSITION,
+          EStream.FILL
+          // EStream.TRANSFER
+        ].includes(stream as EStream)
         if (!isTdg) {
           return key.includes(instrument)
             ? [...acc, ...Object.values(value)]
@@ -142,12 +150,13 @@ export class WS {
         }
 
         // TDG
-        const subAccountId = String((result as IOrder).sub_account_id)
+        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id)
         // const subAccountId = String((result as IPositions).sub_account_id)
-        // const subAccountId = String((result as IPrivateTrade).sub_account_id)
+        // const subAccountId = String((result as IFill).sub_account_id)
         const feed = this._parseStream({
-          stream: stream as EStream.FILL | EStream.ORDER | EStream.POSITION,
+          stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
           params: {
+            sub_account_id: subAccountId,
             subAccountId,
             instrument
           }
