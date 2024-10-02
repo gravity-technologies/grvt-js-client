@@ -204,10 +204,15 @@ export interface IAPISettlementPrice {
   settlement_price?: string
 }
 
+export interface IAck {
+  // Gravity has acknowledged that the request has been successfully received and it will process it in the backend
+  ack?: boolean
+}
+
 // Used to acknowledge a request has been received and will be processed
 export interface IAckResponse {
-  // Gravity has acknowledged that the request has been successfully received and it will process it in the backend
-  acknowledgement?: boolean
+  // The Ack Object
+  result?: IAck
 }
 
 export interface IAggregatedAccountSummary {
@@ -279,7 +284,7 @@ export interface IApiCandlestickRequest {
 
 export interface IApiCandlestickResponse {
   // The candlestick result set for given interval
-  results?: ICandlestick[]
+  result?: ICandlestick[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -314,7 +319,7 @@ export interface IApiDepositHistoryRequest {
 
 export interface IApiDepositHistoryResponse {
   // The deposit history matching the request account
-  results?: IDepositHistory[]
+  result?: IDepositHistory[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -357,7 +362,7 @@ export interface IApiFillHistoryRequest {
 
 export interface IApiFillHistoryResponse {
   // The private trades matching the request asset
-  results?: IFill[]
+  result?: IFill[]
   // The cursor to indicate when to start the query from
   next?: string
 }
@@ -400,12 +405,8 @@ export interface IApiFindTraderLeaderboardResponse {
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
 export interface IApiFundingAccountSummaryResponse {
-  // The main account ID of the account to which the summary belongs
-  main_account_id?: bigint
-  // Total equity of the main account, denominated in USD
-  total_equity?: string
-  // The list of spot assets owned by this main account, and their balances
-  spot_balances?: ISpotBalance[]
+  // The funding account summary
+  result?: IFundingAccountSummary
 }
 
 // Lookup the historical funding rate of a perpetual future.
@@ -426,7 +427,7 @@ export interface IApiFundingRateRequest {
 
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
-  results?: IFundingRate[]
+  result?: IFundingRate[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -481,7 +482,7 @@ export interface IApiGetFilteredInstrumentsRequest {
 
 export interface IApiGetFilteredInstrumentsResponse {
   // The instruments matching the request filter
-  results?: IInstrument[]
+  result?: IInstrument[]
 }
 
 // Fetch a single instrument by supplying the asset or instrument name
@@ -492,7 +493,7 @@ export interface IApiGetInstrumentRequest {
 
 export interface IApiGetInstrumentResponse {
   // The instrument matching the request asset
-  results?: IInstrument
+  result?: IInstrument
 }
 
 export interface IApiGetLPLeaderboardRequest {
@@ -568,7 +569,7 @@ export interface IApiGetOrderRequest {
 
 export interface IApiGetOrderResponse {
   // The order object for the requested filter
-  order?: IOrder
+  result?: IOrder
 }
 
 export interface IApiGetTraderStatResponse {
@@ -599,7 +600,7 @@ export interface IApiLatestSnapSubAccountsRequest {
 
 export interface IApiLatestSnapSubAccountsResponse {
   // The sub account history matching the request sub account
-  results?: ISubAccount[]
+  result?: ISubAccount[]
 }
 
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
@@ -610,7 +611,7 @@ export interface IApiMiniTickerRequest {
 
 export interface IApiMiniTickerResponse {
   // The mini ticker matching the request asset
-  results?: IMiniTicker
+  result?: IMiniTicker
 }
 
 export interface IApiOpenOrdersRequest {
@@ -627,7 +628,7 @@ export interface IApiOpenOrdersRequest {
 // Retrieves all open orders for the account. This may not match new orders in flight.
 export interface IApiOpenOrdersResponse {
   // The Open Orders matching the request filter
-  orders?: IOrder[]
+  result?: IOrder[]
 }
 
 // Retrieves the order history for the account.
@@ -654,7 +655,7 @@ export interface IApiOrderHistoryRequest {
 
 export interface IApiOrderHistoryResponse {
   // The Open Orders matching the request filter
-  orders?: IOrder[]
+  result?: IOrder[]
   // The cursor to indicate when to start the query from
   next?: string
 }
@@ -686,7 +687,7 @@ export interface IApiOrderbookLevelsRequest {
 
 export interface IApiOrderbookLevelsResponse {
   // The orderbook levels objects matching the request asset
-  results?: IOrderbookLevels
+  result?: IOrderbookLevels
 }
 
 // Query the positions of a sub account
@@ -703,7 +704,7 @@ export interface IApiPositionsRequest {
 
 export interface IApiPositionsResponse {
   // The positions matching the request filter
-  results?: IPositions[]
+  result?: IPositions[]
 }
 
 export interface IApiResolveEpochEcosystemMetricResponse {
@@ -735,7 +736,7 @@ export interface IApiSettlementPriceRequest {
 
 export interface IApiSettlementPriceResponse {
   // The funding rate result set for given interval
-  results?: IAPISettlementPrice[]
+  result?: IAPISettlementPrice[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -761,7 +762,7 @@ export interface IApiSubAccountHistoryRequest {
 
 export interface IApiSubAccountHistoryResponse {
   // The sub account history matching the request sub account
-  results?: ISubAccount[]
+  result?: ISubAccount[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -774,7 +775,7 @@ export interface IApiSubAccountSummaryRequest {
 // Query for sub-account details, including base currency balance, all derivative positions, margin levels, and P&L.
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
-  results?: ISubAccount
+  result?: ISubAccount
 }
 
 // startTime are optional parameters. The semantics of these parameters are as follows:<ul>
@@ -799,7 +800,7 @@ export interface IApiSubAccountTradeAggregationRequest {
 
 export interface IApiSubAccountTradeAggregationResponse {
   // The sub account trade aggregation result set for given interval
-  results?: ISubAccountTradeAggregation[]
+  result?: ISubAccountTradeAggregation[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -822,12 +823,12 @@ export interface IApiSubAccountTradeRequest {
 
 export interface IApiSubAccountTradeResponse {
   // The sub account trade result set for given interval
-  results?: ISubAccountTrade[]
+  result?: ISubAccountTrade[]
 }
 
 export interface IApiTickerFeedDataV1 {
   // The mini ticker matching the request asset
-  results?: ITicker
+  result?: ITicker
 }
 
 // Retrieves a single ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
@@ -838,7 +839,7 @@ export interface IApiTickerRequest {
 
 export interface IApiTickerResponse {
   // The mini ticker matching the request asset
-  results?: ITicker
+  result?: ITicker
 }
 
 // Perform historical lookup of public trades in any given instrument.
@@ -861,7 +862,7 @@ export interface IApiTradeHistoryRequest {
 
 export interface IApiTradeHistoryResponse {
   // The public trades matching the request asset
-  results?: ITrade[]
+  result?: ITrade[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -877,7 +878,7 @@ export interface IApiTradeRequest {
 
 export interface IApiTradeResponse {
   // The public trades matching the request asset
-  results?: ITrade[]
+  result?: ITrade[]
 }
 
 // The request to get the historical transfers of an account
@@ -899,7 +900,7 @@ export interface IApiTransferHistoryRequest {
 
 export interface IApiTransferHistoryResponse {
   // The transfer history matching the request account
-  results?: ITransferHistory[]
+  result?: ITransferHistory[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -945,7 +946,7 @@ export interface IApiWithdrawalHistoryRequest {
 
 export interface IApiWithdrawalHistoryResponse {
   // The withdrawals history matching the request account
-  results?: IWithdrawalHistory[]
+  result?: IWithdrawalHistory[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -1131,6 +1132,16 @@ export interface IFlatReferral {
   main_account_id?: bigint
   // The referrer main account id
   referrer_main_account_id?: bigint
+}
+
+// The funding account summary, that reports the total equity and spot balances of a funding (main) account
+export interface IFundingAccountSummary {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the main account, denominated in USD
+  total_equity?: string
+  // The list of spot assets owned by this main account, and their balances
+  spot_balances?: ISpotBalance[]
 }
 
 export interface IFundingRate {
@@ -1823,8 +1834,9 @@ export interface IWSRequestV1 {
   is_full?: boolean
 }
 
-// All V1 Websocket Responses are housed in this wrapper. It returns .
+// All V1 Websocket Responses are housed in this wrapper. It returns a confirmation of the JSON RPC subscribe request.
 // If a `request_id` is supplied in the JSON RPC request, it will be propagated back in this JSON RPC response.
+// To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
 export interface IWSResponseV1 {
   // Optional Field which is used to match the response by the client.
@@ -1834,8 +1846,12 @@ export interface IWSResponseV1 {
   stream?: string
   // The list of feeds subscribed to
   subs?: string[]
-  // The list of feeds unsubscribed to
+  // The list of feeds unsubscribed from
   unsubs?: string[]
+  // The number of snapshot payloads to expect for each subscribed feed. Returned in same order as `subs`
+  num_snapshots?: number[]
+  // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
+  first_sequence_number?: bigint[]
 }
 
 export interface IWSTickerFeedDataV1 {
