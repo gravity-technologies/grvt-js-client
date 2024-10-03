@@ -6,7 +6,7 @@ export const DEPOSIT_HISTORY_MAP: SchemaPairMap = Object.freeze({
     tx_id: 'ti',
     tx_hash: 'th',
     to_account_id: 'ta',
-    token_currency: 'tc',
+    currency: 'c',
     num_tokens: 'nt',
     event_time: 'et'
   },
@@ -14,7 +14,7 @@ export const DEPOSIT_HISTORY_MAP: SchemaPairMap = Object.freeze({
     ti: 'tx_id',
     th: 'tx_hash',
     ta: 'to_account_id',
-    tc: 'token_currency',
+    c: 'currency',
     nt: 'num_tokens',
     et: 'event_time'
   }

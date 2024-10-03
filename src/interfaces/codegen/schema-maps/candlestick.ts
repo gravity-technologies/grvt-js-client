@@ -9,8 +9,8 @@ export const CANDLESTICK_MAP: SchemaPairMap = Object.freeze({
     close: 'c',
     high: 'h',
     low: 'l',
-    volume_u: 'vu',
-    volume_q: 'vq',
+    volume_b: 'v',
+    volume_q: 'v1',
     trades: 't',
     instrument: 'i'
   },
@@ -21,8 +21,8 @@ export const CANDLESTICK_MAP: SchemaPairMap = Object.freeze({
     c: 'close',
     h: 'high',
     l: 'low',
-    vu: 'volume_u',
-    vq: 'volume_q',
+    v: 'volume_b',
+    v1: 'volume_q',
     t: 'trades',
     i: 'instrument'
   }

@@ -306,7 +306,7 @@ export interface IApiCreateOrderResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiDepositHistoryRequest {
   // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
-  token_currency?: ECurrency[]
+  currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
@@ -333,7 +333,7 @@ export interface IApiDepositRequest {
   // The main account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to deposit, quoted in token_currency decimals
   num_tokens?: string
 }
@@ -885,7 +885,7 @@ export interface IApiTradeResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiTransferHistoryRequest {
   // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
-  token_currency?: ECurrency[]
+  currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
@@ -918,7 +918,7 @@ export interface IApiTransferRequest {
   // The subaccount to transfer to (0 if transferring to main account)
   to_sub_account_id?: bigint
   // The token currency to transfer
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to transfer, quoted in tokenCurrency decimal units
   num_tokens?: string
   // The signature of the transfer
@@ -931,7 +931,7 @@ export interface IApiTransferRequest {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiWithdrawalHistoryRequest {
   // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
-  token_currency?: ECurrency[]
+  currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
   start_time?: bigint
   // The end time to query for in unix nanoseconds
@@ -961,7 +961,7 @@ export interface IApiWithdrawalRequest {
   // The Ethereum wallet to withdraw into
   to_eth_address?: bigint
   // The token currency to withdraw
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to withdraw, quoted in tokenCurrency decimal units
   num_tokens?: string
   // The signature of the withdrawal
@@ -1008,7 +1008,7 @@ export interface ICandlestick {
   // The low price, expressed in underlying currency resolution units
   low?: string
   // The underlying volume transacted, expressed in base asset decimal units
-  volume_u?: string
+  volume_b?: string
   // The quote volume transacted, expressed in quote asset decimal units
   volume_q?: string
   // The number of trades transacted
@@ -1023,7 +1023,7 @@ export interface IDeposit {
   // The account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: string
 }
@@ -1036,7 +1036,7 @@ export interface IDepositHistory {
   // The account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: string
   // The timestamp of the deposit in unix nanoseconds
@@ -1185,7 +1185,7 @@ export interface IInstrument {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The asset ID used for instrument signing.
-  asset_id?: bigint
+  instrument_hash?: bigint
   // The base currency
   base?: ECurrency
   // The quote currency
@@ -1201,7 +1201,7 @@ export interface IInstrument {
   // The settlement period of the instrument
   settlement_period?: EInstrumentSettlementPeriod
   // The smallest denomination of the base asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
-  underlying_decimals?: number
+  base_decimals?: number
   // The smallest denomination of the quote asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
   quote_decimals?: number
   // The size of a single tick, expressed in quote asset decimal units
@@ -1558,7 +1558,7 @@ export interface ITicker {
   // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_h_curr?: string
+  funding_rate_8_curr?: string
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
   funding_rate_8_h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
@@ -1566,9 +1566,9 @@ export interface ITicker {
   // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: string
   // The 24 hour taker buy volume of the instrument, expressed in base asset decimal units
-  buy_volume_24_h_u?: string
+  buy_volume_24_h_b?: string
   // The 24 hour taker sell volume of the instrument, expressed in base asset decimal units
-  sell_volume_24_h_u?: string
+  sell_volume_24_h_b?: string
   // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
   buy_volume_24_h_q?: string
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
@@ -1645,7 +1645,7 @@ export interface ITransfer {
   // The subaccount to transfer to (0 if transferring to main account)
   to_sub_account_id?: bigint
   // The token currency to transfer
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to transfer
   num_tokens?: string
   // The signature of the transfer
@@ -1664,7 +1664,7 @@ export interface ITransferHistory {
   // The subaccount to transfer to (0 if transferring to main account)
   to_sub_account_id?: bigint
   // The token currency to transfer
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to transfer
   num_tokens?: string
   // The signature of the transfer
@@ -1988,7 +1988,7 @@ export interface IWithdrawal {
   // The ethereum address to withdraw to
   to_eth_address?: bigint
   // The token currency to withdraw
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to withdraw
   num_tokens?: string
   // The signature of the withdrawal
@@ -2003,7 +2003,7 @@ export interface IWithdrawalHistory {
   // The ethereum address to withdraw to
   to_eth_address?: bigint
   // The token currency to withdraw
-  token_currency?: ECurrency
+  currency?: ECurrency
   // The number of tokens to withdraw
   num_tokens?: string
   // The signature of the withdrawal
