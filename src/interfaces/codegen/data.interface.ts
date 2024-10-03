@@ -1558,21 +1558,21 @@ export interface ITicker {
   // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_h_curr?: string
+  funding_rate_8h_curr?: string
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_h_avg?: string
+  funding_rate_8h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: string
   // [Options] The forward price of the option, expressed in `9` decimals
   forward_price?: string
   // The 24 hour taker buy volume of the instrument, expressed in base asset decimal units
-  buy_volume_24_h_b?: string
+  buy_volume_24h_b?: string
   // The 24 hour taker sell volume of the instrument, expressed in base asset decimal units
-  sell_volume_24_h_b?: string
+  sell_volume_24h_b?: string
   // The 24 hour taker buy volume of the instrument, expressed in quote asset decimal units
-  buy_volume_24_h_q?: string
+  buy_volume_24h_q?: string
   // The 24 hour taker sell volume of the instrument, expressed in quote asset decimal units
-  sell_volume_24_h_q?: string
+  sell_volume_24h_q?: string
   // The 24 hour highest traded price of the instrument, expressed in `9` decimals
   high_price?: string
   // The 24 hour lowest traded price of the instrument, expressed in `9` decimals
