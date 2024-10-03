@@ -178,13 +178,10 @@ export interface IWSTdgDepositRequest {
 }
 export interface IWSTdgTransferRequest {
   stream: `${EStream.TRANSFER}`
-  params: ({
+  params: {
     main_account_id: string
     sub_account_id?: string
-  } | {
-    main_account_id?: string
-    sub_account_id: string
-  }) & Omit<IWSTransferFeedSelectorV1, keyof IWSTransferFeedSelectorV1>
+  } & Omit<IWSTransferFeedSelectorV1, keyof IWSTransferFeedSelectorV1>
   onData?: TMessageHandler<ITransfer>
   onError?: (error: Error) => void
 }

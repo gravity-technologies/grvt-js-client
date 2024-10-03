@@ -116,7 +116,10 @@ export class WS {
         }
 
         const depositDestinationAccountId = (result as IDeposit).to_account_id?.toString(16)
-        const transferDestinationAccountId = (result as ITransfer).to_account_id?.toString(16) ?? (result as ITransfer).to_sub_account_id?.toString()
+        const transferDestinationKey = [
+          (result as ITransfer).to_account_id?.toString(16),
+          (result as ITransfer).to_sub_account_id?.toString()
+        ].filter(Boolean).join('-')
         const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {
           case EStream.STATE:
@@ -127,7 +130,7 @@ export class WS {
             }
             break
           case EStream.TRANSFER:
-            if (transferDestinationAccountId && key.endsWith(transferDestinationAccountId)) {
+            if (transferDestinationKey && key.endsWith(transferDestinationKey)) {
               return [...acc, ...Object.values(value)]
             }
             break
@@ -348,9 +351,9 @@ export class WS {
 
     const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
       if (params.sub_account_id) {
-        return params.sub_account_id
+        return [params.main_account_id, params.sub_account_id].join('-')
       }
-      return params.main_account_id as string
+      return params.main_account_id
     }
 
     const withdrawalFeed = (params: IWSTdgWithDrawalRequest['params']): string => {
