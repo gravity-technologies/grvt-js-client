@@ -4,12 +4,12 @@ import { type SchemaPairMap } from './types'
 export const API_DEPOSIT_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     to_account_id: 'ta',
-    token_currency: 'tc',
+    currency: 'c',
     num_tokens: 'nt'
   },
   LITE_TO_FULL: {
     ta: 'to_account_id',
-    tc: 'token_currency',
+    c: 'currency',
     nt: 'num_tokens'
   }
 })

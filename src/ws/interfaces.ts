@@ -2,6 +2,7 @@ import {
   type ECandlestickInterval,
   type ECandlestickType,
   type ICandlestick,
+  type IDeposit,
   type IFill,
   type IMiniTicker,
   type IOrder,
@@ -12,6 +13,7 @@ import {
   type ITrade,
   type ITransfer,
   type IWSCandlestickFeedSelectorV1,
+  type IWSDepositFeedSelectorV1,
   type IWSFillFeedSelectorV1,
   type IWSMiniTickerFeedSelectorV1,
   type IWSOrderFeedSelectorV1,
@@ -19,7 +21,10 @@ import {
   type IWSOrderbookLevelsFeedSelectorV1,
   type IWSPositionsFeedSelectorV1,
   type IWSTickerFeedSelectorV1,
-  type IWSTradeFeedSelectorV1
+  type IWSTradeFeedSelectorV1,
+  type IWSTransferFeedSelectorV1,
+  type IWSWithdrawalFeedSelectorV1,
+  type IWithdrawal
 } from '../interfaces'
 
 export enum EStream {
@@ -36,7 +41,9 @@ export enum EStream {
   STATE = 'state',
   POSITION = 'position',
   FILL = 'fill',
+  DEPOSIT = 'deposit',
   TRANSFER = 'transfer',
+  WITHDRAWAL = 'withdrawal',
 }
 
 // const EStrategyShort = Object.freeze({
@@ -161,16 +168,32 @@ export interface IWSTdgFillRequest {
   onError?: (error: Error) => void
 }
 
+export interface IWSTdgDepositRequest {
+  stream: `${EStream.DEPOSIT}`
+  params: {
+    main_account_id: string
+  } & Omit<IWSDepositFeedSelectorV1, keyof IWSDepositFeedSelectorV1>
+  onData?: TMessageHandler<IDeposit>
+  onError?: (error: Error) => void
+}
 export interface IWSTdgTransferRequest {
   stream: `${EStream.TRANSFER}`
-  params: {
-    subAccountId: string
-    mainAccountId?: string
+  params: ({
+    main_account_id: string
+    sub_account_id?: string
   } | {
-    subAccountId?: string
-    mainAccountId: string
-  }
+    main_account_id?: string
+    sub_account_id: string
+  }) & Omit<IWSTransferFeedSelectorV1, keyof IWSTransferFeedSelectorV1>
   onData?: TMessageHandler<ITransfer>
+  onError?: (error: Error) => void
+}
+export interface IWSTdgWithDrawalRequest {
+  stream: `${EStream.WITHDRAWAL}`
+  params: {
+    main_account_id: string
+  } & Omit<IWSWithdrawalFeedSelectorV1, keyof IWSWithdrawalFeedSelectorV1>
+  onData?: TMessageHandler<IWithdrawal>
   onError?: (error: Error) => void
 }
 
@@ -184,4 +207,6 @@ export type TWSRequest =
   | IWSTdgOrderStateRequest
   | IWSTdgPositionRequest
   | IWSTdgFillRequest
+  | IWSTdgDepositRequest
   | IWSTdgTransferRequest
+  | IWSTdgWithDrawalRequest
