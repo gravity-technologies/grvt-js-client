@@ -4,7 +4,7 @@ import { type SchemaPairMap } from './types'
 export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
-    instrument_hash: 'i1',
+    instrument_hash: 'ih',
     base: 'b',
     quote: 'q',
     kind: 'k',
@@ -12,7 +12,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     strike_price: 'sp',
     venues: 'v',
     settlement_period: 'sp1',
-    base_decimals: 'b1',
+    base_decimals: 'bd',
     quote_decimals: 'qd',
     tick_size: 'ts',
     min_size: 'ms',
@@ -21,7 +21,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     i: 'instrument',
-    i1: 'instrument_hash',
+    ih: 'instrument_hash',
     b: 'base',
     q: 'quote',
     k: 'kind',
@@ -29,7 +29,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     sp: 'strike_price',
     v: 'venues',
     sp1: 'settlement_period',
-    b1: 'base_decimals',
+    bd: 'base_decimals',
     qd: 'quote_decimals',
     ts: 'tick_size',
     ms: 'min_size',

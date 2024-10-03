@@ -1558,7 +1558,7 @@ export interface ITicker {
   // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
   // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
-  funding_rate_8_curr?: string
+  funding_rate_8_h_curr?: string
   // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
   funding_rate_8_h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
