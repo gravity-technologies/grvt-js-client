@@ -6,7 +6,7 @@ export const HexStringMap = [
   'indirect_invite_trading_volume',
   'liquidity_score',
   'main_account_id',
-  'market_share_multiplier',
+  'maker_trading_volume',
   'order_id',
   'r',
   'referrer_main_account_id',

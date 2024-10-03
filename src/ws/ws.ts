@@ -1,5 +1,6 @@
 import {
   WS_CANDLESTICK_FEED_DATA_V_1_MAP,
+  WS_DEPOSIT_FEED_DATA_V_1_MAP,
   WS_FILL_FEED_DATA_V_1_MAP,
   WS_MINI_TICKER_FEED_DATA_V_1_MAP,
   WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP,
@@ -9,12 +10,15 @@ import {
   WS_TICKER_FEED_DATA_V_1_MAP,
   WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
+  WS_WITHDRAWAL_FEED_DATA_V_1_MAP,
+  type IDeposit,
   type IFill,
   type IOrder,
   type IOrderState,
   type IPositions,
   type ITransfer,
   type IWSCandlestickFeedDataV1,
+  type IWSDepositFeedDataV1,
   type IWSFillFeedDataV1,
   type IWSMiniTickerFeedDataV1,
   type IWSOrderFeedDataV1,
@@ -23,7 +27,9 @@ import {
   type IWSRequestV1,
   type IWSTickerFeedDataV1,
   type IWSTradeFeedDataV1,
-  type IWSTransferFeedDataV1
+  type IWSTransferFeedDataV1,
+  type IWSWithdrawalFeedDataV1,
+  type IWithdrawal
 } from '../interfaces'
 import { JsonUtils, StringUtils, Utils } from '../utils'
 import {
@@ -31,11 +37,13 @@ import {
   type IWSBookRequest,
   type IWSCandleRequest,
   type IWSMiniRequest,
+  type IWSTdgDepositRequest,
   type IWSTdgFillRequest,
   type IWSTdgOrderRequest,
   type IWSTdgOrderStateRequest,
   type IWSTdgPositionRequest,
   type IWSTdgTransferRequest,
+  type IWSTdgWithDrawalRequest,
   type IWSTickerRequest,
   type IWSTradeRequest,
   type TMessageHandler,
@@ -50,6 +58,8 @@ interface IMessage {
 }
 
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
+
+type TEntityHasInstrument = Exclude<TEntities, IOrder | IOrderState | IDeposit | ITransfer | IWithdrawal>
 
 interface IOptions {
   url: string | URL
@@ -93,7 +103,7 @@ export class WS {
 
   /**
    * Only use for TDG
-   * IOrderState | ITransfer
+   * Use for TEntities of STATE | DEPOSIT | TRANSFER | WITHDRAWAL streams
    */
   private _getNonInstrumentConsumers ({ result, stream }: {
     result: TEntities
@@ -105,12 +115,24 @@ export class WS {
           return acc
         }
 
-        const destinationAccountId = (result as ITransfer).to_account_id?.toString(16) ?? (result as ITransfer).to_sub_account_id?.toString()
+        const depositDestinationAccountId = (result as IDeposit).to_account_id?.toString(16)
+        const transferDestinationAccountId = (result as ITransfer).to_account_id?.toString(16) ?? (result as ITransfer).to_sub_account_id?.toString()
+        const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {
           case EStream.STATE:
             return [...acc, ...Object.values(value)]
+          case EStream.DEPOSIT:
+            if (depositDestinationAccountId && key.endsWith(depositDestinationAccountId)) {
+              return [...acc, ...Object.values(value)]
+            }
+            break
           case EStream.TRANSFER:
-            if (destinationAccountId && key.endsWith(destinationAccountId)) {
+            if (transferDestinationAccountId && key.endsWith(transferDestinationAccountId)) {
+              return [...acc, ...Object.values(value)]
+            }
+            break
+          case EStream.WITHDRAWAL:
+            if (withdrawalFromAccountId && key.endsWith(withdrawalFromAccountId)) {
               return [...acc, ...Object.values(value)]
             }
             break
@@ -122,8 +144,8 @@ export class WS {
   }
 
   /**
-   * Only use for TDG
-   * Use for TEntities not ITransfer | IOrderState
+   * Use for MDG/TDG
+   * Use for TEntityHasInstrument
    */
   private _getInstrumentConsumers ({ result, stream, instrument }: {
     result: TEntities
@@ -141,8 +163,12 @@ export class WS {
           // EStream.STATE,
           EStream.POSITION,
           EStream.FILL
-          // EStream.TRANSFER
+          // EStream.DEPOSIT,
+          // EStream.TRANSFER,
+          // EStream.WITHDRAWAL,
         ].includes(stream as EStream)
+
+        // MDG
         if (!isTdg) {
           return key.includes(instrument)
             ? [...acc, ...Object.values(value)]
@@ -157,7 +183,6 @@ export class WS {
           stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
           params: {
             sub_account_id: subAccountId,
-            subAccountId,
             instrument
           }
         })?.feed
@@ -207,7 +232,7 @@ export class WS {
         return
       }
 
-      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as Exclude<typeof result, IOrder | ITransfer | IOrderState>)?.instrument
+      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as TEntityHasInstrument)?.instrument
 
       /**
        * Handle subscriptions with instrument
@@ -240,8 +265,7 @@ export class WS {
       params.instrument,
       [
         params.rate ?? 1000,
-        params.depth ?? 10,
-        params.aggregate ?? 1
+        params.depth ?? 10
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
@@ -318,11 +342,19 @@ export class WS {
       // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
+    const depositFeed = (params: IWSTdgDepositRequest['params']): string => {
+      return params.main_account_id
+    }
+
     const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
-      if (params.subAccountId) {
-        return params.subAccountId
+      if (params.sub_account_id) {
+        return params.sub_account_id
       }
-      return params.mainAccountId as string
+      return params.main_account_id as string
+    }
+
+    const withdrawalFeed = (params: IWSTdgWithDrawalRequest['params']): string => {
+      return params.main_account_id
     }
 
     const { stream, params } = options
@@ -375,10 +407,20 @@ export class WS {
           stream,
           feed: [fillFeed(params as IWSTdgFillRequest['params'])]
         }
+      case EStream.DEPOSIT:
+        return {
+          stream,
+          feed: [depositFeed(params as IWSTdgDepositRequest['params'])]
+        }
       case EStream.TRANSFER:
         return {
           stream,
           feed: [transferFeed(params as IWSTdgTransferRequest['params'])]
+        }
+      case EStream.WITHDRAWAL:
+        return {
+          stream,
+          feed: [withdrawalFeed(params as IWSTdgWithDrawalRequest['params'])]
         }
       default:
         console.error('Unknown stream: ' + stream)
@@ -408,8 +450,12 @@ export class WS {
         return (Utils.schemaMap(message, WS_POSITIONS_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSPositionsFeedDataV1).feed
       case EStream.FILL:
         return (Utils.schemaMap(message, WS_FILL_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSFillFeedDataV1).feed
+      case EStream.DEPOSIT:
+        return (Utils.schemaMap(message, WS_DEPOSIT_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSDepositFeedDataV1).feed
       case EStream.TRANSFER:
         return (Utils.schemaMap(message, WS_TRANSFER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTransferFeedDataV1).feed
+      case EStream.WITHDRAWAL:
+        return (Utils.schemaMap(message, WS_WITHDRAWAL_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSWithdrawalFeedDataV1).feed
       default:
         console.error('Unknown message: ', message)
     }

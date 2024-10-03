@@ -244,7 +244,7 @@ export interface IApiCancelAllOrdersRequest {
 
 export interface IApiCancelAllOrdersResponse {
   // The number of orders cancelled
-  num_cancelled?: number
+  result?: number
 }
 
 // Cancel an order on the orderbook for this trading account. Either `order_id` or `client_order_id` must be provided.
@@ -259,7 +259,7 @@ export interface IApiCancelOrderRequest {
 
 export interface IApiCancelOrderResponse {
   // The cancelled order
-  order?: IOrder
+  result?: IOrder
 }
 
 // Kline/Candlestick bars for an instrument. Klines are uniquely identified by their instrument, type, interval, and open time.
@@ -297,7 +297,7 @@ export interface IApiCreateOrderRequest {
 
 export interface IApiCreateOrderResponse {
   // The created order
-  order?: IOrder
+  result?: IOrder
 }
 
 // The request to get the historical deposits of an account
@@ -440,7 +440,7 @@ export interface IApiGetAllInstrumentsRequest {
 
 export interface IApiGetAllInstrumentsResponse {
   // List of instruments
-  results?: IInstrument[]
+  result?: IInstrument[]
 }
 
 export interface IApiGetEcosystemLeaderboardRequest {
@@ -523,7 +523,7 @@ export interface IApiGetLPPointRequest {
 
 export interface IApiGetLPPointResponse {
   // LP points of user
-  point?: ILPPoint
+  point?: IApproximateLPPoint
   // The number of maker
   maker_count?: number
 }
@@ -537,7 +537,7 @@ export interface IApiGetLatestLPSnapshotRequest {
 
 export interface IApiGetLatestLPSnapshotResponse {
   // The latest LP snapshot
-  snapshot?: ILPSnapshot
+  snapshot?: IApproximateLPSnapshot
 }
 
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
@@ -679,10 +679,8 @@ export interface IApiOrderStateResponse {
 export interface IApiOrderbookLevelsRequest {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
-  // Depth of the order book to be retrieved (10, 40, 200, 500)
+  // Depth of the order book to be retrieved (10, 50, 100, 500)
   depth?: number
-  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
-  aggregate?: number
 }
 
 export interface IApiOrderbookLevelsResponse {
@@ -970,6 +968,32 @@ export interface IApiWithdrawalRequest {
   signature?: ISignature
 }
 
+export interface IApproximateLPPoint {
+  // The main account id
+  main_account_id?: bigint
+  // Liquidity score
+  liquidity_score?: bigint
+  // The rank of user in the LP leaderboard
+  rank?: number
+}
+
+export interface IApproximateLPSnapshot {
+  // The main account id
+  main_account_id?: bigint
+  // Underlying multiplier
+  underlying_multiplier?: bigint
+  // Market share multiplier
+  market_share_multiplier?: bigint
+  // Fast market multiplier
+  bid_fast_market_multiplier?: number
+  // Fast market multiplier
+  ask_fast_market_multiplier?: number
+  // Liquidity score
+  liquidity_score?: bigint
+  // The time when the snapshot was calculated
+  calculate_at?: bigint
+}
+
 export interface ICandlestick {
   // Open time of kline bar in unix nanoseconds
   open_time?: bigint
@@ -1097,8 +1121,10 @@ export interface IFill {
   fee?: string
   // The fee rate paid on the trade
   fee_rate?: string
-  // A trade identifier
-  trade_id?: bigint
+  // A trade identifier, globally unique, and monotonically increasing (not by `1`).
+  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
+  trade_id?: string
   // An order identifier
   order_id?: bigint
   // The venue where the trade occurred
@@ -1195,7 +1221,7 @@ export interface ILPPoint {
   lp_asset?: bigint
   // Start time of the epoch - phase
   start_interval?: bigint
-  // Liquidty score
+  // Liquidity score
   liquidity_score?: bigint
   // The rank of user in the LP leaderboard
   rank?: number
@@ -1208,13 +1234,13 @@ export interface ILPSnapshot {
   lp_asset?: bigint
   // Underlying multiplier
   underlying_multiplier?: bigint
-  // Market share multiplier
-  market_share_multiplier?: bigint
+  // Maker trading volume
+  maker_trading_volume?: bigint
   // Fast market multiplier
   bid_fast_market_multiplier?: number
   // Fast market multiplier
   ask_fast_market_multiplier?: number
-  // Liquidty score
+  // Liquidity score
   liquidity_score?: bigint
   // The time when the snapshot was calculated
   calculate_at?: bigint
@@ -1405,6 +1431,11 @@ export interface IPositions {
   quote_index_price?: string
 }
 
+export interface IQueryGetLatestLPSnapshotResponse {
+  // The latest LP snapshot
+  snapshot?: ILPSnapshot
+}
+
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
   signer?: bigint
@@ -1574,8 +1605,10 @@ export interface ITrade {
   interest_rate?: string
   // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: string
-  // A trade identifier
-  trade_id?: bigint
+  // A trade identifier, globally unique, and monotonically increasing (not by `1`).
+  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
+  trade_id?: string
   // The venue where the trade occurred
   venue?: EVenue
   // If the trade was a liquidation
@@ -1674,6 +1707,13 @@ export interface IWSDepositFeedDataV1 {
   feed?: IDeposit
 }
 
+// Subscribes to a feed of deposits. This will execute when there is any deposit to selected account.
+// To subscribe to a main account, specify the account ID (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a`).
+export interface IWSDepositFeedSelectorV1 {
+  // The main account ID to request for
+  main_account_id?: bigint
+}
+
 export interface IWSFillFeedDataV1 {
   // The websocket channel to which the response is sent
   stream?: string
@@ -1716,7 +1756,7 @@ export interface IWSMiniTickerFeedSelectorV1 {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (0, 40, 100, 200, 500, 1000, 5000)
+  // Delta (0 - `raw`, 50, 100, 200, 500, 1000, 5000)
   // Snapshot (200, 500, 1000, 5000)
   rate?: number
 }
@@ -1782,18 +1822,20 @@ export interface IWSOrderbookLevelsFeedDataV1 {
 //
 // The Delta feed will work as follows:<ul><li>On subscription, the server will send a full snapshot of all levels of the Orderbook.</li><li>After the snapshot, the server will only send levels that have changed in value.</li></ul>
 //
+// Subscription Pattern:<ul><li>Delta - `instrument@rate`</li><li>Snapshot - `instrument@rate-depth`</li></ul>
+//
 // Field Semantics:<ul><li>[DeltaOnly] If a level is not updated, level not published</li><li>If a level is updated, {size: '123'}</li><li>If a level is set to zero, {size: '0'}</li><li>Incoming levels will be published as soon as price moves</li><li>Outgoing levels will be published with `size = 0`</li></ul>
 export interface IWSOrderbookLevelsFeedSelectorV1 {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The minimal rate at which we publish feeds (in milliseconds)
-  // Delta (40, 100, 200, 500, 1000, 5000)
-  // Snapshot (500, 1000, 5000)
+  // Delta (50, 100, 500, 1000)
+  // Snapshot (500, 1000)
   rate?: number
-  // Depth of the order book to be retrieved (10, 40, 200, 500)
+  // Depth of the order book to be retrieved
+  // Delta(0 - `unlimited`)
+  // Snapshot(10, 50, 100, 500)
   depth?: number
-  // The number of levels to aggregate into one level (1 = no aggregation, 10/100/1000 = aggregate 10/100/1000 levels into 1)
-  aggregate?: number
 }
 
 export interface IWSPositionsFeedDataV1 {
@@ -1824,9 +1866,9 @@ export interface IWSRequestV1 {
   // Optional Field which is used to match the response by the client.
   // If not passed, this field will not be returned
   request_id?: number
-  // The channel to subscribe to (eg: ticker.s / ticker.d
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
   stream?: string
-  // The list of feeds to subscribe to (eg:
+  // The list of feeds to subscribe to
   feed?: string[]
   // The method to use for the request (eg: subscribe / unsubscribe)
   method?: string
@@ -1836,13 +1878,13 @@ export interface IWSRequestV1 {
 
 // All V1 Websocket Responses are housed in this wrapper. It returns a confirmation of the JSON RPC subscribe request.
 // If a `request_id` is supplied in the JSON RPC request, it will be propagated back in this JSON RPC response.
-// To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
+// To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. All delta payloads will have a sequence number of `1+`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
 export interface IWSResponseV1 {
   // Optional Field which is used to match the response by the client.
   // If not passed, this field will not be returned
   request_id?: number
-  // The channel to subscribe to (eg: ticker.s / ticker.d
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
   stream?: string
   // The list of feeds subscribed to
   subs?: string[]
@@ -1911,6 +1953,16 @@ export interface IWSTransferFeedDataV1 {
   feed?: ITransfer
 }
 
+// Subscribes to a feed of transfers. This will execute when there is any transfer to or from the selected account.
+// To subscribe to a main account, specify the account ID (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a`).
+// To subscribe to a sub account, specify the main account and the sub account dash separated (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a-1920109784202388`).
+export interface IWSTransferFeedSelectorV1 {
+  // The main account ID to request for
+  main_account_id?: bigint
+  // The sub account ID to request for
+  sub_account_id?: bigint
+}
+
 // Subscribes to a feed of withdrawal updates.
 export interface IWSWithdrawalFeedDataV1 {
   // The websocket channel to which the response is sent
@@ -1921,6 +1973,13 @@ export interface IWSWithdrawalFeedDataV1 {
   sequence_number?: bigint
   // The Withdrawal object
   feed?: IWithdrawal
+}
+
+// Subscribes to a feed of withdrawals. This will execute when there is any withdrawal from the selected account.
+// To subscribe to a main account, specify the account ID (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a`).
+export interface IWSWithdrawalFeedSelectorV1 {
+  // The main account ID to request for
+  main_account_id?: bigint
 }
 
 export interface IWithdrawal {

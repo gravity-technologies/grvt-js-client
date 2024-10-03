@@ -4,12 +4,10 @@ import { type SchemaPairMap } from './types'
 export const API_ORDERBOOK_LEVELS_REQUEST_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
-    depth: 'd',
-    aggregate: 'a'
+    depth: 'd'
   },
   LITE_TO_FULL: {
     i: 'instrument',
-    d: 'depth',
-    a: 'aggregate'
+    d: 'depth'
   }
 })
