@@ -116,9 +116,13 @@ export class WS {
         }
 
         const depositDestinationAccountId = (result as IDeposit).to_account_id?.toString(16)
+        const transferSourceKey = [
+          (result as ITransfer).from_account_id?.toString(16),
+          (result as ITransfer).from_sub_account_id ? (result as ITransfer).from_sub_account_id?.toString() : 0
+        ].filter(Boolean).join('-')
         const transferDestinationKey = [
           (result as ITransfer).to_account_id?.toString(16),
-          (result as ITransfer).to_sub_account_id?.toString()
+          (result as ITransfer).to_sub_account_id ? (result as ITransfer).to_sub_account_id?.toString() : 0
         ].filter(Boolean).join('-')
         const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {
@@ -130,7 +134,7 @@ export class WS {
             }
             break
           case EStream.TRANSFER:
-            if (transferDestinationKey && key.endsWith(transferDestinationKey)) {
+            if ((transferSourceKey && key.endsWith(transferSourceKey)) || (transferDestinationKey && key.endsWith(transferDestinationKey))) {
               return [...acc, ...Object.values(value)]
             }
             break
