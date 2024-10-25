@@ -2,8 +2,11 @@
 export const HexStringMap = [
   'direct_invite_trading_volume',
   'from_account_id',
+  'from_address',
   'indirect_invite_trading_volume',
   'instrument_hash',
+  'l_1_hash',
+  'l_2_hash',
   'liquidity_score',
   'main_account_id',
   'maker_trading_volume',

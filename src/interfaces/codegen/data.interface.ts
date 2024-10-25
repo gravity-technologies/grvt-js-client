@@ -147,18 +147,20 @@ export enum EOrderRejectReason {
   UNSUPPORTED_TIME_IN_FORCE = 'UNSUPPORTED_TIME_IN_FORCE',
   // the order has multiple legs, but multiple legs are not supported by this venue
   MULTI_LEGGED_ORDER = 'MULTI_LEGGED_ORDER',
+  // the order would have caused the subaccount to exceed the max position size
+  EXCEED_MAX_POSITION_SIZE = 'EXCEED_MAX_POSITION_SIZE',
 }
 
 export enum EOrderStatus {
-  // Order is waiting for Trigger Condition to be hit
+  // Order has been sent to the matching engine and is pending a transition to open/filled/rejected.
   PENDING = 'PENDING',
-  // Order is actively matching on the orderbook, could be unfilled or partially filled
+  // Order is actively matching on the matching engine, could be unfilled or partially filled.
   OPEN = 'OPEN',
-  // Order is fully filled and hence closed
+  // Order is fully filled and hence closed. Taker Orders can transition directly from pending to filled, without going through open.
   FILLED = 'FILLED',
-  // Order is rejected by GRVT Backend since if fails a particular check (See OrderRejectReason)
+  // Order is rejected by matching engine since if fails a particular check (See OrderRejectReason). Once an order is open, it cannot be rejected.
   REJECTED = 'REJECTED',
-  // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason)
+  // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason). Before an order is open, it cannot be cancelled.
   CANCELLED = 'CANCELLED',
 }
 
@@ -494,6 +496,24 @@ export interface IApiGetInstrumentRequest {
 export interface IApiGetInstrumentResponse {
   // The instrument matching the request asset
   result?: IInstrument
+}
+
+export interface IApiGetLPConfigRequest {
+  // The kind filter to apply
+  kind?: EKind
+  // The base filter to apply
+  base?: ECurrency
+}
+
+export interface IApiGetLPConfigResponse {
+  // The spread score multiplier
+  spread_score_multiplier?: bigint
+  // The depth score multiplier
+  depth_score_multiplier?: bigint
+  // The market share multiplier
+  market_share_multiplier?: bigint
+  // Is LP maker
+  is_lp_maker?: boolean
 }
 
 export interface IApiGetLPLeaderboardRequest {
@@ -1029,18 +1049,22 @@ export interface IDeposit {
 }
 
 export interface IDepositHistory {
-  // The transaction ID of the deposit
-  tx_id?: bigint
-  // The txHash of the bridgemint event
-  tx_hash?: bigint
+  // The L1 txHash of the deposit
+  l_1_hash?: bigint
+  // The L2 txHash of the deposit
+  l_2_hash?: bigint
   // The account to deposit into
   to_account_id?: bigint
   // The token currency to deposit
   currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: string
-  // The timestamp of the deposit in unix nanoseconds
-  event_time?: bigint
+  // The timestamp when the deposit was initiated on L1 in unix nanoseconds
+  initiated_time?: bigint
+  // The timestamp when the deposit was confirmed on L2 in unix nanoseconds
+  confirmed_time?: bigint
+  // The address of the sender
+  from_address?: bigint
 }
 
 export interface IEcosystemLeaderboardUser {
@@ -1090,6 +1114,14 @@ export interface IEcosystemPoint {
   calculate_to?: bigint
   // The rank of the account in the ecosystem
   rank?: number
+}
+
+// An error response
+export interface IError {
+  // The error code for the request
+  code?: number
+  // The error message for the request
+  message?: string
 }
 
 export interface IFill {
@@ -1212,6 +1244,52 @@ export interface IInstrument {
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
+}
+
+// Pre-order margin check to determine if a new order can be created for a given sub-account
+export interface IInternalPreOrderMarginCheckRequest {
+  // The sub-account for which the order is being evaluated
+  sub_account_id?: bigint
+  // Open orders created by this sub-account
+  open_order_legs?: IOrderLeg[]
+  // New orders this sub-account is attempting to create
+  new_order_legs?: IOrderLeg[]
+}
+
+export interface IInternalPreOrderMarginCheckResponse {
+  // True if the new order can be placed, false otherwise
+  result?: boolean
+}
+
+// All Websocket JSON RPC Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
+// If a `request_id` is supplied in this JSON RPC request, it will be propagated back to any relevant JSON RPC responses (including error).
+// When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
+export interface IJSONRPCRequest {
+  // The JSON RPC version to use for the request
+  jsonrpc?: string
+  // The method to use for the request (eg: `subscribe` / `unsubscribe` / `v1/instrument` )
+  method?: string
+  // The parameters for the request
+  params?: any
+  // Optional Field which is used to match the response by the client.
+  // If not passed, this field will not be returned
+  id?: number
+}
+
+// All Websocket JSON RPC Responses are housed in this wrapper. It returns a confirmation of the JSON RPC subscribe request.
+// If a `request_id` is supplied in the JSON RPC request, it will be propagated back in this JSON RPC response.
+export interface IJSONRPCResponse {
+  // The JSON RPC version to use for the request
+  jsonrpc?: string
+  // The result for the request
+  result?: any
+  // The error for the request
+  error?: IError
+  // Optional Field which is used to match the response by the client.
+  // If not passed, this field will not be returned
+  id?: number
+  // The method used in the request for this response (eg: `subscribe` / `unsubscribe` / `v1/instrument` )
+  method?: string
 }
 
 export interface ILPPoint {
@@ -1363,6 +1441,8 @@ export interface IOrderState {
   traded_size?: string[]
   // Time at which the order was updated by GRVT, expressed in unix nanoseconds
   update_time?: bigint
+  // The average fill price of the order. Sorted in same order as Order.Legs
+  avg_fill_price?: string[]
 }
 
 export interface IOrderStateFeed {
@@ -1461,6 +1541,13 @@ export interface ISpotBalance {
   balance?: string
   // The index price of this currency. (reported in `USD`)
   index_price?: string
+}
+
+export interface IStreamReference {
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
+  stream?: string
+  // The list of selectors for the stream
+  selectors?: string[]
 }
 
 export interface ISubAccount {
@@ -1735,6 +1822,12 @@ export interface IWSFillFeedSelectorV1 {
   instrument?: string
 }
 
+// Returns a list of all rooms the client has subscribed to.
+export interface IWSListStreamsResult {
+  // The list of stream references  the connection is connected to
+  stream_reference?: IStreamReference[]
+}
+
 export interface IWSMiniTickerFeedDataV1 {
   // Stream name
   stream?: string
@@ -1859,10 +1952,19 @@ export interface IWSPositionsFeedSelectorV1 {
   instrument?: string
 }
 
+// All V1 Websocket Subscription Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
+// When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
+export interface IWSSubscribeParams {
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
+  stream?: string
+  // The list of feeds to subscribe to
+  selectors?: string[]
+}
+
 // All V1 Websocket Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
 // If a `request_id` is supplied in this JSON RPC request, it will be propagated back to any relevant JSON RPC responses (including error).
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
-export interface IWSRequestV1 {
+export interface IWSSubscribeRequestV1Legacy {
   // Optional Field which is used to match the response by the client.
   // If not passed, this field will not be returned
   request_id?: number
@@ -1880,10 +1982,25 @@ export interface IWSRequestV1 {
 // If a `request_id` is supplied in the JSON RPC request, it will be propagated back in this JSON RPC response.
 // To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. All delta payloads will have a sequence number of `1+`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
-export interface IWSResponseV1 {
+export interface IWSSubscribeResponseV1Legacy {
   // Optional Field which is used to match the response by the client.
   // If not passed, this field will not be returned
   request_id?: number
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
+  stream?: string
+  // The list of feeds subscribed to
+  subs?: string[]
+  // The list of feeds unsubscribed from
+  unsubs?: string[]
+  // The number of snapshot payloads to expect for each subscribed feed. Returned in same order as `subs`
+  num_snapshots?: number[]
+  // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
+  first_sequence_number?: bigint[]
+}
+
+// To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. All delta payloads will have a sequence number of `1+`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
+// When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
+export interface IWSSubscribeResult {
   // The channel to subscribe to (eg: ticker.s / ticker.d)
   stream?: string
   // The list of feeds subscribed to
@@ -1937,7 +2054,7 @@ export interface IWSTradeFeedDataV1 {
 export interface IWSTradeFeedSelectorV1 {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
-  // The limit to query for. Defaults to 500; Max 1000
+  // The limit to query for. Valid values are (50, 200, 500, 1000). Default is 50
   limit?: number
 }
 
@@ -1961,6 +2078,28 @@ export interface IWSTransferFeedSelectorV1 {
   main_account_id?: bigint
   // The sub account ID to request for
   sub_account_id?: bigint
+}
+
+// Returns a list of all rooms the client has unsubscribed from.
+export interface IWSUnsubscribeAllResult {
+  // The list of stream references unsubscribed from
+  stream_reference?: IStreamReference[]
+}
+
+// All V1 Websocket Unsubscription Requests are housed in this wrapper. You may specify a stream, and a list of feeds to unsubscribe from.
+export interface IWSUnsubscribeParams {
+  // The channel to unsubscribe from (eg: ticker.s / ticker.d)
+  stream?: string
+  // The list of feeds to unsubscribe from
+  selectors?: string[]
+}
+
+// Returns a confirmation of all unsubscribes
+export interface IWSUnsubscribeResult {
+  // The channel to subscribe to (eg: ticker.s / ticker.d)
+  stream?: string
+  // The list of feeds unsubscribed from
+  unsubs?: string[]
 }
 
 // Subscribes to a feed of withdrawal updates.

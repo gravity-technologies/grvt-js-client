@@ -3,19 +3,23 @@ import { type SchemaPairMap } from './types'
 // Schema map for the 'DEPOSIT_HISTORY' struct.
 export const DEPOSIT_HISTORY_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    tx_id: 'ti',
-    tx_hash: 'th',
+    l_1_hash: 'l1',
+    l_2_hash: 'l2',
     to_account_id: 'ta',
     currency: 'c',
     num_tokens: 'nt',
-    event_time: 'et'
+    initiated_time: 'it',
+    confirmed_time: 'ct',
+    from_address: 'fa'
   },
   LITE_TO_FULL: {
-    ti: 'tx_id',
-    th: 'tx_hash',
+    l1: 'l_1_hash',
+    l2: 'l_2_hash',
     ta: 'to_account_id',
     c: 'currency',
     nt: 'num_tokens',
-    et: 'event_time'
+    it: 'initiated_time',
+    ct: 'confirmed_time',
+    fa: 'from_address'
   }
 })

@@ -24,7 +24,7 @@ import {
   type IWSOrderFeedDataV1,
   type IWSOrderStateFeedDataV1,
   type IWSPositionsFeedDataV1,
-  type IWSRequestV1,
+  type IWSSubscribeRequestV1Legacy,
   type IWSTickerFeedDataV1,
   type IWSTradeFeedDataV1,
   type IWSTransferFeedDataV1,
@@ -468,7 +468,7 @@ export class WS {
     }
   }
 
-  private _sendMessage (payload: IWSRequestV1) {
+  private _sendMessage (payload: IWSSubscribeRequestV1Legacy) {
     if (this._ws.readyState === 1) {
       this._ws.send(JSON.stringify({
         ...payload,
@@ -557,7 +557,7 @@ export class WS {
     }
   }
 
-  private async _subscribe (pair: string, subscribePayload: IWSRequestV1) {
+  private async _subscribe (pair: string, subscribePayload: IWSSubscribeRequestV1Legacy) {
     if (Object.keys(this._pairs[pair] || {}).length) {
       return
     }
@@ -605,7 +605,7 @@ export class WS {
    */
   subscribe (_options: TWSRequest): string {
     const { onData: onMessage, onError, ...options } = _options
-    const subscribePayload: IWSRequestV1 = {
+    const subscribePayload: IWSSubscribeRequestV1Legacy = {
       ...this._parseStream(options),
       method: 'subscribe'
     }
