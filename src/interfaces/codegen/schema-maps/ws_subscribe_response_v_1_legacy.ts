@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'WS_RESPONSE_V_1' struct.
-export const WS_RESPONSE_V_1_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'WS_SUBSCRIBE_RESPONSE_V_1_LEGACY' struct.
+export const WS_SUBSCRIBE_RESPONSE_V_1_LEGACY_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     request_id: 'ri',
     stream: 's',
