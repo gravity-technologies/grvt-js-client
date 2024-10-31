@@ -149,6 +149,8 @@ export enum EOrderRejectReason {
   MULTI_LEGGED_ORDER = 'MULTI_LEGGED_ORDER',
   // the order would have caused the subaccount to exceed the max position size
   EXCEED_MAX_POSITION_SIZE = 'EXCEED_MAX_POSITION_SIZE',
+  // the signature supplied is more than 30 days in the future
+  EXCEED_MAX_SIGNATURE_EXPIRATION = 'EXCEED_MAX_SIGNATURE_EXPIRATION',
 }
 
 export enum EOrderStatus {
@@ -369,6 +371,17 @@ export interface IApiFillHistoryResponse {
   next?: string
 }
 
+export interface IApiFindEcosystemEpochMetricResponse {
+  // The epoch metric
+  metric?: IEcosystemMetric
+  // The rank of the account in the ecosystem
+  rank?: number
+  // The total number of accounts in the ecosystem
+  total?: number
+  // The time when the ecosystem points were last calculated
+  last_calculated_at?: bigint
+}
+
 export interface IApiFindEcosystemLeaderboardResponse {
   // The list of ecosystem leaderboard users
   users?: IEcosystemLeaderboardUser[]
@@ -409,6 +422,31 @@ export interface IApiFindTraderLeaderboardResponse {
 export interface IApiFundingAccountSummaryResponse {
   // The funding account summary
   result?: IFundingAccountSummary
+}
+
+// Query for all historical funding payments made by a single account.
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
+export interface IApiFundingPaymentHistoryRequest {
+  // The sub account ID to request for
+  sub_account_id?: bigint
+  // The perpetual instrument to filter for
+  instrument?: string
+  // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
+  start_time?: bigint
+  // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
+  end_time?: bigint
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IApiFundingPaymentHistoryResponse {
+  // The funding payments matching the request asset
+  result?: IFundingPayment[]
+  // The cursor to indicate when to start the query from
+  next?: string
 }
 
 // Lookup the historical funding rate of a perpetual future.
@@ -466,6 +504,20 @@ export interface IApiGetEcosystemReferralStatResponse {
   direct_invite_trading_volume?: bigint
   // Total volume traded by indirect invites multiple by 1e9
   indirect_invite_trading_volume?: bigint
+}
+
+export interface IApiGetFastMarketInfoRequest {
+  // The kind filter to apply
+  kind?: EKind
+  // The base filter to apply
+  base?: ECurrency
+}
+
+export interface IApiGetFastMarketInfoResponse {
+  // ASk fast market multiplier
+  ask_fast_market_multiplier?: number
+  // Bid fast market multiplier
+  bid_fast_market_multiplier?: number
 }
 
 // Fetch a list of instruments based on the filters provided
@@ -1202,6 +1254,23 @@ export interface IFundingAccountSummary {
   spot_balances?: ISpotBalance[]
 }
 
+export interface IFundingPayment {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The sub account ID that made the funding payment
+  sub_account_id?: bigint
+  // The perpetual instrument being funded
+  instrument?: string
+  // The currency of the funding payment
+  currency?: ECurrency
+  // The amount of the funding payment. Positive if paid, negative if received
+  amount?: string
+  // The transaction ID of the funding payment.
+  // Funding payments can be triggered by a trade, transfer, or liquidation.
+  // The `tx_id` will match the corresponding `trade_id` or `tx_id`.
+  tx_id?: bigint
+}
+
 export interface IFundingRate {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
@@ -1236,7 +1305,7 @@ export interface IInstrument {
   base_decimals?: number
   // The smallest denomination of the quote asset supported by GRVT (+3 represents 0.001, -3 represents 1000, 0 represents 1)
   quote_decimals?: number
-  // The size of a single tick, expressed in quote asset decimal units
+  // The size of a single tick, expressed in price decimal units
   tick_size?: string
   // The minimum contract size, expressed in base asset decimal units
   min_size?: string
@@ -1244,21 +1313,8 @@ export interface IInstrument {
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
-}
-
-// Pre-order margin check to determine if a new order can be created for a given sub-account
-export interface IInternalPreOrderMarginCheckRequest {
-  // The sub-account for which the order is being evaluated
-  sub_account_id?: bigint
-  // Open orders created by this sub-account
-  open_order_legs?: IOrderLeg[]
-  // New orders this sub-account is attempting to create
-  new_order_legs?: IOrderLeg[]
-}
-
-export interface IInternalPreOrderMarginCheckResponse {
-  // True if the new order can be placed, false otherwise
-  result?: boolean
+  // The maximum position size, expressed in base currency terms
+  max_position_size?: bigint
 }
 
 // All Websocket JSON RPC Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
@@ -1710,7 +1766,7 @@ export interface ITraderLeaderboardUser {
   // The rank of the account in the Trader
   rank?: number
   // Total Trader point
-  total_point?: bigint
+  total_point?: number
   // The twitter username of the account
   twitter_username?: string
 }
@@ -1719,7 +1775,7 @@ export interface ITraderMetric {
   // Total fee paid
   total_fee?: bigint
   // Total trader point of this epoch/phase
-  total_point?: bigint
+  total_point?: number
 }
 
 export interface ITransfer {

@@ -14,6 +14,8 @@ import {
   API_FILL_HISTORY_REQUEST_MAP,
   API_FILL_HISTORY_RESPONSE_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_GET_ORDER_REQUEST_MAP,
+  API_GET_ORDER_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
   API_OPEN_ORDERS_RESPONSE_MAP,
   API_ORDER_HISTORY_REQUEST_MAP,
@@ -44,6 +46,8 @@ import {
   type IApiFillHistoryRequest,
   type IApiFillHistoryResponse,
   type IApiFundingAccountSummaryResponse,
+  type IApiGetOrderRequest,
+  type IApiGetOrderResponse,
   type IApiOpenOrdersRequest,
   type IApiOpenOrdersResponse,
   type IApiOrderHistoryRequest,
@@ -79,7 +83,7 @@ export class TDG {
 
   /**
    * TODO: missing response interface
-   * @see https://docs.gravitymarkets.io/trading_api/#deposit
+   * @see https://api-docs.grvt.io/trading_api/#deposit
    */
   deposit (payload: IApiDepositRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -88,11 +92,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#deposit-history
+   * @see https://api-docs.grvt.io/trading_api/#deposit-history
    */
   depositHistory (payload: IApiDepositHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -101,12 +105,12 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_DEPOSIT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiDepositHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
    * TODO: missing response interface
-   * @see https://docs.gravitymarkets.io/trading_api/#transfer
+   * @see https://api-docs.grvt.io/trading_api/#transfer
    */
   transfer (payload: IApiTransferRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -115,11 +119,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#transfer-history
+   * @see https://api-docs.grvt.io/trading_api/#transfer-history
    */
   transferHistory (payload: IApiTransferHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -128,12 +132,12 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TRANSFER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiTransferHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
    * TODO: missing response interface
-   * @see https://docs.gravitymarkets.io/trading_api/#withdrawal
+   * @see https://api-docs.grvt.io/trading_api/#withdrawal
    */
   withdrawal (payload: IApiWithdrawalRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -142,11 +146,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#withdrawal-history
+   * @see https://api-docs.grvt.io/trading_api/#withdrawal-history
    */
   withdrawalHistory (payload: IApiWithdrawalHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -155,13 +159,13 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_WITHDRAWAL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiWithdrawalHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /** ===== ACCOUNT ===== */
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#positions
+   * @see https://api-docs.grvt.io/trading_api/#positions
    */
   positions (payload: IApiPositionsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -170,11 +174,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#sub-account-summary
+   * @see https://api-docs.grvt.io/trading_api/#sub-account-summary
    */
   subAccountSummary (payload: IApiSubAccountSummaryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -183,11 +187,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#sub-account-history
+   * @see https://api-docs.grvt.io/trading_api/#sub-account-history
    */
   subAccountHistory (payload: IApiSubAccountHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -196,7 +200,7 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -209,21 +213,13 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_FILL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiFillHistoryResponse
-    })
-  }
-
-  /**
-   * @deprecated
-   * Use `fillHistory` instead
-   */
-  tradeHistory (...args: Parameters<TDG['fillHistory']>) {
-    return this.fillHistory(...args)
+    }).catch(Utils.coverApiError)
   }
 
   /** ===== ORDER ===== */
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#create-order
+   * @see https://api-docs.grvt.io/trading_api/#create-order
    */
   createOrder (payload: IApiCreateOrderRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -232,11 +228,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateOrderResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-order
+   * @see https://api-docs.grvt.io/trading_api/#cancel-order
    */
   cancelOrder (payload: IApiCancelOrderRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -245,11 +241,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelOrderResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-orders
+   * @see https://api-docs.grvt.io/trading_api/#cancel-all-orders
    */
   cancelAllOrders (payload: IApiCancelAllOrdersRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -258,19 +254,32 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANCEL_ALL_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCancelAllOrdersResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
    * TODO: missing interfaces
-   * @see https://docs.gravitymarkets.io/trading_api/#cancel-all-session-orders
+   * @see https://api-docs.grvt.io/trading_api/#cancel-all-session-orders
    */
   cancelAllSessionOrders () {
-    throw new Error('This has been marked as a POST-LAUNCH feature, see https://docs.gravitymarkets.io/trading_api/#cancel-all-session-orders')
+    throw new Error('This has been marked as a POST-LAUNCH feature, see https://api-docs.grvt.io/trading_api/#cancel-all-session-orders')
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#open-orders
+   * @see https://api-docs.grvt.io/trading_api/#get-order
+   */
+  order (payload: IApiGetOrderRequest, config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/order',
+      Utils.schemaMap(payload, API_GET_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiGetOrderResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * @see https://api-docs.grvt.io/trading_api/#open-orders
    */
   openOrders (payload: IApiOpenOrdersRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -279,11 +288,11 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenOrdersResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/trading_api/#order-history
+   * @see https://api-docs.grvt.io/trading_api/#order-history
    */
   orderHistory (payload: IApiOrderHistoryRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -292,7 +301,7 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -305,7 +314,7 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingAccountSummaryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -318,6 +327,6 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiAggregatedAccountSummaryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 }
