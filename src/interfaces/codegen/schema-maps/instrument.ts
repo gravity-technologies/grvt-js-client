@@ -17,7 +17,8 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     tick_size: 'ts',
     min_size: 'ms',
     min_block_trade_size: 'mb',
-    create_time: 'ct'
+    create_time: 'ct',
+    max_position_size: 'mp'
   },
   LITE_TO_FULL: {
     i: 'instrument',
@@ -34,6 +35,7 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     ts: 'tick_size',
     ms: 'min_size',
     mb: 'min_block_trade_size',
-    ct: 'create_time'
+    ct: 'create_time',
+    mp: 'max_position_size'
   }
 })

@@ -61,7 +61,7 @@ export class MDG {
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#get-instrument
+   * @see https://api-docs.grvt.io/market_data_api/#get-instrument
    */
   instrument (payload: IApiGetInstrumentRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -73,11 +73,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_INSTRUMENT_RESPONSE_MAP.LITE_TO_FULL) as IApiGetInstrumentResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#get-instruments
+   * @see https://api-docs.grvt.io/market_data_api/#get-instruments
    */
   instruments (payload: IApiGetFilteredInstrumentsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -89,7 +89,7 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetFilteredInstrumentsResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -105,11 +105,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_ALL_INSTRUMENTS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetAllInstrumentsResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#mini-ticker
+   * @see https://api-docs.grvt.io/market_data_api/#mini-ticker
    */
   miniTicker (payload: IApiMiniTickerRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -121,11 +121,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_MINI_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiMiniTickerResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#ticker
+   * @see https://api-docs.grvt.io/market_data_api/#ticker
    */
   ticker (payload: IApiTickerRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -137,11 +137,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TICKER_RESPONSE_MAP.LITE_TO_FULL) as IApiTickerResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#orderbook
+   * @see https://api-docs.grvt.io/market_data_api/#orderbook
    */
   orderBook (payload: IApiOrderbookLevelsRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -153,7 +153,7 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDERBOOK_LEVELS_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderbookLevelsResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -169,15 +169,7 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TRADE_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeResponse
-    })
-  }
-
-  /**
-   * @deprecated
-   * Use `trade` instead
-   */
-  trades (...args: Parameters<MDG['trade']>) {
-    return this.trade(...args)
+    }).catch(Utils.coverApiError)
   }
 
   /**
@@ -193,11 +185,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TRADE_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiTradeHistoryResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#settlement-price
+   * @see https://api-docs.grvt.io/market_data_api/#settlement-price
    */
   settlement (payload: IApiSettlementPriceRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -209,11 +201,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SETTLEMENT_PRICE_RESPONSE_MAP.LITE_TO_FULL) as IApiSettlementPriceResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#funding-rate
+   * @see https://api-docs.grvt.io/market_data_api/#funding-rate
    */
   funding (payload: IApiFundingRateRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -225,11 +217,11 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_FUNDING_RATE_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingRateResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 
   /**
-   * @see https://docs.gravitymarkets.io/market_data_api/#candlestick
+   * @see https://api-docs.grvt.io/market_data_api/#candlestick
    */
   candlestick (payload: IApiCandlestickRequest, config?: AxiosRequestConfig) {
     return RestfulService.post(
@@ -241,6 +233,6 @@ export class MDG {
       }
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
-    })
+    }).catch(Utils.coverApiError)
   }
 }

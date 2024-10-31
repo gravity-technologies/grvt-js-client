@@ -1,4 +1,5 @@
-import { HexStringMap, type SchemaMap } from '../interfaces'
+import { type AxiosError } from 'axios'
+import { ERROR_MAP, HexStringMap, type IError, type SchemaMap } from '../interfaces'
 
 export * from './json.utils'
 export * from './string.utils'
@@ -79,5 +80,12 @@ export class Utils {
     }
 
     return result
+  }
+
+  static coverApiError (error: AxiosError): never {
+    if (error?.response?.data) {
+      error.response.data = Utils.schemaMap(error.response.data, ERROR_MAP.LITE_TO_FULL) as IError
+    }
+    throw error as AxiosError<IError>
   }
 }
