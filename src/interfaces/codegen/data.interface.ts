@@ -103,7 +103,7 @@ export enum EOrderRejectReason {
   CLIENT_BULK_CANCEL = 'CLIENT_BULK_CANCEL',
   // client called a Session Cancel API, or set the WebSocket connection to 'cancelOrdersOnTerminate'
   CLIENT_SESSION_END = 'CLIENT_SESSION_END',
-  // the market order was cancelled after no/partial fill. Takes precedence over other TimeInForce cancel reasons
+  // the market order was cancelled after no/partial fill. Lower precedence than other TimeInForce cancel reasons
   MARKET_CANCEL = 'MARKET_CANCEL',
   // the IOC order was cancelled after no/partial fill
   IOC_CANCEL = 'IOC_CANCEL',
@@ -151,6 +151,8 @@ export enum EOrderRejectReason {
   EXCEED_MAX_POSITION_SIZE = 'EXCEED_MAX_POSITION_SIZE',
   // the signature supplied is more than 30 days in the future
   EXCEED_MAX_SIGNATURE_EXPIRATION = 'EXCEED_MAX_SIGNATURE_EXPIRATION',
+  // the market order has a limit price set
+  MARKET_ORDER_WITH_LIMIT_PRICE = 'MARKET_ORDER_WITH_LIMIT_PRICE',
 }
 
 export enum EOrderStatus {
@@ -506,20 +508,6 @@ export interface IApiGetEcosystemReferralStatResponse {
   indirect_invite_trading_volume?: bigint
 }
 
-export interface IApiGetFastMarketInfoRequest {
-  // The kind filter to apply
-  kind?: EKind
-  // The base filter to apply
-  base?: ECurrency
-}
-
-export interface IApiGetFastMarketInfoResponse {
-  // ASk fast market multiplier
-  ask_fast_market_multiplier?: number
-  // Bid fast market multiplier
-  bid_fast_market_multiplier?: number
-}
-
 // Fetch a list of instruments based on the filters provided
 export interface IApiGetFilteredInstrumentsRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
@@ -550,22 +538,30 @@ export interface IApiGetInstrumentResponse {
   result?: IInstrument
 }
 
-export interface IApiGetLPConfigRequest {
+export interface IApiGetLPInfoRequest {
   // The kind filter to apply
   kind?: EKind
   // The base filter to apply
   base?: ECurrency
 }
 
-export interface IApiGetLPConfigResponse {
-  // The spread score multiplier
-  spread_score_multiplier?: bigint
-  // The depth score multiplier
-  depth_score_multiplier?: bigint
-  // The market share multiplier
-  market_share_multiplier?: bigint
+export interface IApiGetLPInfoResponse {
   // Is LP maker
   is_lp_maker?: boolean
+  // The spread score value multiplier
+  spread_score_value_multiplier?: bigint
+  // The depth score value multiplier
+  depth_score_value_multiplier?: bigint
+  // The market share value multiplier
+  market_share_value_multiplier?: bigint
+  // Underlying multiplier
+  underlying_multiplier?: bigint
+  // The market share multiplier, equal to the maker trading volume in the past 2 hours
+  market_share_multiplier?: bigint
+  // Ask fast market multiplier
+  ask_fast_market_multiplier?: number
+  // Bid fast market multiplier
+  bid_fast_market_multiplier?: number
 }
 
 export interface IApiGetLPLeaderboardRequest {
@@ -585,11 +581,11 @@ export interface IApiGetLPLeaderboardResponse {
 }
 
 export interface IApiGetLPPointRequest {
-  // Start time of the epoch - phase
+  // Optional. Start time of the epoch - phase
   start_interval?: bigint
-  // The kind filter to apply
+  // Optional. The kind filter to apply
   kind?: EKind
-  // The base filter to apply
+  // Optional. The base filter to apply
   base?: ECurrency
 }
 
@@ -673,6 +669,16 @@ export interface IApiLatestSnapSubAccountsRequest {
 export interface IApiLatestSnapSubAccountsResponse {
   // The sub account history matching the request sub account
   result?: ISubAccount[]
+}
+
+export interface IApiListAggregatedAccountSummaryRequest {
+  // The list of main account ID to request for
+  main_account_ids?: string[]
+}
+
+export interface IApiListAggregatedAccountSummaryResponse {
+  // The list of aggregated account summaries of requested main accounts
+  account_summaries?: IApiAggregatedAccountSummaryResponse[]
 }
 
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
@@ -811,6 +817,14 @@ export interface IApiSettlementPriceResponse {
   next?: string
 }
 
+// The socialized loss status.
+export interface IApiSocializedLossStatusResponse {
+  // Whether the socialized loss is active
+  is_active?: boolean
+  // The socialized loss haircut ratio in centi-beeps
+  haircut_ratio?: bigint
+}
+
 // The request to get the history of a sub account
 // SubAccount Summary values are snapshotted once every hour
 // No snapshots are taken if the sub account has no activity in the hourly window
@@ -866,6 +880,10 @@ export interface IApiSubAccountTradeAggregationRequest {
   end_time?: bigint
   // The cursor to indicate when to start the next query from
   cursor?: string
+  // Filter on the maker of the trade
+  is_maker?: boolean
+  // Filter on the taker of the trade
+  is_taker?: boolean
 }
 
 export interface IApiSubAccountTradeAggregationResponse {
@@ -873,27 +891,6 @@ export interface IApiSubAccountTradeAggregationResponse {
   result?: ISubAccountTradeAggregation[]
   // The cursor to indicate when to start the next query from
   next?: string
-}
-
-// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
-export interface IApiSubAccountTradeRequest {
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
-  instrument?: string
-  // The interval of each sub account trade
-  interval?: ESubAccountTradeInterval
-  // The list of sub account ids to query
-  sub_account_i_ds?: bigint[]
-  // Optional. The starting time in unix nanoseconds of a specific interval to query
-  start_interval?: bigint
-  // Optional. Start time in unix nanoseconds
-  start_time?: bigint
-  // Optional. End time in unix nanoseconds
-  end_time?: bigint
-}
-
-export interface IApiSubAccountTradeResponse {
-  // The sub account trade result set for given interval
-  result?: ISubAccountTrade[]
 }
 
 export interface IApiTickerFeedDataV1 {
@@ -1313,8 +1310,8 @@ export interface IInstrument {
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
   create_time?: bigint
-  // The maximum position size, expressed in base currency terms
-  max_position_size?: bigint
+  // The maximum position size, expressed in base asset decimal units
+  max_position_size?: string
 }
 
 // All Websocket JSON RPC Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
@@ -1351,10 +1348,6 @@ export interface IJSONRPCResponse {
 export interface ILPPoint {
   // The main account id
   main_account_id?: bigint
-  // The LP Asset
-  lp_asset?: bigint
-  // Start time of the epoch - phase
-  start_interval?: bigint
   // Liquidity score
   liquidity_score?: bigint
   // The rank of user in the LP leaderboard
@@ -1642,19 +1635,6 @@ export interface ISubAccount {
   settle_index_price?: string
 }
 
-export interface ISubAccountTrade {
-  // Start of calculation epoch
-  start_interval?: bigint
-  // The sub account id
-  sub_account_id?: bigint
-  // The instrument being represented
-  instrument?: string
-  // Total fee paid
-  total_fee?: bigint
-  // Total volume traded
-  total_trade_volume?: bigint
-}
-
 // Similar to sub-account trade, but not divided by individual assets.
 export interface ISubAccountTradeAggregation {
   // The sub account id
@@ -1663,6 +1643,8 @@ export interface ISubAccountTradeAggregation {
   total_fee?: bigint
   // Total volume traded
   total_trade_volume?: bigint
+  // Number of trades
+  num_traded?: bigint
 }
 
 // Derived data such as the below, will not be included by default:

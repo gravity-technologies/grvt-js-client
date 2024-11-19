@@ -22,6 +22,7 @@ import {
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
+  API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
   API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
@@ -54,6 +55,7 @@ import {
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
+  type IApiSocializedLossStatusResponse,
   type IApiSubAccountHistoryRequest,
   type IApiSubAccountHistoryResponse,
   type IApiSubAccountSummaryRequest,
@@ -146,6 +148,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+    }).catch(Utils.coverApiError)
+  }
+
+  socializedLossStatus (config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/socialized_loss_status',
+      {},
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP.LITE_TO_FULL) as IApiSocializedLossStatusResponse
     }).catch(Utils.coverApiError)
   }
 
