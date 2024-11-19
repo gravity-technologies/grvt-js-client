@@ -96,7 +96,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.UNSUPPORTED_TIME_IN_FORCE]: 24,
   [EOrderRejectReason.MULTI_LEGGED_ORDER]: 25,
   [EOrderRejectReason.EXCEED_MAX_POSITION_SIZE]: 26,
-  [EOrderRejectReason.EXCEED_MAX_SIGNATURE_EXPIRATION]: 27
+  [EOrderRejectReason.EXCEED_MAX_SIGNATURE_EXPIRATION]: 27,
+  [EOrderRejectReason.MARKET_ORDER_WITH_LIMIT_PRICE]: 28
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({

@@ -10,7 +10,9 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     start_interval: 'si',
     start_time: 'st',
     end_time: 'et',
-    cursor: 'c'
+    cursor: 'c',
+    is_maker: 'im',
+    is_taker: 'it'
   },
   LITE_TO_FULL: {
     l: 'limit',
@@ -20,6 +22,8 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     si: 'start_interval',
     st: 'start_time',
     et: 'end_time',
-    c: 'cursor'
+    c: 'cursor',
+    im: 'is_maker',
+    it: 'is_taker'
   }
 })
