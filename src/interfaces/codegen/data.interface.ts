@@ -783,6 +783,25 @@ export interface IApiPositionsResponse {
   result?: IPositions[]
 }
 
+// Get pre-order check information for a new order
+export interface IApiPreOrderCheckRequest {
+  // The order to do pre-order check
+  order?: IOrder
+}
+
+export interface IApiPreOrderCheckResponse {
+  // The maximum quantity for each leg
+  max_qty?: IAssetMaxQty[]
+  // The margin required for the order (reported in `settle_currency`)
+  margin_required?: string
+  // Whether the order is valid
+  order_valid?: boolean
+  // The reason the order is invalid, if any
+  reason?: string
+  // The subAccount settle currency
+  settle_currency?: ECurrency
+}
+
 export interface IApiResolveEpochEcosystemMetricResponse {
   // The name of the epoch
   epoch_name?: string
@@ -1063,6 +1082,15 @@ export interface IApproximateLPSnapshot {
   calculate_at?: bigint
 }
 
+export interface IAssetMaxQty {
+  // The asset associated with the max quantity
+  asset?: string
+  // The maximum buy quantity
+  max_buy_qty?: string
+  // The maximum sell quantity
+  max_sell_qty?: string
+}
+
 export interface ICandlestick {
   // Open time of kline bar in unix nanoseconds
   open_time?: bigint
@@ -1203,7 +1231,7 @@ export interface IFill {
   // The fee rate paid on the trade
   fee_rate?: string
   // A trade identifier, globally unique, and monotonically increasing (not by `1`).
-  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // All trades sharing a single taker execution share the same first component (before `-`), and `event_time`.
   // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
   trade_id?: string
   // An order identifier
@@ -1271,7 +1299,7 @@ export interface IFundingPayment {
 export interface IFundingRate {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
-  // The funding rate of the instrument, expressed in centibeeps
+  // The funding rate of the instrument, expressed in percentage points
   funding_rate?: number
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
   funding_time?: bigint
@@ -1682,9 +1710,9 @@ export interface ITicker {
   best_ask_price?: string
   // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
-  // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
+  // The current funding rate of the instrument, expressed in percentage points
   funding_rate_8h_curr?: string
-  // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
+  // The average funding rate of the instrument (over last 8h), expressed in percentage points
   funding_rate_8h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: string
@@ -1731,7 +1759,7 @@ export interface ITrade {
   // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: string
   // A trade identifier, globally unique, and monotonically increasing (not by `1`).
-  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // All trades sharing a single taker execution share the same first component (before `-`), and `event_time`.
   // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
   trade_id?: string
   // The venue where the trade occurred

@@ -22,6 +22,8 @@ import {
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
+  API_PRE_ORDER_CHECK_REQUEST_MAP,
+  API_PRE_ORDER_CHECK_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
   API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
@@ -55,6 +57,8 @@ import {
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
+  type IApiPreOrderCheckRequest,
+  type IApiPreOrderCheckResponse,
   type IApiSocializedLossStatusResponse,
   type IApiSubAccountHistoryRequest,
   type IApiSubAccountHistoryResponse,
@@ -240,6 +244,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateOrderResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  preOrderCheck (payload: IApiPreOrderCheckRequest, config?: AxiosRequestConfig) {
+    return RestfulService.post(
+      this._liteUrl + '/pre_order_check ',
+      Utils.schemaMap(payload, API_PRE_ORDER_CHECK_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_PRE_ORDER_CHECK_RESPONSE_MAP.LITE_TO_FULL) as IApiPreOrderCheckResponse
     }).catch(Utils.coverApiError)
   }
 
