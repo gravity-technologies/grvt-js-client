@@ -785,21 +785,15 @@ export interface IApiPositionsResponse {
 
 // Get pre-order check information for a new order
 export interface IApiPreOrderCheckRequest {
+  // The subaccount ID of orders to query
+  sub_account_id?: bigint
   // The order to do pre-order check
-  order?: IOrder
+  orders?: IOrder[]
 }
 
 export interface IApiPreOrderCheckResponse {
-  // The maximum quantity for each leg
-  max_qty?: IAssetMaxQty[]
-  // The margin required for the order (reported in `settle_currency`)
-  margin_required?: string
-  // Whether the order is valid
-  order_valid?: boolean
-  // The reason the order is invalid, if any
-  reason?: string
-  // The subAccount settle currency
-  settle_currency?: ECurrency
+  // Pre order check for each new order in the request
+  results?: IPreOrderCheckResult[]
 }
 
 export interface IApiResolveEpochEcosystemMetricResponse {
@@ -1586,6 +1580,19 @@ export interface IPositions {
   roi?: string
   // The index price of the quote currency. (reported in `USD`)
   quote_index_price?: string
+}
+
+export interface IPreOrderCheckResult {
+  // The maximum quantity for each leg
+  max_qty?: IAssetMaxQty[]
+  // The margin required for the order (reported in `settle_currency`)
+  margin_required?: string
+  // Whether the order is valid
+  order_valid?: boolean
+  // The reason the order is invalid, if any
+  reason?: string
+  // The subAccount settle currency
+  settle_currency?: ECurrency
 }
 
 export interface IQueryGetLatestLPSnapshotResponse {
