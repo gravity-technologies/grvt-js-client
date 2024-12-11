@@ -268,6 +268,13 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
+    const bookDeltaFeed = (params: IWSBookRequest['params']): string => [
+      params.instrument,
+      [
+        params.rate ?? 1000
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
     const bookFeed = (params: IWSBookRequest['params']): string => [
       params.instrument,
       [
@@ -372,6 +379,10 @@ export class WS {
           feed: [candleFeed(params as IWSCandleRequest['params'])]
         }
       case EStream.ORDERBOOK_DELTA:
+        return {
+          stream,
+          feed: [bookDeltaFeed(params as IWSBookRequest['params'])]
+        }
       case EStream.ORDERBOOK_SNAP:
         return {
           stream,
