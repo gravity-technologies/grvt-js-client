@@ -101,6 +101,62 @@ export class WS {
     return this._ws
   }
 
+  private _bindWebSocketListeners () {
+    const reconnect = (e: CloseEvent | Event) => {
+      if (!this._connecting) {
+        return
+      }
+      const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
+      if (typeof retryTimeout === 'number') {
+        return setTimeout(this._createWs.bind(this), retryTimeout)
+      }
+      throw retryTimeout
+    }
+    this._ws.addEventListener('open', (e: Event) => {
+      this._subscribeCurrentPairs()
+    })
+    this._ws.addEventListener('close', reconnect)
+    this._ws.addEventListener('error', reconnect)
+    this._ws.addEventListener('message', (e: MessageEvent<string>) => {
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
+      const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
+      const result = this._messageLiteToFull(message)
+      // no entity found
+      if (!result) {
+        // if no entity found and not a subscription message
+        if (!message.s1?.length) {
+          console.error('Error: something went wrong with message', message)
+        }
+        return
+      }
+      if (!stream) {
+        console.error('Error: cannot parse stream or feed from message', message)
+        return
+      }
+
+      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as TEntityHasInstrument)?.instrument
+
+      /**
+       * Handle subscriptions with instrument
+       */
+      const consumers = instrument
+        ? this._getInstrumentConsumers({ stream, instrument, result })
+        : this._getNonInstrumentConsumers({ stream, result })
+      if (!consumers?.length) {
+        console.log('TODO: send unsubscribe with by message:', message)
+        return
+      }
+      if (result && consumers?.length) {
+        for (const consumer of consumers) {
+          typeof consumer === 'function' && consumer(result)
+        }
+      }
+    })
+  }
+
   /**
    * Only use for TDG
    * Use for TEntities of STATE | DEPOSIT | TRANSFER | WITHDRAWAL streams
@@ -203,68 +259,19 @@ export class WS {
     )
   }
 
-  private _bindWebSocketListeners () {
-    const reconnect = (e: CloseEvent | Event) => {
-      if (!this._connecting) {
-        return
-      }
-      const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
-      if (typeof retryTimeout === 'number') {
-        return setTimeout(this._createWs.bind(this), retryTimeout)
-      }
-      throw retryTimeout
-    }
-    this._ws.addEventListener('open', (e: Event) => {
-      this._subscribeCurrentPairs()
-    })
-    this._ws.addEventListener('close', reconnect)
-    this._ws.addEventListener('error', reconnect)
-    this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const message = JsonUtils.parse<IMessage>(
-        e.data,
-        JsonUtils.bigintReviver
-      )
-      const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
-      const result = this._messageLiteToFull(message)
-      // no entity found
-      if (!result) {
-        // if no entity found and not a subscription message
-        if (!message.s1?.length) {
-          console.error('Error: something went wrong with message', message)
-        }
-        return
-      }
-      if (!stream) {
-        console.error('Error: cannot parse stream or feed from message', message)
-        return
-      }
-
-      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as TEntityHasInstrument)?.instrument
-
-      /**
-       * Handle subscriptions with instrument
-       */
-      const consumers = instrument
-        ? this._getInstrumentConsumers({ stream, instrument, result })
-        : this._getNonInstrumentConsumers({ stream, result })
-      if (!consumers?.length) {
-        console.log('TODO: send unsubscribe with by message:', message)
-        return
-      }
-      if (result && consumers?.length) {
-        for (const consumer of consumers) {
-          typeof consumer === 'function' && consumer(result)
-        }
-      }
-    })
-  }
-
   private _parseStream (options: Omit<TWSRequest, 'onData' | 'onError'>) {
     const candleFeed = (params: IWSCandleRequest['params']): string => [
       params.instrument,
       [
         params.interval.toLowerCase().replace(/_/g, ''),
         params.type.toLowerCase()
+      ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const bookDeltaFeed = (params: IWSBookRequest['params']): string => [
+      params.instrument,
+      [
+        params.rate ?? 1000
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
@@ -372,6 +379,10 @@ export class WS {
           feed: [candleFeed(params as IWSCandleRequest['params'])]
         }
       case EStream.ORDERBOOK_DELTA:
+        return {
+          stream,
+          feed: [bookDeltaFeed(params as IWSBookRequest['params'])]
+        }
       case EStream.ORDERBOOK_SNAP:
         return {
           stream,
@@ -529,6 +540,16 @@ export class WS {
         feed: [feed]
       })
     }
+  }
+
+  setParams (params: Record<string, string>) {
+    const url = new URL(this._options.url.toString())
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.set(key, value)
+    }
+    this._options.url = url
+    this._createWs()
+    return this
   }
 
   /**

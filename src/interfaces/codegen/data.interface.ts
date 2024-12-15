@@ -1,3 +1,8 @@
+export enum EBridgeType {
+  // XY Bridge type
+  XY = 'XY',
+}
+
 export enum ECandlestickInterval {
   // 1 minute
   CI_1_M = 'CI_1_M',
@@ -330,20 +335,6 @@ export interface IApiDepositHistoryResponse {
   next?: string
 }
 
-// GRVT runs on a ZKSync Hyperchain which settles directly onto Ethereum.
-// To Deposit funds from your L1 wallet into a GRVT SubAccount, you will be required to submit a deposit transaction directly to Ethereum.
-// GRVT's bridge verifier will scan Ethereum from time to time. Once it receives proof that your deposit has been confirmed on Ethereum, it will initiate the deposit process.
-//
-// This current payload is used for alpha testing only.
-export interface IApiDepositRequest {
-  // The main account to deposit into
-  to_account_id?: bigint
-  // The token currency to deposit
-  currency?: ECurrency
-  // The number of tokens to deposit, quoted in token_currency decimals
-  num_tokens?: string
-}
-
 // Query for all historical fills made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
@@ -577,7 +568,7 @@ export interface IApiGetLPLeaderboardRequest {
 
 export interface IApiGetLPLeaderboardResponse {
   // The list of LP points
-  points?: ILPPoint[]
+  points?: IApproximateLPPoint[]
 }
 
 export interface IApiGetLPPointRequest {
@@ -591,7 +582,7 @@ export interface IApiGetLPPointRequest {
 
 export interface IApiGetLPPointResponse {
   // LP points of user
-  point?: IApproximateLPPoint
+  point?: ILPPoint
   // The number of maker
   maker_count?: number
 }
@@ -783,6 +774,32 @@ export interface IApiPositionsResponse {
   result?: IPositions[]
 }
 
+// UI only for bridge deposits through non native bridge. Currently only supports XY Finance bridge account.
+export interface IApiPreDepositCheckRequest {
+  // The currency you hold the deposit in
+  currency?: ECurrency
+  // The bridge type to conduct checks for
+  bridge?: EBridgeType
+}
+
+export interface IApiPreDepositCheckResponse {
+  // Max Deposit Limit reported for the Bridge Account reported in the currency balance
+  max_deposit_limit?: string
+}
+
+// Get pre-order check information for a new order
+export interface IApiPreOrderCheckRequest {
+  // The subaccount ID of orders to query
+  sub_account_id?: bigint
+  // The order to do pre-order check
+  orders?: IOrder[]
+}
+
+export interface IApiPreOrderCheckResponse {
+  // Pre order check for each new order in the request
+  results?: IPreOrderCheckResult[]
+}
+
 export interface IApiResolveEpochEcosystemMetricResponse {
   // The name of the epoch
   epoch_name?: string
@@ -822,7 +839,7 @@ export interface IApiSocializedLossStatusResponse {
   // Whether the socialized loss is active
   is_active?: boolean
   // The socialized loss haircut ratio in centi-beeps
-  haircut_ratio?: bigint
+  haircut_ratio?: string
 }
 
 // The request to get the history of a sub account
@@ -1038,8 +1055,8 @@ export interface IApiWithdrawalRequest {
 }
 
 export interface IApproximateLPPoint {
-  // The main account id
-  main_account_id?: bigint
+  // The off chain account id
+  off_chain_account_id?: string
   // Liquidity score
   liquidity_score?: bigint
   // The rank of user in the LP leaderboard
@@ -1061,6 +1078,15 @@ export interface IApproximateLPSnapshot {
   liquidity_score?: bigint
   // The time when the snapshot was calculated
   calculate_at?: bigint
+}
+
+export interface IAssetMaxQty {
+  // The asset associated with the max quantity
+  asset?: string
+  // The maximum buy quantity
+  max_buy_qty?: string
+  // The maximum sell quantity
+  max_sell_qty?: string
 }
 
 export interface ICandlestick {
@@ -1203,7 +1229,7 @@ export interface IFill {
   // The fee rate paid on the trade
   fee_rate?: string
   // A trade identifier, globally unique, and monotonically increasing (not by `1`).
-  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // All trades sharing a single taker execution share the same first component (before `-`), and `event_time`.
   // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
   trade_id?: string
   // An order identifier
@@ -1224,6 +1250,8 @@ export interface IFill {
   client_order_id?: bigint
   // A trade index
   trade_index?: number
+  // The address (public key) of the wallet signing the payload
+  signer?: bigint
 }
 
 export interface IFlatReferral {
@@ -1239,6 +1267,8 @@ export interface IFlatReferral {
   main_account_id?: bigint
   // The referrer main account id
   referrer_main_account_id?: bigint
+  // The account is a business account or not
+  is_business?: boolean
 }
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
@@ -1271,12 +1301,12 @@ export interface IFundingPayment {
 export interface IFundingRate {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
-  // The funding rate of the instrument, expressed in centibeeps
-  funding_rate?: number
+  // The funding rate of the instrument, expressed in percentage points
+  funding_rate?: string
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in `9` decimals
-  mark_price?: bigint
+  mark_price?: string
 }
 
 export interface IInstrument {
@@ -1560,6 +1590,19 @@ export interface IPositions {
   quote_index_price?: string
 }
 
+export interface IPreOrderCheckResult {
+  // The maximum quantity for each leg
+  max_qty?: IAssetMaxQty[]
+  // The margin required for the order (reported in `settle_currency`)
+  margin_required?: string
+  // Whether the order is valid
+  order_valid?: boolean
+  // The reason the order is invalid, if any
+  reason?: string
+  // The subAccount settle currency
+  settle_currency?: ECurrency
+}
+
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
@@ -1645,6 +1688,8 @@ export interface ISubAccountTradeAggregation {
   total_trade_volume?: bigint
   // Number of trades
   num_traded?: bigint
+  // Total positive fee paid by user
+  positive_fee?: bigint
 }
 
 // Derived data such as the below, will not be included by default:
@@ -1682,9 +1727,9 @@ export interface ITicker {
   best_ask_price?: string
   // The number of assets offered on the best ask price of the instrument, expressed in base asset decimal units
   best_ask_size?: string
-  // The current funding rate of the instrument, expressed in centibeeps (1/100th of a basis point)
+  // The current funding rate of the instrument, expressed in percentage points
   funding_rate_8h_curr?: string
-  // The average funding rate of the instrument (over last 8h), expressed in centibeeps (1/100th of a basis point)
+  // The average funding rate of the instrument (over last 8h), expressed in percentage points
   funding_rate_8h_avg?: string
   // The interest rate of the underlying, expressed in centibeeps (1/100th of a basis point)
   interest_rate?: string
@@ -1731,7 +1776,7 @@ export interface ITrade {
   // [Options] The forward price of the option at point of trade, expressed in `9` decimals
   forward_price?: string
   // A trade identifier, globally unique, and monotonically increasing (not by `1`).
-  // All trades sharing a single taker execution share the same first component (before `:`), and `event_time`.
+  // All trades sharing a single taker execution share the same first component (before `-`), and `event_time`.
   // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
   trade_id?: string
   // The venue where the trade occurred
