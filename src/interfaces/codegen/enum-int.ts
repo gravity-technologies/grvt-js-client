@@ -1,4 +1,5 @@
 import {
+  EBridgeType,
   ECandlestickInterval,
   ECandlestickType,
   ECurrency,
@@ -11,6 +12,10 @@ import {
   ETimeInForce,
   EVenue
 } from './data.interface'
+
+export const EBridgeTypeInt: Record<EBridgeType, number> = Object.freeze({
+  [EBridgeType.XY]: 1
+})
 
 export const ECandlestickIntervalInt: Record<ECandlestickInterval, number> = Object.freeze({
   [ECandlestickInterval.CI_1_M]: 1,

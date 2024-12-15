@@ -1,5 +1,5 @@
-import { ORDER_MAP } from './order'
 import { type SchemaPairMap } from './types'
+import { ORDER_MAP } from './order'
 
 // Schema map for the 'API_PRE_ORDER_CHECK_REQUEST' struct.
 export const API_PRE_ORDER_CHECK_REQUEST_MAP: SchemaPairMap = Object.freeze({
