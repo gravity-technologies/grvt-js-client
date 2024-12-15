@@ -1,4 +1,4 @@
-import { type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import { type AxiosRequestConfig } from 'axios'
 import {
   ACK_RESPONSE_MAP,
   API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP,
@@ -74,7 +74,7 @@ import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
 export class TDG {
-  private readonly _axios: AxiosInstance
+  private readonly _axios = createAxiosInstance()
   private readonly _fullUrl: string
   private readonly _liteUrl: string
 
@@ -82,11 +82,10 @@ export class TDG {
     const parseConfig = validConfig(config)
     this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
     this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
-    this._axios = createAxiosInstance()
   }
 
-  get interceptors () {
-    return this._axios.interceptors
+  get axios () {
+    return this._axios
   }
 
   /** ===== TRANSFER ===== */
