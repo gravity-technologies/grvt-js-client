@@ -1,4 +1,4 @@
-import { type AxiosRequestConfig } from 'axios'
+import { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import {
   ACK_RESPONSE_MAP,
   API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP,
@@ -10,7 +10,6 @@ import {
   API_CREATE_ORDER_RESPONSE_MAP,
   API_DEPOSIT_HISTORY_REQUEST_MAP,
   API_DEPOSIT_HISTORY_RESPONSE_MAP,
-  API_DEPOSIT_REQUEST_MAP,
   API_FILL_HISTORY_REQUEST_MAP,
   API_FILL_HISTORY_RESPONSE_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
@@ -45,7 +44,6 @@ import {
   type IApiCreateOrderResponse,
   type IApiDepositHistoryRequest,
   type IApiDepositHistoryResponse,
-  type IApiDepositRequest,
   type IApiFillHistoryRequest,
   type IApiFillHistoryResponse,
   type IApiFundingAccountSummaryResponse,
@@ -72,10 +70,11 @@ import {
   type IApiWithdrawalRequest,
   type IConfig
 } from '../interfaces'
-import { RestfulService } from '../services'
+import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
 export class TDG {
+  private readonly _axios: AxiosInstance
   private readonly _fullUrl: string
   private readonly _liteUrl: string
 
@@ -83,29 +82,20 @@ export class TDG {
     const parseConfig = validConfig(config)
     this._fullUrl = `${parseConfig.host}/full/${parseConfig.version}`
     this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
+    this._axios = createAxiosInstance()
+  }
+
+  get interceptors () {
+    return this._axios.interceptors
   }
 
   /** ===== TRANSFER ===== */
 
   /**
-   * TODO: missing response interface
-   * @see https://api-docs.grvt.io/trading_api/#deposit
-   */
-  deposit (payload: IApiDepositRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
-      this._liteUrl + '/deposit',
-      Utils.schemaMap(payload, API_DEPOSIT_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
    * @see https://api-docs.grvt.io/trading_api/#deposit-history
    */
   depositHistory (payload: IApiDepositHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/deposit_history',
       Utils.schemaMap(payload, API_DEPOSIT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -119,7 +109,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#transfer
    */
   transfer (payload: IApiTransferRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/transfer',
       Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -132,7 +122,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#transfer-history
    */
   transferHistory (payload: IApiTransferHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/transfer_history',
       Utils.schemaMap(payload, API_TRANSFER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -146,7 +136,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#withdrawal
    */
   withdrawal (payload: IApiWithdrawalRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/withdrawal',
       Utils.schemaMap(payload, API_WITHDRAWAL_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -156,7 +146,7 @@ export class TDG {
   }
 
   socializedLossStatus (config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/socialized_loss_status',
       {},
       config
@@ -169,7 +159,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#withdrawal-history
    */
   withdrawalHistory (payload: IApiWithdrawalHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/withdrawal_history',
       Utils.schemaMap(payload, API_WITHDRAWAL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -184,7 +174,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#positions
    */
   positions (payload: IApiPositionsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/positions',
       Utils.schemaMap(payload, API_POSITIONS_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -197,7 +187,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#sub-account-summary
    */
   subAccountSummary (payload: IApiSubAccountSummaryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/account_summary',
       Utils.schemaMap(payload, API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -210,7 +200,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#sub-account-history
    */
   subAccountHistory (payload: IApiSubAccountHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/account_history',
       Utils.schemaMap(payload, API_SUB_ACCOUNT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -223,7 +213,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/market_data_api/#trade-history
    */
   fillHistory (payload: IApiFillHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/fill_history',
       Utils.schemaMap(payload, API_FILL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -238,7 +228,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#create-order
    */
   createOrder (payload: IApiCreateOrderRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/create_order',
       Utils.schemaMap(payload, API_CREATE_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -248,7 +238,7 @@ export class TDG {
   }
 
   preOrderCheck (payload: IApiPreOrderCheckRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/pre_order_check ',
       Utils.schemaMap(payload, API_PRE_ORDER_CHECK_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -261,7 +251,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#cancel-order
    */
   cancelOrder (payload: IApiCancelOrderRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/cancel_order',
       Utils.schemaMap(payload, API_CANCEL_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -274,7 +264,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#cancel-all-orders
    */
   cancelAllOrders (payload: IApiCancelAllOrdersRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/cancel_all_orders',
       Utils.schemaMap(payload, API_CANCEL_ALL_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -295,7 +285,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#get-order
    */
   order (payload: IApiGetOrderRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/order',
       Utils.schemaMap(payload, API_GET_ORDER_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -308,7 +298,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#open-orders
    */
   openOrders (payload: IApiOpenOrdersRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/open_orders',
       Utils.schemaMap(payload, API_OPEN_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -321,7 +311,7 @@ export class TDG {
    * @see https://api-docs.grvt.io/trading_api/#order-history
    */
   orderHistory (payload: IApiOrderHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/order_history',
       Utils.schemaMap(payload, API_ORDER_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       config
@@ -334,7 +324,7 @@ export class TDG {
    * @description Missing documentation
    */
   fundingAccountSummary (config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/funding_account_summary',
       null,
       config
@@ -347,7 +337,7 @@ export class TDG {
    * @description Missing documentation
    */
   aggregatedAccountSummary (config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/aggregated_account_summary',
       null,
       config
