@@ -1,5 +1,5 @@
-import { PRE_ORDER_CHECK_RESULT_MAP } from './pre_order_check_result'
 import { type SchemaPairMap } from './types'
+import { PRE_ORDER_CHECK_RESULT_MAP } from './pre_order_check_result'
 
 // Schema map for the 'API_PRE_ORDER_CHECK_RESPONSE' struct.
 export const API_PRE_ORDER_CHECK_RESPONSE_MAP: SchemaPairMap = Object.freeze({

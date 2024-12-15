@@ -1,5 +1,5 @@
-import { ASSET_MAX_QTY_MAP } from './asset_max_qty'
 import { type SchemaPairMap } from './types'
+import { ASSET_MAX_QTY_MAP } from './asset_max_qty'
 
 // Schema map for the 'PRE_ORDER_CHECK_RESULT' struct.
 export const PRE_ORDER_CHECK_RESULT_MAP: SchemaPairMap = Object.freeze({
