@@ -373,6 +373,10 @@ export interface IApiFindEcosystemEpochMetricResponse {
   total?: number
   // The time when the ecosystem points were last calculated
   last_calculated_at?: bigint
+  // Direct invite count without relying on epochs
+  total_direct_invite_count?: number
+  // Indirect invite count without relying on epochs
+  total_indirect_invite_count?: number
 }
 
 export interface IApiFindEcosystemLeaderboardResponse {
@@ -798,6 +802,19 @@ export interface IApiPreOrderCheckRequest {
 export interface IApiPreOrderCheckResponse {
   // Pre order check for each new order in the request
   results?: IPreOrderCheckResult[]
+}
+
+// Query flat referral stats
+export interface IApiQueryFlatReferralStatRequest {
+  // The off chain account id to get referral stats
+  account_id?: string
+}
+
+export interface IApiQueryFlatReferralStatResponse {
+  // Direct invite count
+  direct_invite_count?: number
+  // Indirect invite count
+  indirect_invite_count?: number
 }
 
 export interface IApiResolveEpochEcosystemMetricResponse {

@@ -21,6 +21,8 @@ import {
   API_ORDER_HISTORY_RESPONSE_MAP,
   API_POSITIONS_REQUEST_MAP,
   API_POSITIONS_RESPONSE_MAP,
+  API_PRE_DEPOSIT_CHECK_REQUEST_MAP,
+  API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
   API_PRE_ORDER_CHECK_REQUEST_MAP,
   API_PRE_ORDER_CHECK_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
@@ -55,6 +57,8 @@ import {
   type IApiOrderHistoryResponse,
   type IApiPositionsRequest,
   type IApiPositionsResponse,
+  type IApiPreDepositCheckRequest,
+  type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
   type IApiSocializedLossStatusResponse,
@@ -89,6 +93,19 @@ export class TDG {
   }
 
   /** ===== TRANSFER ===== */
+
+  /**
+   * @see https://api-docs.grvt.io/trading_api/#predepositcheck
+   */
+  preDepositCheck (payload: IApiPreDepositCheckRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/pre_deposit_check',
+      Utils.schemaMap(payload, API_PRE_DEPOSIT_CHECK_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_PRE_DEPOSIT_CHECK_RESPONSE_MAP.LITE_TO_FULL) as IApiPreDepositCheckResponse
+    }).catch(Utils.coverApiError)
+  }
 
   /**
    * @see https://api-docs.grvt.io/trading_api/#deposit-history
