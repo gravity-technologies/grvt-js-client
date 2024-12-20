@@ -73,6 +73,7 @@ interface IOptions {
 }
 
 export class WS {
+  private _id = 0
   private _retries = 0
   private _connecting = false
   private readonly _version = 'v1'
@@ -492,6 +493,8 @@ export class WS {
       this._ws.send(JSON.stringify(
         Utils.schemaMap({
           ...payload,
+          jsonrpc: '2.0',
+          id: ++this._id,
           stream: `${this._version}.${payload.stream}`
         }, WS_SUBSCRIBE_PARAMS_MAP.FULL_TO_LITE, true),
         JsonUtils.bigintReplacer

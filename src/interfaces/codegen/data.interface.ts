@@ -789,6 +789,8 @@ export interface IApiPreDepositCheckRequest {
 export interface IApiPreDepositCheckResponse {
   // Max Deposit Limit reported for the Bridge Account reported in the currency balance
   max_deposit_limit?: string
+  // The currency you hold the deposit in
+  currency?: ECurrency
 }
 
 // Get pre-order check information for a new order
