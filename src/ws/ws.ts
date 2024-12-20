@@ -7,8 +7,6 @@ import {
   WS_ORDER_FEED_DATA_V_1_MAP,
   WS_ORDER_STATE_FEED_DATA_V_1_MAP,
   WS_POSITIONS_FEED_DATA_V_1_MAP,
-  WS_SUBSCRIBE_PARAMS_MAP,
-  WS_SUBSCRIBE_RESULT_MAP,
   WS_TICKER_FEED_DATA_V_1_MAP,
   WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
@@ -27,7 +25,6 @@ import {
   type IWSOrderStateFeedDataV1,
   type IWSPositionsFeedDataV1,
   type IWSSubscribeRequestV1Legacy,
-  type IWSSubscribeResult,
   type IWSTickerFeedDataV1,
   type IWSTradeFeedDataV1,
   type IWSTransferFeedDataV1,
@@ -95,11 +92,7 @@ export class WS {
   }
 
   constructor (options: IOptions) {
-    const url = new URL(options.url.toString())
-    this._options = {
-      ...options,
-      url: `${url.protocol}//${url.host}/ws/lite`
-    }
+    this._options = options
   }
 
   private _createWs () {
@@ -125,23 +118,22 @@ export class WS {
     this._ws.addEventListener('close', reconnect)
     this._ws.addEventListener('error', reconnect)
     this._ws.addEventListener('message', (e: MessageEvent<string>) => {
-      const messageLite = JsonUtils.parse<IMessage>(
+      const message = JsonUtils.parse<IMessage>(
         e.data,
         JsonUtils.bigintReviver
       )
-      const messageFull = Utils.schemaMap(messageLite, WS_SUBSCRIBE_RESULT_MAP.LITE_TO_FULL) as IWSSubscribeResult
-      const stream = messageFull.stream = messageFull.stream?.replace?.(`${this._version}.`, '') as `${EStream}`
-      const result = this._messageLiteToFull(messageLite)
+      const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
+      const result = this._messageLiteToFull(message)
       // no entity found
       if (!result) {
         // if no entity found and not a subscription message
-        if (!messageFull.subs?.length) {
-          console.error('Error: something went wrong with message', messageLite)
+        if (!message.s1?.length) {
+          console.error('Error: something went wrong with message', message)
         }
         return
       }
       if (!stream) {
-        console.error('Error: cannot parse stream or feed from message', messageLite)
+        console.error('Error: cannot parse stream or feed from message', message)
         return
       }
 
@@ -154,7 +146,7 @@ export class WS {
         ? this._getInstrumentConsumers({ stream, instrument, result })
         : this._getNonInstrumentConsumers({ stream, result })
       if (!consumers?.length) {
-        console.log('TODO: send unsubscribe with by message:', messageLite)
+        console.log('TODO: send unsubscribe with by message:', message)
         return
       }
       if (result && consumers?.length) {
@@ -489,13 +481,10 @@ export class WS {
 
   private _sendMessage (payload: IWSSubscribeRequestV1Legacy) {
     if (this._ws.readyState === 1) {
-      this._ws.send(JSON.stringify(
-        Utils.schemaMap({
-          ...payload,
-          stream: `${this._version}.${payload.stream}`
-        }, WS_SUBSCRIBE_PARAMS_MAP.FULL_TO_LITE, true),
-        JsonUtils.bigintReplacer
-      ))
+      this._ws.send(JSON.stringify({
+        ...payload,
+        stream: `${this._version}.${payload.stream}`
+      }, JsonUtils.bigintReplacer))
     }
   }
 
