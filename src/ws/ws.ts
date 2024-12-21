@@ -531,9 +531,22 @@ export class WS {
     if (!this._pairs[pair]) {
       return
     }
-    const { [consumerKey]: _, ...keep } = this._pairs[pair]
-    this._pairs[pair] = keep
-    if (!Object.keys(keep).length) {
+
+    let needUnsubscribe = true
+    const pairPrimary = pair.split('@')[0]
+    for (const key of Object.keys(this._pairs)) {
+      if (!key.startsWith(pairPrimary)) {
+        continue
+      }
+      const primaryGroup = this._pairs[key]
+      const { [consumerKey]: _, ...keep } = primaryGroup
+      this._pairs[pair] = keep
+      if (Object.keys(keep).length) {
+        needUnsubscribe = false
+      }
+    }
+
+    if (needUnsubscribe) {
       this._sendMessage({
         method: 'unsubscribe',
         stream,
