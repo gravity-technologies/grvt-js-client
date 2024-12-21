@@ -527,20 +527,20 @@ export class WS {
 
   private _removeConsumer (pairedConsumerKey: string) {
     const [stream, feed, consumerKey] = pairedConsumerKey.split('__')
-    const pair = this._getPair({ stream, feed })
-    if (!this._pairs[pair]) {
+    const pairKey = this._getPair({ stream, feed })
+    if (!this._pairs[pairKey]) {
       return
     }
 
     let needUnsubscribe = true
-    const pairPrimary = pair.split('@')[0]
+    const pairPrimary = pairKey.split('@')[0]
     for (const key of Object.keys(this._pairs)) {
-      if (!key.startsWith(pairPrimary)) {
+      if (key.split('@')[0] !== pairPrimary) {
         continue
       }
       const primaryGroup = this._pairs[key]
       const { [consumerKey]: _, ...keep } = primaryGroup
-      this._pairs[pair] = keep
+      this._pairs[key] = keep
       if (Object.keys(keep).length) {
         needUnsubscribe = false
       }
