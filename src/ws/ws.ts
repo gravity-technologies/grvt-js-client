@@ -71,7 +71,7 @@ interface IOptions {
 
 export class WS {
   private _retries = 0
-  private _connecting = false
+  private _connecting = true
   private readonly _version = 'v1'
   private readonly _options: IOptions
 
@@ -84,40 +84,90 @@ export class WS {
     return this.__ws
   }
 
-  private set _ws (ws: WebSocket) {
-    if (this.__ws?.readyState === 1) {
-      this.__ws.close()
-    }
-    this.__ws = ws
-  }
-
   constructor (options: IOptions) {
     this._options = options
   }
 
   private _createWs () {
-    this._ws = new WebSocket(this._options.url, this._options.protocols)
-    this._bindWebSocketListeners()
-    return this._ws
+    if (this.__ws) {
+      this._close(this.__ws)
+    }
+    this._connecting = true
+    this.__ws = new WebSocket(this._options.url, this._options.protocols)
+    this._bindWebSocketListeners(this.__ws)
+    return this.__ws
   }
 
-  private _bindWebSocketListeners () {
-    const reconnect = (e: CloseEvent | Event) => {
+  private _close (ws: WebSocket) {
+    const close = () => {
+      if (ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CONNECTING) {
+        ws.onclose = null
+        ws.close()
+      }
+    }
+    ws.addEventListener('open', () => {
+      close()
+    })
+    ws.addEventListener('message', () => {
+      close()
+    })
+    ws.addEventListener('error', () => {
+      close()
+    })
+    close()
+  }
+
+  private _bindWebSocketListeners (currentWs: WebSocket) {
+    const reconnect = () => {
       if (!this._connecting) {
         return
       }
       const retryTimeout = this._options.reconnectStrategy?.(++this._retries) ?? new Error('No reconnect strategy')
       if (typeof retryTimeout === 'number') {
-        return setTimeout(this._createWs.bind(this), retryTimeout)
+        return setTimeout(() => {
+          if (currentWs !== this.__ws) {
+            this._close(currentWs)
+            return
+          }
+          this._createWs()
+        }, retryTimeout)
       }
       throw retryTimeout
     }
-    this._ws.addEventListener('open', (e: Event) => {
+    currentWs.addEventListener('open', (e: Event) => {
+      // only keep the latest ws
+      if (currentWs !== this.__ws) {
+        this._close(currentWs)
+        return
+      }
       this._subscribeCurrentPairs()
     })
-    this._ws.addEventListener('close', reconnect)
-    this._ws.addEventListener('error', reconnect)
-    this._ws.addEventListener('message', (e: MessageEvent<string>) => {
+    currentWs.addEventListener('close', () => {
+      // only keep the latest ws
+      if (currentWs !== this.__ws) {
+        this._close(currentWs)
+        return
+      }
+      reconnect()
+    })
+    currentWs.addEventListener('error', () => {
+      // only keep the latest ws
+      if (currentWs !== this.__ws) {
+        this._close(currentWs)
+        return
+      }
+      reconnect()
+    })
+    currentWs.addEventListener('message', (e: MessageEvent<string>) => {
+      // only keep the latest ws
+      if (currentWs !== this.__ws) {
+        this._close(currentWs)
+        return
+      }
+      // reset retries
+      if (this._retries) {
+        this._retries = 0
+      }
       const message = JsonUtils.parse<IMessage>(
         e.data,
         JsonUtils.bigintReviver
@@ -480,7 +530,7 @@ export class WS {
   }
 
   private _sendMessage (payload: IWSSubscribeRequestV1Legacy) {
-    if (this._ws.readyState === 1) {
+    if (this._ws.readyState === WebSocket.OPEN) {
       this._ws.send(JSON.stringify({
         ...payload,
         stream: `${this._version}.${payload.stream}`
@@ -659,26 +709,24 @@ export class WS {
   }
 
   connect () {
-    if (!this._connecting) {
-      this._connecting = true
-      this._createWs()
-    }
+    this._createWs()
     return this
   }
 
   disconnect () {
-    if (this._connecting) {
-      this._connecting = false
-      this._ws.close()
+    if (this.__ws) {
+      this._close(this.__ws)
+      this.__ws = undefined
     }
+    this._connecting = false
     return this
   }
 
   ready (delay = 100) {
-    if (this._ws.readyState === 1) {
+    if (this._ws.readyState === WebSocket.OPEN) {
       return Promise.resolve(this)
     }
-    if (this._ws.readyState === 3) {
+    if (this._ws.readyState === WebSocket.CLOSED) {
       return Promise.reject(new Error('WebSocket is closed'))
     }
     return new Promise((resolve) => {
