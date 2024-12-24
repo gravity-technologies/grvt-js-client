@@ -65,6 +65,24 @@ export enum ECurrency {
   ETH = 'ETH',
   // the BTC token
   BTC = 'BTC',
+  // the SOL token
+  SOL = 'SOL',
+  // the ARB token
+  ARB = 'ARB',
+  // the BNB token
+  BNB = 'BNB',
+  // the ZK token
+  ZK = 'ZK',
+  // the POL token
+  POL = 'POL',
+  // the OP token
+  OP = 'OP',
+  // the ATOM token
+  ATOM = 'ATOM',
+  // the 1000PEPE token
+  PEPE_1000 = 'PEPE_1000',
+  // the TON token
+  TON = 'TON',
 }
 
 export enum EInstrumentSettlementPeriod {

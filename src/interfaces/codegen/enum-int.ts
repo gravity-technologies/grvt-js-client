@@ -50,7 +50,16 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.USDC]: 2,
   [ECurrency.USDT]: 3,
   [ECurrency.ETH]: 4,
-  [ECurrency.BTC]: 5
+  [ECurrency.BTC]: 5,
+  [ECurrency.SOL]: 6,
+  [ECurrency.ARB]: 7,
+  [ECurrency.BNB]: 8,
+  [ECurrency.ZK]: 9,
+  [ECurrency.POL]: 10,
+  [ECurrency.OP]: 11,
+  [ECurrency.ATOM]: 12,
+  [ECurrency.PEPE_1000]: 13,
+  [ECurrency.TON]: 14
 })
 
 export const EInstrumentSettlementPeriodInt: Record<EInstrumentSettlementPeriod, number> = Object.freeze({
