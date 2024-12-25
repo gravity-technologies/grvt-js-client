@@ -100,10 +100,11 @@ export class WS {
 
   private _close (ws: WebSocket) {
     const close = () => {
-      if (ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CONNECTING) {
-        ws.onclose = null
-        ws.close()
-      }
+      // force close
+      ws.close()
+      // if (ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CONNECTING) {
+      //   ws.close()
+      // }
     }
     ws.addEventListener('open', () => {
       close()
@@ -214,9 +215,7 @@ export class WS {
     let autoCloseTimer: ReturnType<typeof setTimeout>
     const timeoutCloseOnHang = () => {
       clearTimeout(autoCloseTimer)
-      autoCloseTimer = setTimeout(() => {
-        this._close(currentWs)
-      }, autoCloseDelay)
+      autoCloseTimer = setTimeout(reconnect, autoCloseDelay)
     }
     timeoutCloseOnHang()
     currentWs.addEventListener('message', () => {
