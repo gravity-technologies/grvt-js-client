@@ -205,6 +205,38 @@ export class WS {
         }
       }
     })
+
+    /**
+     * Auto close after 10s of inactivity
+     */
+    const autoCloseDelay = 10 * 1000
+    let lastMessageAt = Date.now()
+    let autoCloseTimer: ReturnType<typeof setTimeout>
+    const timeoutCloseOnHang = () => {
+      clearTimeout(autoCloseTimer)
+      autoCloseTimer = setTimeout(() => {
+        this._close(currentWs)
+      }, autoCloseDelay)
+    }
+    timeoutCloseOnHang()
+    currentWs.addEventListener('message', () => {
+      lastMessageAt = Date.now()
+      timeoutCloseOnHang()
+    })
+
+    /**
+     * Heartbeat every 3s
+     */
+    const heartbeatDelay = 3 * 1000
+    const heartbeat = () => {
+      if (currentWs.readyState === WebSocket.OPEN && Date.now() - lastMessageAt > heartbeatDelay) {
+        currentWs.send('ping')
+      }
+    }
+    const heartbeatInterval = setInterval(heartbeat, heartbeatDelay)
+    currentWs.addEventListener('close', () => {
+      clearInterval(heartbeatInterval)
+    })
   }
 
   /**
