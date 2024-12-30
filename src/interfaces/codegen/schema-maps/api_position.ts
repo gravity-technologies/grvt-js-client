@@ -15,7 +15,8 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     realized_pnl: 'rp',
     total_pnl: 'tp',
     roi: 'r',
-    quote_index_price: 'qi'
+    quote_index_price: 'qi',
+    est_liquidation_price: 'el'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -30,6 +31,7 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     rp: 'realized_pnl',
     tp: 'total_pnl',
     r: 'roi',
-    qi: 'quote_index_price'
+    qi: 'quote_index_price',
+    el: 'est_liquidation_price'
   }
 })

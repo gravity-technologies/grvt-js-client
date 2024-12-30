@@ -1625,6 +1625,8 @@ export interface IPositions {
   roi?: string
   // The index price of the quote currency. (reported in `USD`)
   quote_index_price?: string
+  // The estimated liquidation price
+  est_liquidation_price?: string
 }
 
 export interface IPreOrderCheckResult {
