@@ -10,7 +10,9 @@ export const TRANSFER_MAP: SchemaPairMap = Object.freeze({
     to_sub_account_id: 'ts',
     currency: 'c',
     num_tokens: 'nt',
-    signature: ['s', SIGNATURE_MAP.FULL_TO_LITE]
+    signature: ['s', SIGNATURE_MAP.FULL_TO_LITE],
+    transfer_type: 'tt',
+    transfer_metadata: 'tm'
   },
   LITE_TO_FULL: {
     fa: 'from_account_id',
@@ -19,6 +21,8 @@ export const TRANSFER_MAP: SchemaPairMap = Object.freeze({
     ts: 'to_sub_account_id',
     c: 'currency',
     nt: 'num_tokens',
-    s: ['signature', SIGNATURE_MAP.LITE_TO_FULL]
+    s: ['signature', SIGNATURE_MAP.LITE_TO_FULL],
+    tt: 'transfer_type',
+    tm: 'transfer_metadata'
   }
 })
