@@ -10,6 +10,7 @@ import {
   EOrderStatus,
   ESubAccountTradeInterval,
   ETimeInForce,
+  ETransferType,
   EVenue
 } from './data.interface'
 
@@ -58,7 +59,7 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.POL]: 10,
   [ECurrency.OP]: 11,
   [ECurrency.ATOM]: 12,
-  [ECurrency.PEPE_1000]: 13,
+  [ECurrency.KPEPE]: 13,
   [ECurrency.TON]: 14
 })
 
@@ -132,6 +133,12 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
   [ETimeInForce.ALL_OR_NONE]: 2,
   [ETimeInForce.IMMEDIATE_OR_CANCEL]: 3,
   [ETimeInForce.FILL_OR_KILL]: 4
+})
+
+export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
+  [ETransferType.STANDARD]: 1,
+  [ETransferType.XY_DEPOSIT]: 2,
+  [ETransferType.XY_WITHDRAWAL]: 3
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({

@@ -80,7 +80,7 @@ export enum ECurrency {
   // the ATOM token
   ATOM = 'ATOM',
   // the 1000PEPE token
-  PEPE_1000 = 'PEPE_1000',
+  KPEPE = 'KPEPE',
   // the TON token
   TON = 'TON',
 }
@@ -212,6 +212,15 @@ export enum ETimeInForce {
   IMMEDIATE_OR_CANCEL = 'IMMEDIATE_OR_CANCEL',
   // FOK - Both AoN and IoC. Either fill the full order when hitting the orderbook, or cancel it
   FILL_OR_KILL = 'FILL_OR_KILL',
+}
+
+export enum ETransferType {
+  // Standard transfer that has nothing to do with bridging
+  STANDARD = 'STANDARD',
+  // XY finance deposit
+  XY_DEPOSIT = 'XY_DEPOSIT',
+  // XY finance withdrawal
+  XY_WITHDRAWAL = 'XY_WITHDRAWAL',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -1046,6 +1055,10 @@ export interface IApiTransferRequest {
   num_tokens?: string
   // The signature of the transfer
   signature?: ISignature
+  // The type of transfer
+  transfer_type?: ETransferType
+  // The metadata of the transfer
+  transfer_metadata?: string
 }
 
 // The request to get the historical withdrawals of an account
@@ -1859,6 +1872,10 @@ export interface ITransfer {
   num_tokens?: string
   // The signature of the transfer
   signature?: ISignature
+  // The type of transfer
+  transfer_type?: ETransferType
+  // The metadata of the transfer
+  transfer_metadata?: string
 }
 
 export interface ITransferHistory {
@@ -1880,6 +1897,10 @@ export interface ITransferHistory {
   signature?: ISignature
   // The timestamp of the transfer in unix nanoseconds
   event_time?: bigint
+  // The type of transfer
+  transfer_type?: ETransferType
+  // The metadata of the transfer
+  transfer_metadata?: string
 }
 
 export interface IWSCandlestickFeedDataV1 {
