@@ -55,6 +55,8 @@ interface IMessage {
   n: bigint
   f?: TEntities
   s1?: Array<string | bigint>
+  code?: number
+  status?: number
 }
 
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
@@ -173,6 +175,14 @@ export class WS {
         e.data,
         JsonUtils.bigintReviver
       )
+
+      /**
+       * Ignore 400 status response messages
+       */
+      if (message.status === 400) {
+        return
+      }
+
       const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
       const result = this._messageLiteToFull(message)
       // no entity found
@@ -197,7 +207,8 @@ export class WS {
         ? this._getInstrumentConsumers({ stream, instrument, result })
         : this._getNonInstrumentConsumers({ stream, result })
       if (!consumers?.length) {
-        console.log('TODO: send unsubscribe with by message:', message)
+        // There are delay in sending unsubscribe message so clients might receive messages after unsubscribing
+        // console.log('TODO: send unsubscribe with by message:', message, result)
         return
       }
       if (result && consumers?.length) {
