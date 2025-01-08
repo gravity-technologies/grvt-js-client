@@ -125,7 +125,8 @@ export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
 
 export const ESubAccountTradeIntervalInt: Record<ESubAccountTradeInterval, number> = Object.freeze({
   [ESubAccountTradeInterval.SAT_1_MO]: 1,
-  [ESubAccountTradeInterval.SAT_1_D]: 2
+  [ESubAccountTradeInterval.SAT_1_D]: 2,
+  [ESubAccountTradeInterval.SAT_1_H]: 3
 })
 
 export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
@@ -137,8 +138,8 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
 
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.STANDARD]: 1,
-  [ETransferType.XY_DEPOSIT]: 2,
-  [ETransferType.XY_WITHDRAWAL]: 3
+  [ETransferType.FAST_ARB_DEPOSIT]: 2,
+  [ETransferType.FAST_ARB_WITHDRAWAL]: 3
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({

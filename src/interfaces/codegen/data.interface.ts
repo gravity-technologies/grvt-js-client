@@ -196,6 +196,8 @@ export enum ESubAccountTradeInterval {
   SAT_1_MO = 'SAT_1_MO',
   // 1 day
   SAT_1_D = 'SAT_1_D',
+  // 1 hour
+  SAT_1_H = 'SAT_1_H',
 }
 
 // |                       | Must Fill All | Can Fill Partial |
@@ -217,10 +219,10 @@ export enum ETimeInForce {
 export enum ETransferType {
   // Standard transfer that has nothing to do with bridging
   STANDARD = 'STANDARD',
-  // XY finance deposit
-  XY_DEPOSIT = 'XY_DEPOSIT',
-  // XY finance withdrawal
-  XY_WITHDRAWAL = 'XY_WITHDRAWAL',
+  // Fast Arb Deposit Metadata type
+  FAST_ARB_DEPOSIT = 'FAST_ARB_DEPOSIT',
+  // Fast Arb Withdrawal Metadata type
+  FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -494,6 +496,18 @@ export interface IApiFundingRateResponse {
   result?: IFundingRate[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+// The request to get the initial leverage of a sub account
+export interface IApiGetAllInitialLeverageRequest {
+  // The sub account ID to get the leverage for
+  sub_account_id?: bigint
+}
+
+// The response to get the initial leverage of a sub account
+export interface IApiGetAllInitialLeverageResponse {
+  // The initial leverage of the sub account
+  results?: IInitialLeverageResult[]
 }
 
 // Fetch all instruments
@@ -853,6 +867,22 @@ export interface IApiResolveEpochEcosystemMetricResponse {
   point?: number
   // The time in unix nanoseconds when the ecosystem points were last calculated
   last_calculated_time?: bigint
+}
+
+// The request to set the initial leverage of a sub account
+export interface IApiSetIntialLeverageRequest {
+  // The sub account ID to set the leverage for
+  sub_account_id?: bigint
+  // The instrument to set the leverage for
+  instrument?: string
+  // The leverage to set for the sub account
+  leverage?: string
+}
+
+// The response to set the initial leverage of a sub account
+export interface IApiSetIntialLeverageResponse {
+  // Whether the leverage was set successfully
+  success?: boolean
 }
 
 // Lookup the historical settlement price of various pairs.
@@ -1357,6 +1387,17 @@ export interface IFundingRate {
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: string
+}
+
+export interface IInitialLeverageResult {
+  // The instrument to get the leverage for
+  instrument?: string
+  // The initial leverage of the sub account
+  leverage?: string
+  // The min leverage this sub account can set
+  min_leverage?: string
+  // The max leverage this sub account can set
+  max_leverage?: string
 }
 
 export interface IInstrument {
