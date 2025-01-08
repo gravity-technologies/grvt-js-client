@@ -13,6 +13,8 @@ import {
   API_FILL_HISTORY_REQUEST_MAP,
   API_FILL_HISTORY_RESPONSE_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP,
+  API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_GET_ORDER_REQUEST_MAP,
   API_GET_ORDER_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
@@ -25,6 +27,8 @@ import {
   API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
   API_PRE_ORDER_CHECK_REQUEST_MAP,
   API_PRE_ORDER_CHECK_RESPONSE_MAP,
+  API_SET_INTIAL_LEVERAGE_REQUEST_MAP,
+  API_SET_INTIAL_LEVERAGE_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
   API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
@@ -49,6 +53,8 @@ import {
   type IApiFillHistoryRequest,
   type IApiFillHistoryResponse,
   type IApiFundingAccountSummaryResponse,
+  type IApiGetAllInitialLeverageRequest,
+  type IApiGetAllInitialLeverageResponse,
   type IApiGetOrderRequest,
   type IApiGetOrderResponse,
   type IApiOpenOrdersRequest,
@@ -61,6 +67,8 @@ import {
   type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
+  type IApiSetIntialLeverageRequest,
+  type IApiSetIntialLeverageResponse,
   type IApiSocializedLossStatusResponse,
   type IApiSubAccountHistoryRequest,
   type IApiSubAccountHistoryResponse,
@@ -333,6 +341,32 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_ORDER_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiOrderHistoryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * @description Missing documentation
+   */
+  getAllInitialLeverage (payload: IApiGetAllInitialLeverageRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/get_all_initial_leverage',
+      Utils.schemaMap(payload, API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP.LITE_TO_FULL) as IApiGetAllInitialLeverageResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * @description Missing documentation
+   */
+  setInitialLeverage (payload: IApiSetIntialLeverageRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/set_initial_leverage',
+      Utils.schemaMap(payload, API_SET_INTIAL_LEVERAGE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SET_INTIAL_LEVERAGE_RESPONSE_MAP.LITE_TO_FULL) as IApiSetIntialLeverageResponse
     }).catch(Utils.coverApiError)
   }
 
