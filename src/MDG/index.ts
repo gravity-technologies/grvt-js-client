@@ -47,10 +47,11 @@ import {
   type IApiTradeResponse,
   type IConfig
 } from '../interfaces'
-import { RestfulService } from '../services'
+import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
 export class MDG {
+  private readonly _axios = createAxiosInstance()
   private readonly _fullUrl: string
   private readonly _liteUrl: string
 
@@ -60,11 +61,15 @@ export class MDG {
     this._liteUrl = `${parseConfig.host}/lite/${parseConfig.version}`
   }
 
+  get axios () {
+    return this._axios
+  }
+
   /**
    * @see https://api-docs.grvt.io/market_data_api/#get-instrument
    */
   instrument (payload: IApiGetInstrumentRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/instrument',
       Utils.schemaMap(payload, API_GET_INSTRUMENT_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -80,7 +85,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#get-instruments
    */
   instruments (payload: IApiGetFilteredInstrumentsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/instruments',
       Utils.schemaMap(payload, API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -96,7 +101,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#get-all-instruments
    */
   allInstruments (payload: IApiGetAllInstrumentsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/all_instruments',
       Utils.schemaMap(payload, API_GET_ALL_INSTRUMENTS_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -112,7 +117,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#mini-ticker
    */
   miniTicker (payload: IApiMiniTickerRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/mini',
       Utils.schemaMap(payload, API_MINI_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -128,7 +133,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#ticker
    */
   ticker (payload: IApiTickerRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/ticker',
       Utils.schemaMap(payload, API_TICKER_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -144,7 +149,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#orderbook
    */
   orderBook (payload: IApiOrderbookLevelsRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/book',
       Utils.schemaMap(payload, API_ORDERBOOK_LEVELS_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -160,7 +165,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#trade_1
    */
   trade (payload: IApiTradeRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/trade',
       Utils.schemaMap(payload, API_TRADE_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -176,7 +181,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#trade-history
    */
   tradesHistory (payload: IApiTradeHistoryRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/trade_history',
       Utils.schemaMap(payload, API_TRADE_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -192,7 +197,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#settlement-price
    */
   settlement (payload: IApiSettlementPriceRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/settlement',
       Utils.schemaMap(payload, API_SETTLEMENT_PRICE_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -208,7 +213,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#funding-rate
    */
   funding (payload: IApiFundingRateRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/funding',
       Utils.schemaMap(payload, API_FUNDING_RATE_REQUEST_MAP.FULL_TO_LITE, true),
       {
@@ -224,7 +229,7 @@ export class MDG {
    * @see https://api-docs.grvt.io/market_data_api/#candlestick
    */
   candlestick (payload: IApiCandlestickRequest, config?: AxiosRequestConfig) {
-    return RestfulService.post(
+    return this._axios.post(
       this._liteUrl + '/kline',
       Utils.schemaMap(payload, API_CANDLESTICK_REQUEST_MAP.FULL_TO_LITE, true),
       {

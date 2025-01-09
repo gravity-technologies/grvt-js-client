@@ -27,8 +27,8 @@ import {
   API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
   API_PRE_ORDER_CHECK_REQUEST_MAP,
   API_PRE_ORDER_CHECK_RESPONSE_MAP,
-  API_SET_INTIAL_LEVERAGE_REQUEST_MAP,
-  API_SET_INTIAL_LEVERAGE_RESPONSE_MAP,
+  API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
+  API_SET_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
   API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
@@ -67,8 +67,8 @@ import {
   type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
-  type IApiSetIntialLeverageRequest,
-  type IApiSetIntialLeverageResponse,
+  type IApiSetInitialLeverageRequest,
+  type IApiSetInitialLeverageResponse,
   type IApiSocializedLossStatusResponse,
   type IApiSubAccountHistoryRequest,
   type IApiSubAccountHistoryResponse,
@@ -360,13 +360,13 @@ export class TDG {
   /**
    * @description Missing documentation
    */
-  setInitialLeverage (payload: IApiSetIntialLeverageRequest, config?: AxiosRequestConfig) {
+  setInitialLeverage (payload: IApiSetInitialLeverageRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/set_initial_leverage',
-      Utils.schemaMap(payload, API_SET_INTIAL_LEVERAGE_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_SET_INITIAL_LEVERAGE_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, API_SET_INTIAL_LEVERAGE_RESPONSE_MAP.LITE_TO_FULL) as IApiSetIntialLeverageResponse
+      return Utils.schemaMap(response.data, API_SET_INITIAL_LEVERAGE_RESPONSE_MAP.LITE_TO_FULL) as IApiSetInitialLeverageResponse
     }).catch(Utils.coverApiError)
   }
 

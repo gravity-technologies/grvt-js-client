@@ -870,7 +870,7 @@ export interface IApiResolveEpochEcosystemMetricResponse {
 }
 
 // The request to set the initial leverage of a sub account
-export interface IApiSetIntialLeverageRequest {
+export interface IApiSetInitialLeverageRequest {
   // The sub account ID to set the leverage for
   sub_account_id?: bigint
   // The instrument to set the leverage for
@@ -880,7 +880,7 @@ export interface IApiSetIntialLeverageRequest {
 }
 
 // The response to set the initial leverage of a sub account
-export interface IApiSetIntialLeverageResponse {
+export interface IApiSetInitialLeverageResponse {
   // Whether the leverage was set successfully
   success?: boolean
 }
@@ -963,20 +963,18 @@ export interface IApiSubAccountTradeAggregationRequest {
   interval?: ESubAccountTradeInterval
   // The list of sub account ids to query
   sub_account_i_ds?: bigint[]
-  // The sub account id to query greater than
-  sub_account_id_greater_than?: bigint
   // Optional. The starting time in unix nanoseconds of a specific interval to query
   start_interval?: bigint
   // Optional. Start time in unix nanoseconds
   start_time?: bigint
   // Optional. End time in unix nanoseconds
   end_time?: bigint
-  // The cursor to indicate when to start the next query from
-  cursor?: string
   // Filter on the maker of the trade
   is_maker?: boolean
   // Filter on the taker of the trade
   is_taker?: boolean
+  // The cursor to indicate when to start the next query from
+  cursor?: string
 }
 
 export interface IApiSubAccountTradeAggregationResponse {
@@ -1069,7 +1067,12 @@ export interface IApiTransferHistoryResponse {
 // <li>Between SubAccounts within your Main Account</li>
 // <li>Between your MainAccount and your SubAccounts</li>
 // <li>To other MainAccounts that you have previously allowlisted</li>
-// </ul>
+// </ul><b>Fast Withdrawal Funding Address</b>
+// For fast withdrawals, funds must be sent to the designated funding account address. Please ensure you use the correct address based on the environment:
+// <b>Production Environment Address:</b>
+// <em>[To be updated, not ready yet]</em>
+// This address should be specified as the <code>to_account_id</code> in your API requests for transferring funds using the transfer API. Ensure accurate input to avoid loss of funds or use the UI.
+//
 export interface IApiTransferRequest {
   // The main account to transfer from
   from_account_id?: bigint
