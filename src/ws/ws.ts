@@ -221,18 +221,13 @@ export class WS {
     /**
      * Auto close after 10s of inactivity
      */
-    const autoCloseDelay = 10 * 1000
     let lastMessageAt = Date.now()
-    let autoCloseTimer: ReturnType<typeof setTimeout>
-    const timeoutCloseOnHang = () => {
-      clearTimeout(autoCloseTimer)
-      autoCloseTimer = setTimeout(reconnect, autoCloseDelay)
-    }
-    timeoutCloseOnHang()
-    currentWs.addEventListener('message', () => {
-      lastMessageAt = Date.now()
-      timeoutCloseOnHang()
-    })
+    const autoCloseDelay = 10 * 1000
+    const autoCloseInterval = setInterval(() => {
+      if (Date.now() - lastMessageAt > autoCloseDelay) {
+        reconnect()
+      }
+    }, autoCloseDelay)
 
     /**
      * Heartbeat every 3s
@@ -244,7 +239,12 @@ export class WS {
       }
     }
     const heartbeatInterval = setInterval(heartbeat, heartbeatDelay)
+
+    currentWs.addEventListener('message', (e: MessageEvent<string>) => {
+      lastMessageAt = Date.now()
+    })
     currentWs.addEventListener('close', () => {
+      clearInterval(autoCloseInterval)
       clearInterval(heartbeatInterval)
     })
   }
