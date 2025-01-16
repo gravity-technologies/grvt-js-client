@@ -121,6 +121,16 @@ export class WS {
   }
 
   private _bindWebSocketListeners (currentWs: WebSocket) {
+    for (const onConnect of this._onConnects) {
+      currentWs.addEventListener('open', onConnect)
+    }
+    for (const onClose of this._onCloses) {
+      currentWs.addEventListener('close', onClose)
+    }
+    for (const onError of this._onErrors) {
+      currentWs.addEventListener('error', onError)
+    }
+
     const reconnect = () => {
       if (!this._connecting) {
         return
@@ -661,14 +671,34 @@ export class WS {
    * END: Pairs
    */
 
-  onClose (callback: (e: CloseEvent) => void) {
-    this._ws.addEventListener('close', callback)
-    return this
+  private readonly _onConnects: Array<() => void> = []
+  onConnect (callback: () => void) {
+    this._onConnects.push(callback)
+    this._ws.addEventListener('open', callback)
+    return () => {
+      this._ws.removeEventListener('open', callback)
+      this._onConnects.splice(this._onConnects.indexOf(callback), 1)
+    }
   }
 
+  private readonly _onCloses: Array<(e: CloseEvent) => void> = []
+  onClose (callback: (e: CloseEvent) => void) {
+    this._onCloses.push(callback)
+    this._ws.addEventListener('close', callback)
+    return () => {
+      this._ws.removeEventListener('close', callback)
+      this._onCloses.splice(this._onCloses.indexOf(callback), 1)
+    }
+  }
+
+  private readonly _onErrors: Array<(e: Event) => void> = []
   onError (callback: (e: Event) => void) {
+    this._onErrors.push(callback)
     this._ws.addEventListener('error', callback)
-    return this
+    return () => {
+      this._ws.removeEventListener('error', callback)
+      this._onErrors.splice(this._onErrors.indexOf(callback), 1)
+    }
   }
 
   private _subscribeCurrentPairs () {
