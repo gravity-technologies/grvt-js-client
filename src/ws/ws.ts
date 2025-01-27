@@ -577,7 +577,7 @@ export class WS {
       case EStream.WITHDRAWAL:
         return (Utils.schemaMap(message, WS_WITHDRAWAL_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSWithdrawalFeedDataV1).feed
       default:
-        console.error('Unknown message: ', message)
+        console.error('Unknown message:', message)
     }
   }
 

@@ -3,6 +3,16 @@ export enum EBridgeType {
   XY = 'XY',
 }
 
+// BrokerTag is a tag for the broker that the order is sent from.
+export enum EBrokerTag {
+  // CoinRoutes
+  COIN_ROUTES = 'COIN_ROUTES',
+  // Alertatron
+  ALERTATRON = 'ALERTATRON',
+  // Origami
+  ORIGAMI = 'ORIGAMI',
+}
+
 export enum ECandlestickInterval {
   // 1 minute
   CI_1_M = 'CI_1_M',
@@ -83,6 +93,9 @@ export enum ECurrency {
   KPEPE = 'KPEPE',
   // the TON token
   TON = 'TON',
+}
+
+export enum EEpochBadgeType {
 }
 
 export enum EInstrumentSettlementPeriod {
@@ -191,6 +204,12 @@ export enum EOrderStatus {
   CANCELLED = 'CANCELLED',
 }
 
+export enum ERewardProgramType {
+  ECOSYSTEM = 'ECOSYSTEM',
+  TRADER = 'TRADER',
+  LP = 'LP',
+}
+
 export enum ESubAccountTradeInterval {
   // 1 month
   SAT_1_MO = 'SAT_1_MO',
@@ -223,6 +242,25 @@ export enum ETransferType {
   FAST_ARB_DEPOSIT = 'FAST_ARB_DEPOSIT',
   // Fast Arb Withdrawal Metadata type
   FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
+}
+
+// Type of the trigger order. eg: Take Profit, Stop Loss, etc
+export enum ETriggerOrderType {
+  // not a trigger order
+  UNSPECIFIED = 'UNSPECIFIED',
+  // Take Profit Order. Requires a tpslOrderTrigger triggerType
+  TAKE_PROFIT = 'TAKE_PROFIT',
+  // Stop Loss Order. Requires a tpslOrderTrigger triggerType
+  STOP_LOSS = 'STOP_LOSS',
+}
+
+// The type that triggers a take profit or stop loss order
+//
+export enum ETriggerType {
+  // no trigger condition
+  UNSPECIFIED = 'UNSPECIFIED',
+  // INDEX - Order is activated when the index price reaches the trigger price
+  INDEX = 'INDEX',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -661,6 +699,11 @@ export interface IApiGetListFlatReferralResponse {
   flat_referrals?: IFlatReferral[]
 }
 
+export interface IApiGetListUserBadgeResponse {
+  // The list of epoch badges
+  result?: IEpochBadge[]
+}
+
 // Retrieve the order for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiGetOrderRequest {
   // The subaccount ID to filter by
@@ -693,6 +736,13 @@ export interface IApiGetUserEcosystemPointRequest {
 export interface IApiGetUserEcosystemPointResponse {
   // The list of ecosystem points
   points?: IEcosystemPoint[]
+}
+
+export interface IApiGetVerifiedEcosystemLeaderboardRequest {
+  // Start time of the epoch
+  calculate_from?: bigint
+  // Completed KYC before this time
+  completed_kyc_before?: bigint
 }
 
 // The request to get the latest snapshot of list sub account
@@ -1195,6 +1245,11 @@ export interface ICandlestick {
   instrument?: string
 }
 
+export interface IClaimEcosystemBadgeResponse {
+  // The epoch badge
+  badge?: IEpochBadge
+}
+
 export interface IDeposit {
   // The hash of the bridgemint event producing the deposit
   tx_hash?: bigint
@@ -1272,6 +1327,31 @@ export interface IEcosystemPoint {
   calculate_to?: bigint
   // The rank of the account in the ecosystem
   rank?: number
+}
+
+export interface IEpochBadge {
+  // The off chain account id
+  account_id?: string
+  // The account ID
+  main_account_id?: bigint
+  // The type of the reward program
+  type?: ERewardProgramType
+  // The epoch number
+  epoch?: number
+  // The start time of the epoch
+  epoch_start_time?: bigint
+  // The end time of the epoch
+  epoch_end_time?: bigint
+  // The type of the badge
+  badge?: EEpochBadgeType
+  // The distributed badges
+  distributed_badges?: EEpochBadgeType[]
+  // Total point
+  total_point?: bigint
+  // Rank
+  rank?: number
+  // The time when the badge was claimed, or the epoch end time if the user has already completed the KYC process
+  claimed_at?: bigint
 }
 
 // An error response
@@ -1352,6 +1432,12 @@ export interface IFlatReferral {
   referrer_main_account_id?: bigint
   // The account is a business account or not
   is_business?: boolean
+  // The account is KYC verified or not
+  is_kyc_completed?: boolean
+  // The KYC completed time
+  kyc_completed_at?: bigint
+  // The KYC type, can be 'individual' or 'business'
+  kyc_type?: string
 }
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
@@ -1390,6 +1476,15 @@ export interface IFundingRate {
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: string
+}
+
+export interface IGetClaimableEcosystemBadgeResponse {
+  // The epoch badge
+  badge?: IEpochBadge
+  // Whether the badge is claimable
+  is_claimable?: boolean
+  // The time when the badge is claimable
+  claimable_until?: bigint
 }
 
 export interface IInitialLeverageResult {
@@ -1601,6 +1696,10 @@ export interface IOrderMetadata {
   client_order_id?: bigint
   // [Filled by GRVT Backend] Time at which the order was received by GRVT in unix nanoseconds
   create_time?: bigint
+  // Trigger fields are used to support any type of trigger order such as TP/SL
+  trigger_order_metadata?: ITriggerOrderMetadata
+  // Specifies the broker who brokered the order
+  broker?: EBrokerTag
 }
 
 export interface IOrderState {
@@ -1699,6 +1798,27 @@ export interface IPreOrderCheckResult {
   settle_currency?: ECurrency
 }
 
+// Query list of epoch badges
+export interface IQueryEpochBadgeRequest {
+  // The off chain account id to get referral stats
+  account_id?: string
+  // The numerical epoch index
+  epoch?: number
+  // The type of the reward program
+  type?: ERewardProgramType
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the query from
+  cursor?: string
+}
+
+export interface IQueryEpochBadgeResponse {
+  // The list of epoch badges
+  result?: IEpochBadge[]
+  // The cursor to indicate when to start the query from
+  next?: string
+}
+
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
@@ -1786,6 +1906,16 @@ export interface ISubAccountTradeAggregation {
   num_traded?: bigint
   // Total positive fee paid by user
   positive_fee?: bigint
+}
+
+// TPSL Order Trigger fields are used to support any type of trigger order such as TP/SL.
+export interface ITPSLOrderTrigger {
+  // The type that triggers a take profit or stop loss order
+  trigger_type?: ETriggerType
+  // The Trigger Price of the order, expressed in `9` decimals.If Trigger Type is percentage based, this will be interpreted as 0.01 bps, eg. 100 = 1bps
+  trigger_point?: bigint
+  // Used for OCO orders. If this order is triggered, the conditionalClientOrderID will be cancelled
+  conditional_client_order_id?: bigint
 }
 
 // Derived data such as the below, will not be included by default:
@@ -1945,6 +2075,14 @@ export interface ITransferHistory {
   transfer_type?: ETransferType
   // The metadata of the transfer
   transfer_metadata?: string
+}
+
+// Trigger fields are used to support any type of trigger order such as TP/SL.
+export interface ITriggerOrderMetadata {
+  // Type of the trigger order. eg: Take Profit, Stop Loss, etc
+  trigger_order_type?: ETriggerOrderType
+  // TODO:
+  tpsl_order_trigger?: ITPSLOrderTrigger
 }
 
 export interface IWSCandlestickFeedDataV1 {

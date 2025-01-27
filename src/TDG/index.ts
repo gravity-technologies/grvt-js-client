@@ -263,7 +263,7 @@ export class TDG {
 
   preOrderCheck (payload: IApiPreOrderCheckRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
-      this._liteUrl + '/pre_order_check ',
+      this._liteUrl + '/pre_order_check',
       Utils.schemaMap(payload, API_PRE_ORDER_CHECK_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
