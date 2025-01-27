@@ -1,21 +1,32 @@
 import {
   EBridgeType,
+  EBrokerTag,
   ECandlestickInterval,
   ECandlestickType,
   ECurrency,
+  type EEpochBadgeType,
   EInstrumentSettlementPeriod,
   EKind,
   EMarginType,
   EOrderRejectReason,
   EOrderStatus,
+  ERewardProgramType,
   ESubAccountTradeInterval,
   ETimeInForce,
   ETransferType,
+  ETriggerOrderType,
+  ETriggerType,
   EVenue
 } from './data.interface'
 
 export const EBridgeTypeInt: Record<EBridgeType, number> = Object.freeze({
   [EBridgeType.XY]: 1
+})
+
+export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({
+  [EBrokerTag.COIN_ROUTES]: 1,
+  [EBrokerTag.ALERTATRON]: 2,
+  [EBrokerTag.ORIGAMI]: 3
 })
 
 export const ECandlestickIntervalInt: Record<ECandlestickInterval, number> = Object.freeze({
@@ -61,6 +72,9 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.ATOM]: 12,
   [ECurrency.KPEPE]: 13,
   [ECurrency.TON]: 14
+})
+
+export const EEpochBadgeTypeInt: Record<EEpochBadgeType, number> = Object.freeze({
 })
 
 export const EInstrumentSettlementPeriodInt: Record<EInstrumentSettlementPeriod, number> = Object.freeze({
@@ -123,6 +137,12 @@ export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
   [EOrderStatus.CANCELLED]: 5
 })
 
+export const ERewardProgramTypeInt: Record<ERewardProgramType, number> = Object.freeze({
+  [ERewardProgramType.ECOSYSTEM]: 1,
+  [ERewardProgramType.TRADER]: 2,
+  [ERewardProgramType.LP]: 3
+})
+
 export const ESubAccountTradeIntervalInt: Record<ESubAccountTradeInterval, number> = Object.freeze({
   [ESubAccountTradeInterval.SAT_1_MO]: 1,
   [ESubAccountTradeInterval.SAT_1_D]: 2,
@@ -140,6 +160,17 @@ export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.STANDARD]: 1,
   [ETransferType.FAST_ARB_DEPOSIT]: 2,
   [ETransferType.FAST_ARB_WITHDRAWAL]: 3
+})
+
+export const ETriggerOrderTypeInt: Record<ETriggerOrderType, number> = Object.freeze({
+  [ETriggerOrderType.UNSPECIFIED]: 0,
+  [ETriggerOrderType.TAKE_PROFIT]: 1,
+  [ETriggerOrderType.STOP_LOSS]: 2
+})
+
+export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
+  [ETriggerType.UNSPECIFIED]: 0,
+  [ETriggerType.INDEX]: 1
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({
