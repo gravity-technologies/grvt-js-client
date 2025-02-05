@@ -7,13 +7,15 @@ export const WS_SUBSCRIBE_RESULT_MAP: SchemaPairMap = Object.freeze({
     subs: 's1',
     unsubs: 'u',
     num_snapshots: 'ns',
-    first_sequence_number: 'fs'
+    first_sequence_number: 'fs',
+    latest_sequence_number: 'ls'
   },
   LITE_TO_FULL: {
     s: 'stream',
     s1: 'subs',
     u: 'unsubs',
     ns: 'num_snapshots',
-    fs: 'first_sequence_number'
+    fs: 'first_sequence_number',
+    ls: 'latest_sequence_number'
   }
 })

@@ -13,6 +13,8 @@ import {
   API_FILL_HISTORY_REQUEST_MAP,
   API_FILL_HISTORY_RESPONSE_MAP,
   API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP,
+  API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_GET_ORDER_REQUEST_MAP,
@@ -53,6 +55,8 @@ import {
   type IApiFillHistoryRequest,
   type IApiFillHistoryResponse,
   type IApiFundingAccountSummaryResponse,
+  type IApiFundingPaymentHistoryRequest,
+  type IApiFundingPaymentHistoryResponse,
   type IApiGetAllInitialLeverageRequest,
   type IApiGetAllInitialLeverageResponse,
   type IApiGetOrderRequest,
@@ -345,7 +349,7 @@ export class TDG {
   }
 
   /**
-   * @description Missing documentation
+   * @see https://api-docs.grvt.io/trading_api/#get-all-initial-leverage
    */
   getAllInitialLeverage (payload: IApiGetAllInitialLeverageRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
@@ -358,7 +362,7 @@ export class TDG {
   }
 
   /**
-   * @description Missing documentation
+   * @see https://api-docs.grvt.io/trading_api/#set-initial-leverage
    */
   setInitialLeverage (payload: IApiSetInitialLeverageRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
@@ -371,7 +375,20 @@ export class TDG {
   }
 
   /**
-   * @description Missing documentation
+   * @see https://api-docs.grvt.io/trading_api/#funding-payment-history
+   */
+  fundingPaymentHistory (payload: IApiFundingPaymentHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/funding_payment_history',
+      Utils.schemaMap(payload, API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingPaymentHistoryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * @see https://api-docs.grvt.io/trading_api/#funding-account-summary
    */
   fundingAccountSummary (config?: AxiosRequestConfig) {
     return this._axios.post(
@@ -384,7 +401,7 @@ export class TDG {
   }
 
   /**
-   * @description Missing documentation
+   * @see https://api-docs.grvt.io/trading_api/#aggregated-account-summary
    */
   aggregatedAccountSummary (config?: AxiosRequestConfig) {
     return this._axios.post(
