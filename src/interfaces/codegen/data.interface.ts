@@ -96,6 +96,24 @@ export enum ECurrency {
 }
 
 export enum EEpochBadgeType {
+  // Champion
+  CHAMPION = 'CHAMPION',
+  // Legend
+  LEGEND = 'LEGEND',
+  // Veteran
+  VETERAN = 'VETERAN',
+  // Elite
+  ELITE = 'ELITE',
+  // Master
+  MASTER = 'MASTER',
+  // Expert
+  EXPERT = 'EXPERT',
+  // Challenger
+  CHALLENGER = 'CHALLENGER',
+  // Apprentice
+  APPRENTICE = 'APPRENTICE',
+  // Rookie
+  ROOKIE = 'ROOKIE',
 }
 
 export enum EInstrumentSettlementPeriod {
@@ -202,6 +220,15 @@ export enum EOrderStatus {
   REJECTED = 'REJECTED',
   // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason). Before an order is open, it cannot be cancelled.
   CANCELLED = 'CANCELLED',
+}
+
+export enum ERewardEpochStatus {
+  // Past
+  PAST = 'PAST',
+  // Current
+  CURRENT = 'CURRENT',
+  // Future
+  FUTURE = 'FUTURE',
 }
 
 export enum ERewardProgramType {
@@ -639,8 +666,8 @@ export interface IApiGetLPInfoResponse {
 }
 
 export interface IApiGetLPLeaderboardRequest {
-  // Start time of the epoch - phase
-  start_interval?: bigint
+  // The epoch to filter
+  epoch?: number
   // The number of accounts to return
   limit?: number
   // The kind filter to apply
@@ -655,8 +682,8 @@ export interface IApiGetLPLeaderboardResponse {
 }
 
 export interface IApiGetLPPointRequest {
-  // Optional. Start time of the epoch - phase
-  start_interval?: bigint
+  // The epoch to filter
+  epoch?: number
   // Optional. The kind filter to apply
   kind?: EKind
   // Optional. The base filter to apply
@@ -682,6 +709,11 @@ export interface IApiGetLatestLPSnapshotResponse {
   snapshot?: IApproximateLPSnapshot
 }
 
+export interface IApiGetListEpochBadgeResponse {
+  // The list of epoch badges
+  result?: IEpochBadge[]
+}
+
 // startTime and endTime are optional parameters. The semantics of these parameters are as follows:<ul>
 export interface IApiGetListFlatReferralRequest {
   // The off chain referrer account id to get all flat referrals
@@ -699,9 +731,11 @@ export interface IApiGetListFlatReferralResponse {
   flat_referrals?: IFlatReferral[]
 }
 
-export interface IApiGetListUserBadgeResponse {
-  // The list of epoch badges
-  result?: IEpochBadge[]
+export interface IApiGetListRewardEpochResponse {
+  // The list of epoch for ecosystem reward
+  ecosystem_epochs?: IRewardEpochInfo[]
+  // The list of epoch for trader reward and lp reward
+  trading_epochs?: IRewardEpochInfo[]
 }
 
 // Retrieve the order for the account. Either `order_id` or `client_order_id` must be provided.
@@ -1354,6 +1388,27 @@ export interface IEpochBadge {
   claimed_at?: bigint
 }
 
+export interface IEpochBadgePointDistribution {
+  // The type of the badge
+  badge?: EEpochBadgeType
+  // The epoch number
+  epoch?: number
+  // The type of the reward program
+  type?: ERewardProgramType
+  // The minimum point to get the badge
+  min_point?: bigint
+  // The maximum point to get the badge
+  max_point?: bigint
+  // The minimum rank to get the badge
+  min_rank?: number
+  // The maximum rank to get the badge
+  max_rank?: number
+  // The total point to get the badge
+  total_point?: bigint
+  // The number of users to get the badge
+  count?: number
+}
+
 // An error response
 export interface IError {
   // The error code for the request
@@ -1799,6 +1854,19 @@ export interface IPreOrderCheckResult {
 }
 
 // Query list of epoch badges
+export interface IQueryEpochBadgePointDistributionRequest {
+  // The numerical epoch index
+  epoch?: number
+  // The type of the reward program
+  type?: ERewardProgramType
+}
+
+export interface IQueryEpochBadgePointDistributionResponse {
+  // The list of epoch badges
+  result?: IEpochBadgePointDistribution[]
+}
+
+// Query list of epoch badges
 export interface IQueryEpochBadgeRequest {
   // The off chain account id to get referral stats
   account_id?: string
@@ -1822,6 +1890,17 @@ export interface IQueryEpochBadgeResponse {
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
+}
+
+export interface IRewardEpochInfo {
+  // The epoch number
+  epoch?: number
+  // The start time of the epoch
+  epoch_start_time?: bigint
+  // The end time of the epoch
+  epoch_end_time?: bigint
+  // The status of the epoch
+  status?: ERewardEpochStatus
 }
 
 export interface ISignature {
@@ -2094,6 +2173,8 @@ export interface IWSCandlestickFeedDataV1 {
   sequence_number?: bigint
   // A candlestick entry matching the request filters
   feed?: ICandlestick
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a stream of Kline/Candlestick updates for an instrument. A Kline is uniquely identified by its open time.
@@ -2117,6 +2198,8 @@ export interface IWSDepositFeedDataV1 {
   sequence_number?: bigint
   // The Deposit object
   feed?: IDeposit
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of deposits. This will execute when there is any deposit to selected account.
@@ -2135,6 +2218,8 @@ export interface IWSFillFeedDataV1 {
   sequence_number?: bigint
   // A private trade matching the request filter
   feed?: IFill
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of private trade updates. This happens when a trade is executed.
@@ -2162,6 +2247,8 @@ export interface IWSMiniTickerFeedDataV1 {
   sequence_number?: bigint
   // A mini ticker matching the request filter
   feed?: IMiniTicker
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a mini ticker feed for a single instrument. The `mini.s` channel offers simpler integration. To experience higher publishing rates, please use the `mini.d` channel.
@@ -2188,6 +2275,8 @@ export interface IWSOrderFeedDataV1 {
   sequence_number?: bigint
   // The order object being created or updated
   feed?: IOrder
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
@@ -2210,6 +2299,8 @@ export interface IWSOrderStateFeedDataV1 {
   sequence_number?: bigint
   // The Order State Feed
   feed?: IOrderStateFeed
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
@@ -2233,6 +2324,8 @@ export interface IWSOrderbookLevelsFeedDataV1 {
   sequence_number?: bigint
   // An orderbook levels object matching the request filter
   feed?: IOrderbookLevels
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to aggregated orderbook updates for a single instrument. The `book.s` channel offers simpler integration. To experience higher publishing rates, please use the `book.d` channel.
@@ -2265,6 +2358,8 @@ export interface IWSPositionsFeedDataV1 {
   sequence_number?: bigint
   // A Position being created or updated matching the request filter
   feed?: IPositions
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of position updates. This happens when a trade is executed.
@@ -2284,6 +2379,8 @@ export interface IWSSubscribeParams {
   stream?: string
   // The list of feeds to subscribe to
   selectors?: string[]
+  // Whether to use the global sequence number for the stream
+  use_global_sequence_number?: boolean
 }
 
 // All V1 Websocket Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
@@ -2321,6 +2418,8 @@ export interface IWSSubscribeResponseV1Legacy {
   num_snapshots?: number[]
   // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
   first_sequence_number?: bigint[]
+  // The sequence number of the most recent message in the stream. Next received sequence number must be larger than this one. Returned in same order as `subs`
+  latest_sequence_number?: bigint[]
 }
 
 // To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. All delta payloads will have a sequence number of `1+`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
@@ -2336,6 +2435,8 @@ export interface IWSSubscribeResult {
   num_snapshots?: number[]
   // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
   first_sequence_number?: bigint[]
+  // The sequence number of the most recent message in the stream. Next received sequence number must be larger than this one. Returned in same order as `subs`
+  latest_sequence_number?: bigint[]
 }
 
 export interface IWSTickerFeedDataV1 {
@@ -2347,6 +2448,8 @@ export interface IWSTickerFeedDataV1 {
   sequence_number?: bigint
   // A ticker matching the request filter
   feed?: ITicker
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a ticker feed for a single instrument. The `ticker.s` channel offers simpler integration. To experience higher publishing rates, please use the `ticker.d` channel.
@@ -2373,6 +2476,8 @@ export interface IWSTradeFeedDataV1 {
   sequence_number?: bigint
   // A public trade matching the request filter
   feed?: ITrade
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a stream of Public Trades for an instrument.
@@ -2393,6 +2498,8 @@ export interface IWSTransferFeedDataV1 {
   sequence_number?: bigint
   // The Transfer object
   feed?: ITransfer
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of transfers. This will execute when there is any transfer to or from the selected account.
@@ -2417,6 +2524,8 @@ export interface IWSUnsubscribeParams {
   stream?: string
   // The list of feeds to unsubscribe from
   selectors?: string[]
+  // Whether to use the global sequence number for the stream
+  use_global_sequence_number?: boolean
 }
 
 // Returns a confirmation of all unsubscribes
@@ -2437,6 +2546,8 @@ export interface IWSWithdrawalFeedDataV1 {
   sequence_number?: bigint
   // The Withdrawal object
   feed?: IWithdrawal
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
 }
 
 // Subscribes to a feed of withdrawals. This will execute when there is any withdrawal from the selected account.

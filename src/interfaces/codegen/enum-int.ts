@@ -4,12 +4,13 @@ import {
   ECandlestickInterval,
   ECandlestickType,
   ECurrency,
-  type EEpochBadgeType,
+  EEpochBadgeType,
   EInstrumentSettlementPeriod,
   EKind,
   EMarginType,
   EOrderRejectReason,
   EOrderStatus,
+  ERewardEpochStatus,
   ERewardProgramType,
   ESubAccountTradeInterval,
   ETimeInForce,
@@ -75,6 +76,15 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
 })
 
 export const EEpochBadgeTypeInt: Record<EEpochBadgeType, number> = Object.freeze({
+  [EEpochBadgeType.CHAMPION]: 1,
+  [EEpochBadgeType.LEGEND]: 2,
+  [EEpochBadgeType.VETERAN]: 3,
+  [EEpochBadgeType.ELITE]: 4,
+  [EEpochBadgeType.MASTER]: 5,
+  [EEpochBadgeType.EXPERT]: 6,
+  [EEpochBadgeType.CHALLENGER]: 7,
+  [EEpochBadgeType.APPRENTICE]: 8,
+  [EEpochBadgeType.ROOKIE]: 9
 })
 
 export const EInstrumentSettlementPeriodInt: Record<EInstrumentSettlementPeriod, number> = Object.freeze({
@@ -135,6 +145,12 @@ export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
   [EOrderStatus.FILLED]: 3,
   [EOrderStatus.REJECTED]: 4,
   [EOrderStatus.CANCELLED]: 5
+})
+
+export const ERewardEpochStatusInt: Record<ERewardEpochStatus, number> = Object.freeze({
+  [ERewardEpochStatus.PAST]: 1,
+  [ERewardEpochStatus.CURRENT]: 2,
+  [ERewardEpochStatus.FUTURE]: 3
 })
 
 export const ERewardProgramTypeInt: Record<ERewardProgramType, number> = Object.freeze({
