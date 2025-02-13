@@ -15,7 +15,7 @@ import {
   ESubAccountTradeInterval,
   ETimeInForce,
   ETransferType,
-  ETriggerOrderType,
+  ETriggerBy,
   ETriggerType,
   EVenue
 } from './data.interface'
@@ -72,7 +72,31 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.OP]: 11,
   [ECurrency.ATOM]: 12,
   [ECurrency.KPEPE]: 13,
-  [ECurrency.TON]: 14
+  [ECurrency.TON]: 14,
+  [ECurrency.XRP]: 15,
+  [ECurrency.XLM]: 16,
+  [ECurrency.WLD]: 17,
+  [ECurrency.WIF]: 18,
+  [ECurrency.VIRTUAL]: 19,
+  [ECurrency.TRUMP]: 20,
+  [ECurrency.SUI]: 21,
+  [ECurrency.KSHIB]: 22,
+  [ECurrency.POPCAT]: 23,
+  [ECurrency.PENGU]: 24,
+  [ECurrency.LINK]: 25,
+  [ECurrency.KBONK]: 26,
+  [ECurrency.JUP]: 27,
+  [ECurrency.FARTCOIN]: 28,
+  [ECurrency.ENA]: 29,
+  [ECurrency.DOGE]: 30,
+  [ECurrency.AIXBT]: 31,
+  [ECurrency.AI_16_Z]: 32,
+  [ECurrency.ADA]: 33,
+  [ECurrency.AAVE]: 34,
+  [ECurrency.BERA]: 35,
+  [ECurrency.VINE]: 36,
+  [ECurrency.PENDLE]: 37,
+  [ECurrency.UXLINK]: 38
 })
 
 export const EEpochBadgeTypeInt: Record<EEpochBadgeType, number> = Object.freeze({
@@ -178,15 +202,15 @@ export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.FAST_ARB_WITHDRAWAL]: 3
 })
 
-export const ETriggerOrderTypeInt: Record<ETriggerOrderType, number> = Object.freeze({
-  [ETriggerOrderType.UNSPECIFIED]: 0,
-  [ETriggerOrderType.TAKE_PROFIT]: 1,
-  [ETriggerOrderType.STOP_LOSS]: 2
+export const ETriggerByInt: Record<ETriggerBy, number> = Object.freeze({
+  [ETriggerBy.UNSPECIFIED]: 0,
+  [ETriggerBy.INDEX]: 1
 })
 
 export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
   [ETriggerType.UNSPECIFIED]: 0,
-  [ETriggerType.INDEX]: 1
+  [ETriggerType.TAKE_PROFIT]: 1,
+  [ETriggerType.STOP_LOSS]: 2
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({

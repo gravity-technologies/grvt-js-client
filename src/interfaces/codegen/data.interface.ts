@@ -93,6 +93,54 @@ export enum ECurrency {
   KPEPE = 'KPEPE',
   // the TON token
   TON = 'TON',
+  // the XRP token
+  XRP = 'XRP',
+  // the XLM token
+  XLM = 'XLM',
+  // the WLD token
+  WLD = 'WLD',
+  // the WIF token
+  WIF = 'WIF',
+  // the VIRTUAL token
+  VIRTUAL = 'VIRTUAL',
+  // the TRUMP token
+  TRUMP = 'TRUMP',
+  // the SUI token
+  SUI = 'SUI',
+  // the 1000SHIB token
+  KSHIB = 'KSHIB',
+  // the POPCAT token
+  POPCAT = 'POPCAT',
+  // the PENGU token
+  PENGU = 'PENGU',
+  // the LINK token
+  LINK = 'LINK',
+  // the 1000BONK token
+  KBONK = 'KBONK',
+  // the JUP token
+  JUP = 'JUP',
+  // the FARTCOIN token
+  FARTCOIN = 'FARTCOIN',
+  // the ENA token
+  ENA = 'ENA',
+  // the DOGE token
+  DOGE = 'DOGE',
+  // the AIXBT token
+  AIXBT = 'AIXBT',
+  // the AI16Z token
+  AI_16_Z = 'AI_16_Z',
+  // the ADA token
+  ADA = 'ADA',
+  // the AAVE token
+  AAVE = 'AAVE',
+  // the BERA token
+  BERA = 'BERA',
+  // the VINE token
+  VINE = 'VINE',
+  // the PENDLE token
+  PENDLE = 'PENDLE',
+  // the UXLINK token
+  UXLINK = 'UXLINK',
 }
 
 export enum EEpochBadgeType {
@@ -271,23 +319,30 @@ export enum ETransferType {
   FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
 }
 
-// Type of the trigger order. eg: Take Profit, Stop Loss, etc
-export enum ETriggerOrderType {
-  // not a trigger order
-  UNSPECIFIED = 'UNSPECIFIED',
-  // Take Profit Order. Requires a tpslOrderTrigger triggerType
-  TAKE_PROFIT = 'TAKE_PROFIT',
-  // Stop Loss Order. Requires a tpslOrderTrigger triggerType
-  STOP_LOSS = 'STOP_LOSS',
-}
-
-// The type that triggers a take profit or stop loss order
+// Defines the price type that activates a Take Profit (TP) or Stop Loss (SL) order.
 //
-export enum ETriggerType {
+// Trigger orders are executed when the selected price type reaches the specified trigger price.Different price types ensure flexibility in executing strategies based on market conditions.
+//
+//
+export enum ETriggerBy {
   // no trigger condition
   UNSPECIFIED = 'UNSPECIFIED',
   // INDEX - Order is activated when the index price reaches the trigger price
   INDEX = 'INDEX',
+}
+
+// Defines the type of trigger order used in trading, such as Take Profit or Stop Loss.
+//
+// Trigger orders allow execution based on pre-defined price conditions rather than immediate market conditions.
+//
+//
+export enum ETriggerType {
+  // Not a trigger order. The order executes normally without any trigger conditions.
+  UNSPECIFIED = 'UNSPECIFIED',
+  // Take Profit Order - Executes when the price reaches a specified level to secure profits.
+  TAKE_PROFIT = 'TAKE_PROFIT',
+  // Stop Loss Order - Executes when the price reaches a specified level to limit losses.
+  STOP_LOSS = 'STOP_LOSS',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -401,6 +456,17 @@ export interface IApiCreateOrderRequest {
 }
 
 export interface IApiCreateOrderResponse {
+  // The created order
+  result?: IOrder
+}
+
+// Remove dust position (i.e., order quantity smaller than minimum required increment) on an account, by matching the specified order against GRVT directly. Limit price should always be better than mark price.
+export interface IApiDedustPositionRequest {
+  // The order to create
+  order?: IOrder
+}
+
+export interface IApiDedustPositionResponse {
   // The created order
   result?: IOrder
 }
@@ -1470,6 +1536,8 @@ export interface IFill {
   trade_index?: number
   // The address (public key) of the wallet signing the payload
   signer?: bigint
+  // Specifies the broker who brokered the order
+  broker?: EBrokerTag
 }
 
 export interface IFlatReferral {
@@ -1752,7 +1820,7 @@ export interface IOrderMetadata {
   // [Filled by GRVT Backend] Time at which the order was received by GRVT in unix nanoseconds
   create_time?: bigint
   // Trigger fields are used to support any type of trigger order such as TP/SL
-  trigger_order_metadata?: ITriggerOrderMetadata
+  trigger?: ITriggerOrderMetadata
   // Specifies the broker who brokered the order
   broker?: EBrokerTag
 }
@@ -1987,14 +2055,18 @@ export interface ISubAccountTradeAggregation {
   positive_fee?: bigint
 }
 
-// TPSL Order Trigger fields are used to support any type of trigger order such as TP/SL.
-export interface ITPSLOrderTrigger {
-  // The type that triggers a take profit or stop loss order
-  trigger_type?: ETriggerType
-  // The Trigger Price of the order, expressed in `9` decimals.If Trigger Type is percentage based, this will be interpreted as 0.01 bps, eg. 100 = 1bps
-  trigger_point?: bigint
-  // Used for OCO orders. If this order is triggered, the conditionalClientOrderID will be cancelled
-  conditional_client_order_id?: bigint
+// Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.
+//
+// ### Fields:
+// - **triggerBy**: Defines the price type that activates the order (e.g., index price).
+// - **triggerPrice**: The price at which the order is triggered, expressed in `9` decimal precision.
+//
+//
+export interface ITPSLOrderMetadata {
+  // Defines the price type that activates a Take Profit (TP) or Stop Loss (SL) order
+  trigger_by?: ETriggerBy
+  // The Trigger Price of the order, expressed in `9` decimals.
+  trigger_price?: string
 }
 
 // Derived data such as the below, will not be included by default:
@@ -2156,12 +2228,18 @@ export interface ITransferHistory {
   transfer_metadata?: string
 }
 
-// Trigger fields are used to support any type of trigger order such as TP/SL.
+// Contains metadata related to trigger orders, such as Take Profit (TP) or Stop Loss (SL).
+//
+// Trigger orders are used to automatically execute an order when a predefined price condition is met, allowing traders to implement risk management strategies.
+//
+//
 export interface ITriggerOrderMetadata {
   // Type of the trigger order. eg: Take Profit, Stop Loss, etc
-  trigger_order_type?: ETriggerOrderType
-  // TODO:
-  tpsl_order_trigger?: ITPSLOrderTrigger
+  trigger_type?: ETriggerType
+  // Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.
+  //
+  //
+  tpsl?: ITPSLOrderMetadata
 }
 
 export interface IWSCandlestickFeedDataV1 {
