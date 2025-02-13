@@ -8,6 +8,8 @@ import {
   API_CANCEL_ORDER_RESPONSE_MAP,
   API_CREATE_ORDER_REQUEST_MAP,
   API_CREATE_ORDER_RESPONSE_MAP,
+  API_DEDUST_POSITION_REQUEST_MAP,
+  API_DEDUST_POSITION_RESPONSE_MAP,
   API_DEPOSIT_HISTORY_REQUEST_MAP,
   API_DEPOSIT_HISTORY_RESPONSE_MAP,
   API_FILL_HISTORY_REQUEST_MAP,
@@ -50,6 +52,8 @@ import {
   type IApiCancelOrderResponse,
   type IApiCreateOrderRequest,
   type IApiCreateOrderResponse,
+  type IApiDedustPositionRequest,
+  type IApiDedustPositionResponse,
   type IApiDepositHistoryRequest,
   type IApiDepositHistoryResponse,
   type IApiFillHistoryRequest,
@@ -272,6 +276,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_PRE_ORDER_CHECK_RESPONSE_MAP.LITE_TO_FULL) as IApiPreOrderCheckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  dedustPosition (payload: IApiDedustPositionRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/dedust_position',
+      Utils.schemaMap(payload, API_DEDUST_POSITION_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_DEDUST_POSITION_RESPONSE_MAP.LITE_TO_FULL) as IApiDedustPositionResponse
     }).catch(Utils.coverApiError)
   }
 
