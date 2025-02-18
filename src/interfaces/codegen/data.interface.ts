@@ -329,6 +329,8 @@ export enum ETriggerBy {
   UNSPECIFIED = 'UNSPECIFIED',
   // INDEX - Order is activated when the index price reaches the trigger price
   INDEX = 'INDEX',
+  // LAST - Order is activated when the last trade price reaches the trigger price
+  LAST = 'LAST',
 }
 
 // Defines the type of trigger order used in trading, such as Take Profit or Stop Loss.
@@ -1204,6 +1206,8 @@ export interface IApiTransferHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
+  // The transaction ID to query for
+  tx_id?: bigint
 }
 
 export interface IApiTransferHistoryResponse {
@@ -2182,27 +2186,6 @@ export interface ITraderMetric {
   total_point?: number
 }
 
-export interface ITransfer {
-  // The account to transfer from
-  from_account_id?: bigint
-  // The subaccount to transfer from (0 if transferring from main account)
-  from_sub_account_id?: bigint
-  // The account to deposit into
-  to_account_id?: bigint
-  // The subaccount to transfer to (0 if transferring to main account)
-  to_sub_account_id?: bigint
-  // The token currency to transfer
-  currency?: ECurrency
-  // The number of tokens to transfer
-  num_tokens?: string
-  // The signature of the transfer
-  signature?: ISignature
-  // The type of transfer
-  transfer_type?: ETransferType
-  // The metadata of the transfer
-  transfer_metadata?: string
-}
-
 export interface ITransferHistory {
   // The transaction ID of the transfer
   tx_id?: bigint
@@ -2574,8 +2557,8 @@ export interface IWSTransferFeedDataV1 {
   selector?: string
   // A running sequence number that determines global message order within the specific stream
   sequence_number?: bigint
-  // The Transfer object
-  feed?: ITransfer
+  // The transfer history matching the requested filters
+  feed?: ITransferHistory
   // The previous sequence number that determines global message order within the specific stream
   prev_sequence_number?: bigint
 }

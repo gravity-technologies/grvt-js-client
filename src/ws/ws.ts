@@ -16,7 +16,7 @@ import {
   type IOrder,
   type IOrderState,
   type IPositions,
-  type ITransfer,
+  type ITransferHistory,
   type IWSCandlestickFeedDataV1,
   type IWSDepositFeedDataV1,
   type IWSFillFeedDataV1,
@@ -61,7 +61,7 @@ interface IMessage {
 
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
 
-type TEntityHasInstrument = Exclude<TEntities, IOrder | IOrderState | IDeposit | ITransfer | IWithdrawal>
+type TEntityHasInstrument = Exclude<TEntities, IOrder | IOrderState | IDeposit | ITransferHistory | IWithdrawal>
 
 interface IOptions {
   url: string | URL
@@ -275,12 +275,12 @@ export class WS {
 
         const depositDestinationAccountId = (result as IDeposit).to_account_id?.toString(16)
         const transferSourceKey = [
-          (result as ITransfer).from_account_id?.toString(16),
-          (result as ITransfer).from_sub_account_id ? (result as ITransfer).from_sub_account_id?.toString() : 0
+          (result as ITransferHistory).from_account_id?.toString(16),
+          (result as ITransferHistory).from_sub_account_id ? (result as ITransferHistory).from_sub_account_id?.toString() : 0
         ].filter(Boolean).join('-')
         const transferDestinationKey = [
-          (result as ITransfer).to_account_id?.toString(16),
-          (result as ITransfer).to_sub_account_id ? (result as ITransfer).to_sub_account_id?.toString() : 0
+          (result as ITransferHistory).to_account_id?.toString(16),
+          (result as ITransferHistory).to_sub_account_id ? (result as ITransferHistory).to_sub_account_id?.toString() : 0
         ].filter(Boolean).join('-')
         const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {

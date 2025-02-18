@@ -204,7 +204,8 @@ export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
 
 export const ETriggerByInt: Record<ETriggerBy, number> = Object.freeze({
   [ETriggerBy.UNSPECIFIED]: 0,
-  [ETriggerBy.INDEX]: 1
+  [ETriggerBy.INDEX]: 1,
+  [ETriggerBy.LAST]: 2
 })
 
 export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({

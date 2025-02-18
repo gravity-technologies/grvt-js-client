@@ -11,7 +11,7 @@ import {
   type IPositions,
   type ITicker,
   type ITrade,
-  type ITransfer,
+  type ITransferHistory,
   type IWSCandlestickFeedSelectorV1,
   type IWSDepositFeedSelectorV1,
   type IWSFillFeedSelectorV1,
@@ -182,7 +182,7 @@ export interface IWSTdgTransferRequest {
     main_account_id: string
     sub_account_id?: string
   } & Omit<IWSTransferFeedSelectorV1, keyof IWSTransferFeedSelectorV1>
-  onData?: TMessageHandler<ITransfer>
+  onData?: TMessageHandler<ITransferHistory>
   onError?: (error: Error) => void
 }
 export interface IWSTdgWithDrawalRequest {
