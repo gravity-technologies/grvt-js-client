@@ -128,7 +128,7 @@ export enum ECurrency {
   // the AIXBT token
   AIXBT = 'AIXBT',
   // the AI16Z token
-  AI_16_Z = 'AI_16_Z',
+  AI16Z = 'AI16Z',
   // the ADA token
   ADA = 'ADA',
   // the AAVE token
@@ -156,6 +156,12 @@ export enum EEpochBadgeType {
   MASTER = 'MASTER',
   // Expert
   EXPERT = 'EXPERT',
+  // Warrior
+  WARRIOR = 'WARRIOR',
+  // Sergeant
+  SERGEANT = 'SERGEANT',
+  // Ranger
+  RANGER = 'RANGER',
   // Challenger
   CHALLENGER = 'CHALLENGER',
   // Apprentice
@@ -255,6 +261,8 @@ export enum EOrderRejectReason {
   EXCEED_MAX_SIGNATURE_EXPIRATION = 'EXCEED_MAX_SIGNATURE_EXPIRATION',
   // the market order has a limit price set
   MARKET_ORDER_WITH_LIMIT_PRICE = 'MARKET_ORDER_WITH_LIMIT_PRICE',
+  // client cancel on disconnect triggered
+  CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED = 'CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED',
 }
 
 export enum EOrderStatus {
@@ -407,6 +415,30 @@ export interface IApiCancelAllOrdersRequest {
 export interface IApiCancelAllOrdersResponse {
   // The number of orders cancelled
   result?: number
+}
+
+// Auto-Cancel All Open Orders when the countdown time hits zero.
+//
+// Market Maker inputs a countdown time parameter in milliseconds (e.g. 120000 for 120s) rounded down to the smallest second follows the following logic:
+//   - Market Maker initially entered a value between 0 -> 1000, which is rounded to 0: will result in termination of their COD
+//   - Market Maker initially entered a value between 1001 -> 300_000, which is rounded to the nearest second: will result in refresh of their COD
+//   - Market Maker initially entered a value bigger than 300_000, which will result in error (upper bound)
+// Market Maker will send a heartbeat message by calling the endpoint at specific intervals (ex. every 30 seconds) to the server to refresh the count down.
+//
+// If the server does not receive a heartbeat message within the countdown time, it will cancel all open orders for the specified Sub Account ID.
+export interface IApiCancelOnDisconnectRequest {
+  // The subaccount ID cancelling the orders for
+  sub_account_id?: bigint
+  // Countdown time in milliseconds (ex. 120000 for 120s).
+  //
+  // 0 to disable the timer.
+  //
+  // Does not accept negative values.
+  //
+  // Minimum acceptable value is 1,000.
+  //
+  // Maximum acceptable value is 300,000
+  countdown_time?: bigint
 }
 
 // Cancel an order on the orderbook for this trading account. Either `order_id` or `client_order_id` must be provided.

@@ -90,7 +90,7 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.ENA]: 29,
   [ECurrency.DOGE]: 30,
   [ECurrency.AIXBT]: 31,
-  [ECurrency.AI_16_Z]: 32,
+  [ECurrency.AI16Z]: 32,
   [ECurrency.ADA]: 33,
   [ECurrency.AAVE]: 34,
   [ECurrency.BERA]: 35,
@@ -106,9 +106,12 @@ export const EEpochBadgeTypeInt: Record<EEpochBadgeType, number> = Object.freeze
   [EEpochBadgeType.ELITE]: 4,
   [EEpochBadgeType.MASTER]: 5,
   [EEpochBadgeType.EXPERT]: 6,
-  [EEpochBadgeType.CHALLENGER]: 7,
-  [EEpochBadgeType.APPRENTICE]: 8,
-  [EEpochBadgeType.ROOKIE]: 9
+  [EEpochBadgeType.WARRIOR]: 7,
+  [EEpochBadgeType.SERGEANT]: 8,
+  [EEpochBadgeType.RANGER]: 9,
+  [EEpochBadgeType.CHALLENGER]: 10,
+  [EEpochBadgeType.APPRENTICE]: 11,
+  [EEpochBadgeType.ROOKIE]: 12
 })
 
 export const EInstrumentSettlementPeriodInt: Record<EInstrumentSettlementPeriod, number> = Object.freeze({
@@ -160,7 +163,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.MULTI_LEGGED_ORDER]: 25,
   [EOrderRejectReason.EXCEED_MAX_POSITION_SIZE]: 26,
   [EOrderRejectReason.EXCEED_MAX_SIGNATURE_EXPIRATION]: 27,
-  [EOrderRejectReason.MARKET_ORDER_WITH_LIMIT_PRICE]: 28
+  [EOrderRejectReason.MARKET_ORDER_WITH_LIMIT_PRICE]: 28,
+  [EOrderRejectReason.CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED]: 29
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
