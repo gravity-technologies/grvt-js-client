@@ -6,6 +6,8 @@ import {
   API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
   API_CANCEL_ORDER_REQUEST_MAP,
   API_CANCEL_ORDER_RESPONSE_MAP,
+  API_CREATE_BULK_ORDERS_REQUEST_MAP,
+  API_CREATE_BULK_ORDERS_RESPONSE_MAP,
   API_CREATE_ORDER_REQUEST_MAP,
   API_CREATE_ORDER_RESPONSE_MAP,
   API_DEDUST_POSITION_REQUEST_MAP,
@@ -50,6 +52,8 @@ import {
   type IApiCancelAllOrdersResponse,
   type IApiCancelOrderRequest,
   type IApiCancelOrderResponse,
+  type IApiCreateBulkOrdersRequest,
+  type IApiCreateBulkOrdersResponse,
   type IApiCreateOrderRequest,
   type IApiCreateOrderResponse,
   type IApiDedustPositionRequest,
@@ -266,6 +270,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_ORDER_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateOrderResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  createBulkOrders (payload: IApiCreateBulkOrdersRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/create_bulk_orders',
+      Utils.schemaMap(payload, API_CREATE_BULK_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_CREATE_BULK_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateBulkOrdersResponse
     }).catch(Utils.coverApiError)
   }
 

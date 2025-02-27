@@ -13,6 +13,11 @@ export enum EBrokerTag {
   ORIGAMI = 'ORIGAMI',
 }
 
+export enum ECancelStatus {
+  // Cancellation has expired because corresponding order had not arrived within the defined time-to-live window.
+  EXPIRED = 'EXPIRED',
+}
+
 export enum ECandlestickInterval {
   // 1 minute
   CI_1_M = 'CI_1_M',
@@ -263,6 +268,8 @@ export enum EOrderRejectReason {
   MARKET_ORDER_WITH_LIMIT_PRICE = 'MARKET_ORDER_WITH_LIMIT_PRICE',
   // client cancel on disconnect triggered
   CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED = 'CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED',
+  // the OCO counter part order was triggered
+  OCO_COUNTER_PART_TRIGGERED = 'OCO_COUNTER_PART_TRIGGERED',
 }
 
 export enum EOrderStatus {
@@ -449,6 +456,15 @@ export interface IApiCancelOrderRequest {
   order_id?: bigint
   // Cancel the order with this `client_order_id`
   client_order_id?: bigint
+  // Specifies the time-to-live (in milliseconds) for this cancellation.
+  // During this period, any order creation with a matching `client_order_id` will be cancelled and not be added to the GRVT matching engine.
+  // This mechanism helps mitigate time-of-flight issues where cancellations might arrive before the corresponding orders.
+  // Hence, cancellation by `order_id` ignores this field as the exchange can only assign `order_id`s to already-processed order creations.
+  // The duration cannot be negative, is rounded down to the nearest 100ms (e.g., `'670'` -> `'600'`, `'30'` -> `'0'`) and capped at 5 seconds (i.e., `'5000'`).
+  // Value of `'0'` or omission disables the TTL mechanism, so only orders already existing in matching engine state at request time will be searched.
+  // If the caller requests multiple successive cancellations for a given order, such that the time-to-live windows overlap, only the first request will be considered.
+  //
+  time_to_live_ms?: bigint
 }
 
 export interface IApiCancelOrderResponse {
@@ -481,6 +497,25 @@ export interface IApiCandlestickResponse {
   result?: ICandlestick[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+// Create multiple orders simultaneously for this trading account.
+//
+// This endpoint supports the following order scenarios:
+// - One-Cancels-Other (OCO) orders combining TP/SL
+// - One-Sends-Other (OSO) orders
+//
+// Usage:
+// - For OCO (TP/SL pair): Send exactly 2 orders in the same request - one Take Profit and one Stop Loss order
+// - For OSO: Send exactly one main order and one contingent order (TP and/or SL)
+export interface IApiCreateBulkOrdersRequest {
+  // The orders to create
+  orders?: IOrder[]
+}
+
+export interface IApiCreateBulkOrdersResponse {
+  // The created orders in same order as requested
+  result?: IOrder[]
 }
 
 // Create an order on the orderbook for this trading account.
@@ -1159,6 +1194,8 @@ export interface IApiSubAccountTradeAggregationRequest {
   is_taker?: boolean
   // The cursor to indicate when to start the next query from
   cursor?: string
+  // Whether to group trades by signer per sub account
+  group_by_signer?: boolean
 }
 
 export interface IApiSubAccountTradeAggregationResponse {
@@ -1356,6 +1393,21 @@ export interface IAssetMaxQty {
   max_buy_qty?: string
   // The maximum sell quantity
   max_sell_qty?: string
+}
+
+export interface ICancelStatusFeed {
+  // The subaccount ID that requested the cancellation
+  sub_account_id?: bigint
+  // A unique identifier for the active order within a subaccount, specified by the client
+  client_order_id?: bigint
+  // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
+  order_id?: bigint
+  // The user-provided reason for cancelling the order
+  reason?: EOrderRejectReason
+  // [Filled by GRVT Backend] Time at which the cancellation status was updated by GRVT in unix nanoseconds
+  update_time?: bigint
+  // Status of the cancellation attempt
+  cancel_status?: ECancelStatus
 }
 
 export interface ICandlestick {
@@ -2089,6 +2141,8 @@ export interface ISubAccountTradeAggregation {
   num_traded?: bigint
   // Total positive fee paid by user
   positive_fee?: bigint
+  // The signer of the trade
+  signer?: bigint
 }
 
 // Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.
@@ -2255,6 +2309,30 @@ export interface ITriggerOrderMetadata {
   //
   //
   tpsl?: ITPSLOrderMetadata
+}
+
+export interface IWSCancelFeedDataV1 {
+  // Stream name
+  stream?: string
+  // Primary selector
+  selector?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // Data relating to the status of the cancellation attempt
+  feed?: ICancelStatusFeed
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
+}
+
+// Subscribes to a feed of time-to-live expiry events for order cancellations requested by a given subaccount.
+// **This stream presently only provides expiry updates for cancel-order requests set with a valid TTL value**.
+// Successful order cancellations will reflect as updates published to the [order-state stream](https://api-docs.grvt.io/trading_streams/#order-state).
+// _A future release will expand the functionality of this stream to provide more general status updates on order cancellation requests._
+// Each Order can be uniquely identified by its `client_order_id`.
+//
+export interface IWSCancelFeedSelectorV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
 }
 
 export interface IWSCandlestickFeedDataV1 {
