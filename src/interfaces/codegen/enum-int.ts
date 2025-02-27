@@ -1,6 +1,7 @@
 import {
   EBridgeType,
   EBrokerTag,
+  ECancelStatus,
   ECandlestickInterval,
   ECandlestickType,
   ECurrency,
@@ -28,6 +29,10 @@ export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({
   [EBrokerTag.COIN_ROUTES]: 1,
   [EBrokerTag.ALERTATRON]: 2,
   [EBrokerTag.ORIGAMI]: 3
+})
+
+export const ECancelStatusInt: Record<ECancelStatus, number> = Object.freeze({
+  [ECancelStatus.EXPIRED]: 1
 })
 
 export const ECandlestickIntervalInt: Record<ECandlestickInterval, number> = Object.freeze({
@@ -164,7 +169,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.EXCEED_MAX_POSITION_SIZE]: 26,
   [EOrderRejectReason.EXCEED_MAX_SIGNATURE_EXPIRATION]: 27,
   [EOrderRejectReason.MARKET_ORDER_WITH_LIMIT_PRICE]: 28,
-  [EOrderRejectReason.CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED]: 29
+  [EOrderRejectReason.CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED]: 29,
+  [EOrderRejectReason.OCO_COUNTER_PART_TRIGGERED]: 30
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
