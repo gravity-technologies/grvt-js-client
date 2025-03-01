@@ -1,30 +1,31 @@
 import {
   type ECandlestickInterval,
   type ECandlestickType,
-  type ICandlestick,
-  type IDeposit,
-  type IFill,
-  type IMiniTicker,
-  type IOrder,
-  type IOrderState,
-  type IOrderbookLevels,
-  type IPositions,
-  type ITicker,
-  type ITrade,
-  type ITransferHistory,
+  type IWSCandlestickFeedDataV1,
   type IWSCandlestickFeedSelectorV1,
+  type IWSDepositFeedDataV1,
   type IWSDepositFeedSelectorV1,
+  type IWSFillFeedDataV1,
   type IWSFillFeedSelectorV1,
+  type IWSMiniTickerFeedDataV1,
   type IWSMiniTickerFeedSelectorV1,
+  type IWSOrderFeedDataV1,
   type IWSOrderFeedSelectorV1,
+  type IWSOrderGroupFeedDataV1,
+  type IWSOrderStateFeedDataV1,
   type IWSOrderStateFeedSelectorV1,
+  type IWSOrderbookLevelsFeedDataV1,
   type IWSOrderbookLevelsFeedSelectorV1,
+  type IWSPositionsFeedDataV1,
   type IWSPositionsFeedSelectorV1,
+  type IWSTickerFeedDataV1,
   type IWSTickerFeedSelectorV1,
+  type IWSTradeFeedDataV1,
   type IWSTradeFeedSelectorV1,
+  type IWSTransferFeedDataV1,
   type IWSTransferFeedSelectorV1,
-  type IWSWithdrawalFeedSelectorV1,
-  type IWithdrawal
+  type IWSWithdrawalFeedDataV1,
+  type IWSWithdrawalFeedSelectorV1
 } from '../interfaces'
 
 export enum EStream {
@@ -37,6 +38,7 @@ export enum EStream {
   TICKER_SNAP = 'ticker.s',
   TRADE = 'trade',
 
+  GROUP = 'group',
   ORDER = 'order',
   STATE = 'state',
   POSITION = 'position',
@@ -100,35 +102,42 @@ export interface IWSCandleRequest {
     interval: `${ECandlestickInterval}`
     type: `${ECandlestickType}`
   } & Pick<IWSCandlestickFeedSelectorV1, 'instrument'>
-  onData?: TMessageHandler<ICandlestick>
+  onData?: TMessageHandler<Required<IWSCandlestickFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
 export interface IWSMiniRequest {
   stream: `${EStream.MINI_DELTA}` | `${EStream.MINI_SNAP}`
   params: IWSMiniTickerFeedSelectorV1
-  onData?: TMessageHandler<IMiniTicker>
+  onData?: TMessageHandler<Required<IWSMiniTickerFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
 export interface IWSBookRequest {
   stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}`
   params: IWSOrderbookLevelsFeedSelectorV1
-  onData?: TMessageHandler<IOrderbookLevels>
+  onData?: TMessageHandler<Required<IWSOrderbookLevelsFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
 export interface IWSTickerRequest {
   stream: `${EStream.TICKER_DELTA}` | `${EStream.TICKER_SNAP}`
   params: IWSTickerFeedSelectorV1
-  onData?: TMessageHandler<ITicker>
+  onData?: TMessageHandler<Required<IWSTickerFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
 export interface IWSTradeRequest {
   stream: `${EStream.TRADE}`
   params: IWSTradeFeedSelectorV1
-  onData?: TMessageHandler<ITrade>
+  onData?: TMessageHandler<Required<IWSTradeFeedDataV1>['feed']>
+  onError?: (error: Error) => void
+}
+
+export interface IWSTdgOrderGroupRequest {
+  stream: `${EStream.GROUP}`
+  params: { sub_account_id: string } // IWSOrderGroupFeedSelectorV1
+  onData?: TMessageHandler<Required<IWSOrderGroupFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -137,7 +146,7 @@ export interface IWSTdgOrderRequest {
   params: {
     sub_account_id: string
   } & Pick<IWSOrderFeedSelectorV1, 'instrument'>
-  onData?: TMessageHandler<IOrder>
+  onData?: TMessageHandler<Required<IWSOrderFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -146,7 +155,7 @@ export interface IWSTdgOrderStateRequest {
   params: {
     sub_account_id: string
   } & Pick<IWSOrderStateFeedSelectorV1, 'instrument'>
-  onData?: TMessageHandler<IOrderState>
+  onData?: TMessageHandler<Required<IWSOrderStateFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -155,7 +164,7 @@ export interface IWSTdgPositionRequest {
   params: {
     sub_account_id: string
   } & Pick<IWSPositionsFeedSelectorV1, 'instrument'>
-  onData?: TMessageHandler<IPositions>
+  onData?: TMessageHandler<Required<IWSPositionsFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -164,7 +173,7 @@ export interface IWSTdgFillRequest {
   params: {
     sub_account_id: string
   } & Pick<IWSFillFeedSelectorV1, 'instrument'>
-  onData?: TMessageHandler<IFill>
+  onData?: TMessageHandler<Required<IWSFillFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -173,7 +182,7 @@ export interface IWSTdgDepositRequest {
   params: {
     main_account_id: string
   } & Omit<IWSDepositFeedSelectorV1, keyof IWSDepositFeedSelectorV1>
-  onData?: TMessageHandler<IDeposit>
+  onData?: TMessageHandler<Required<IWSDepositFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 export interface IWSTdgTransferRequest {
@@ -182,7 +191,7 @@ export interface IWSTdgTransferRequest {
     main_account_id: string
     sub_account_id?: string
   } & Omit<IWSTransferFeedSelectorV1, keyof IWSTransferFeedSelectorV1>
-  onData?: TMessageHandler<ITransferHistory>
+  onData?: TMessageHandler<Required<IWSTransferFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 export interface IWSTdgWithDrawalRequest {
@@ -190,7 +199,7 @@ export interface IWSTdgWithDrawalRequest {
   params: {
     main_account_id: string
   } & Omit<IWSWithdrawalFeedSelectorV1, keyof IWSWithdrawalFeedSelectorV1>
-  onData?: TMessageHandler<IWithdrawal>
+  onData?: TMessageHandler<Required<IWSWithdrawalFeedDataV1>['feed']>
   onError?: (error: Error) => void
 }
 
@@ -200,6 +209,7 @@ export type TWSRequest =
   | IWSMiniRequest
   | IWSTickerRequest
   | IWSTradeRequest
+  | IWSTdgOrderGroupRequest
   | IWSTdgOrderRequest
   | IWSTdgOrderStateRequest
   | IWSTdgPositionRequest

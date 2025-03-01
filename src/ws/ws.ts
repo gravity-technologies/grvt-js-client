@@ -5,12 +5,14 @@ import {
   WS_MINI_TICKER_FEED_DATA_V_1_MAP,
   WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP,
   WS_ORDER_FEED_DATA_V_1_MAP,
+  WS_ORDER_GROUP_FEED_DATA_V_1_MAP,
   WS_ORDER_STATE_FEED_DATA_V_1_MAP,
   WS_POSITIONS_FEED_DATA_V_1_MAP,
   WS_TICKER_FEED_DATA_V_1_MAP,
   WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
   WS_WITHDRAWAL_FEED_DATA_V_1_MAP,
+  type IClientOrderIDsByGroup,
   type IDeposit,
   type IFill,
   type IOrder,
@@ -22,6 +24,7 @@ import {
   type IWSFillFeedDataV1,
   type IWSMiniTickerFeedDataV1,
   type IWSOrderFeedDataV1,
+  type IWSOrderGroupFeedDataV1,
   type IWSOrderStateFeedDataV1,
   type IWSPositionsFeedDataV1,
   type IWSSubscribeRequestV1Legacy,
@@ -39,6 +42,7 @@ import {
   type IWSMiniRequest,
   type IWSTdgDepositRequest,
   type IWSTdgFillRequest,
+  type IWSTdgOrderGroupRequest,
   type IWSTdgOrderRequest,
   type IWSTdgOrderStateRequest,
   type IWSTdgPositionRequest,
@@ -323,29 +327,30 @@ export class WS {
           return acc
         }
 
-        const isTdg = [
+        const hasSubAccountId = [
+          EStream.GROUP,
           EStream.ORDER,
           // EStream.STATE,
           EStream.POSITION,
           EStream.FILL
           // EStream.DEPOSIT,
           // EStream.TRANSFER,
-          // EStream.WITHDRAWAL,
+          // EStream.WITHDRAWAL
         ].includes(stream as EStream)
 
-        // MDG
-        if (!isTdg) {
+        // no sub account id handling
+        if (!hasSubAccountId) {
           return key.includes(instrument)
             ? [...acc, ...Object.values(value)]
             : acc
         }
 
-        // TDG
-        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id)
+        // has sub account id handling
+        const subAccountId = String((result as IClientOrderIDsByGroup | IOrder | IPositions | IFill).sub_account_id)
         // const subAccountId = String((result as IPositions).sub_account_id)
         // const subAccountId = String((result as IFill).sub_account_id)
         const feed = this._parseStream({
-          stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
+          stream: stream as EStream.GROUP | EStream.ORDER | EStream.POSITION | EStream.FILL,
           params: {
             sub_account_id: subAccountId,
             instrument
@@ -410,13 +415,16 @@ export class WS {
      * TDG
      */
 
-    const fillFeed = (params: IWSTdgFillRequest['params']): string => [
+    const orderGroupFeed = (params: IWSTdgOrderGroupRequest['params']): string => [
       [
-        params.sub_account_id,
-        params.instrument
+        params.sub_account_id
       ].filter(Boolean).join('-')
       // [
-      //   params.createOnly
+      //   {
+      //     all: 'a',
+      //     createOnly: 'c',
+      //     updateOnly: 'u'
+      //   }[params.state_filter] || 'a'
       // ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
@@ -449,6 +457,16 @@ export class WS {
     ].filter(Boolean).join('@')
 
     const positionFeed = (params: IWSTdgPositionRequest['params']): string => [
+      [
+        params.sub_account_id,
+        params.instrument
+      ].filter(Boolean).join('-')
+      // [
+      //   params.createOnly
+      // ].filter(Boolean).join('-')
+    ].filter(Boolean).join('@')
+
+    const fillFeed = (params: IWSTdgFillRequest['params']): string => [
       [
         params.sub_account_id,
         params.instrument
@@ -507,6 +525,11 @@ export class WS {
           stream,
           feed: [publicTradesFeed(params as IWSTradeRequest['params'])]
         }
+      case EStream.GROUP:
+        return {
+          stream,
+          feed: [orderGroupFeed(params as IWSTdgOrderGroupRequest['params'])]
+        }
       case EStream.ORDER:
         return {
           stream,
@@ -562,6 +585,8 @@ export class WS {
         return (Utils.schemaMap(message, WS_TICKER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTickerFeedDataV1).feed
       case EStream.TRADE:
         return (Utils.schemaMap(message, WS_TRADE_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSTradeFeedDataV1).feed
+      case EStream.GROUP:
+        return (Utils.schemaMap(message, WS_ORDER_GROUP_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderGroupFeedDataV1).feed
       case EStream.ORDER:
         return (Utils.schemaMap(message, WS_ORDER_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
       case EStream.STATE:
