@@ -32,7 +32,8 @@ export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({
 })
 
 export const ECancelStatusInt: Record<ECancelStatus, number> = Object.freeze({
-  [ECancelStatus.EXPIRED]: 1
+  [ECancelStatus.EXPIRED]: 1,
+  [ECancelStatus.DROPPED_DUPLICATE]: 2
 })
 
 export const ECandlestickIntervalInt: Record<ECandlestickInterval, number> = Object.freeze({
