@@ -16,6 +16,8 @@ export enum EBrokerTag {
 export enum ECancelStatus {
   // Cancellation has expired because corresponding order had not arrived within the defined time-to-live window.
   EXPIRED = 'EXPIRED',
+  // This cancellation request was dropped because its TTL window overlaps with another cancellation request for the same order.
+  DROPPED_DUPLICATE = 'DROPPED_DUPLICATE',
 }
 
 export enum ECandlestickInterval {
@@ -873,6 +875,21 @@ export interface IApiGetListRewardEpochResponse {
   trading_epochs?: IRewardEpochInfo[]
 }
 
+// Retrieves the grouping of non-cancelled, non-filled client orders for a given subaccount when the grouping exist.
+//
+// helping to identify TP/SL pairs or other order relationships within the account.
+export interface IApiGetOrderGroupRequest {
+  // The subaccount ID for which the order groups should be retrieved.
+  sub_account_id?: bigint
+}
+
+export interface IApiGetOrderGroupResponse {
+  // A list of client orders grouped by their associated order group.
+  // Each entry in the list contains a `groupID` and the corresponding `clientOrderID`s
+  // that belong to that group.
+  result?: IClientOrderIDsByGroup[]
+}
+
 // Retrieve the order for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiGetOrderRequest {
   // The subaccount ID to filter by
@@ -1438,6 +1455,18 @@ export interface IClaimEcosystemBadgeResponse {
   badge?: IEpochBadge
 }
 
+// Grouping for the client order id and their associated groups.
+//
+// This is used to define TP/SL pairs or other order groupings after loading the list of Open Orders.
+export interface IClientOrderIDsByGroup {
+  // The group this order belongs to. It can be used to define TP/SL pairs or other order groupings
+  group_id?: bigint
+  // List of client order IDs in the group
+  client_order_id?: bigint[]
+  // The sub account ID that these orders belong to
+  sub_account_id?: bigint
+}
+
 export interface IDeposit {
   // The hash of the bridgemint event producing the deposit
   tx_hash?: bigint
@@ -1515,6 +1544,17 @@ export interface IEcosystemPoint {
   calculate_to?: bigint
   // The rank of the account in the ecosystem
   rank?: number
+  // The epoch number of the ecosystem point
+  epoch?: number
+}
+
+export interface IEpoch {
+  // The epoch number
+  epoch?: number
+  // The start time of the epoch
+  start_time?: bigint
+  // The end time of the epoch
+  end_time?: bigint
 }
 
 export interface IEpochBadge {
@@ -2043,9 +2083,32 @@ export interface IQueryEpochBadgeResponse {
   next?: string
 }
 
+// Query epoch by time or epoch number
+export interface IQueryFindEpochRequest {
+  // The time to query the epoch
+  time?: bigint
+  // The epoch number
+  epoch?: number
+}
+
+export interface IQueryFindEpochResponse {
+  // The epoch
+  epoch?: IEpoch
+}
+
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
+}
+
+export interface IQueryGetListEpochRequest {
+  // The limit to query for
+  limit?: number
+}
+
+export interface IQueryGetListEpochResponse {
+  // The list of epochs
+  result?: IEpoch[]
 }
 
 export interface IRewardEpochInfo {
@@ -2459,6 +2522,26 @@ export interface IWSOrderFeedSelectorV1 {
   sub_account_id?: bigint
   // The instrument filter to apply.
   instrument?: string
+}
+
+export interface IWSOrderGroupFeedDataV1 {
+  // Stream name
+  stream?: string
+  // Primary selector
+  selector?: string
+  // A running sequence number that determines global message order within the specific stream
+  sequence_number?: bigint
+  // The order object being created or updated
+  feed?: IClientOrderIDsByGroup
+  // The previous sequence number that determines global message order within the specific stream
+  prev_sequence_number?: bigint
+}
+
+// Subscribes to a feed of order group to get updated when a new group is created for the subAccount specified.
+//
+export interface IWSOrderGroupFeedSelectorV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
 }
 
 export interface IWSOrderStateFeedDataV1 {

@@ -13,7 +13,8 @@ export const ECOSYSTEM_POINT_MAP: SchemaPairMap = Object.freeze({
     calculate_at: 'ca',
     calculate_from: 'cf',
     calculate_to: 'ct',
-    rank: 'r'
+    rank: 'r',
+    epoch: 'e'
   },
   LITE_TO_FULL: {
     ai: 'account_id',
@@ -26,6 +27,7 @@ export const ECOSYSTEM_POINT_MAP: SchemaPairMap = Object.freeze({
     ca: 'calculate_at',
     cf: 'calculate_from',
     ct: 'calculate_to',
-    r: 'rank'
+    r: 'rank',
+    e: 'epoch'
   }
 })

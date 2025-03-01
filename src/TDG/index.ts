@@ -21,6 +21,8 @@ import {
   API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP,
+  API_GET_ORDER_GROUP_REQUEST_MAP,
+  API_GET_ORDER_GROUP_RESPONSE_MAP,
   API_GET_ORDER_REQUEST_MAP,
   API_GET_ORDER_RESPONSE_MAP,
   API_OPEN_ORDERS_REQUEST_MAP,
@@ -67,6 +69,8 @@ import {
   type IApiFundingPaymentHistoryResponse,
   type IApiGetAllInitialLeverageRequest,
   type IApiGetAllInitialLeverageResponse,
+  type IApiGetOrderGroupRequest,
+  type IApiGetOrderGroupResponse,
   type IApiGetOrderRequest,
   type IApiGetOrderResponse,
   type IApiOpenOrdersRequest,
@@ -360,6 +364,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_OPEN_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiOpenOrdersResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  orderGroup (payload: IApiGetOrderGroupRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/order_group',
+      Utils.schemaMap(payload, API_GET_ORDER_GROUP_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ORDER_GROUP_RESPONSE_MAP.LITE_TO_FULL) as IApiGetOrderGroupResponse
     }).catch(Utils.coverApiError)
   }
 
