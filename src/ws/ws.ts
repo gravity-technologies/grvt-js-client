@@ -12,7 +12,6 @@ import {
   WS_TRADE_FEED_DATA_V_1_MAP,
   WS_TRANSFER_FEED_DATA_V_1_MAP,
   WS_WITHDRAWAL_FEED_DATA_V_1_MAP,
-  type IClientOrderIDsByGroup,
   type IDeposit,
   type IFill,
   type IOrder,
@@ -265,7 +264,7 @@ export class WS {
 
   /**
    * Only use for TDG
-   * Use for TEntities of STATE | DEPOSIT | TRANSFER | WITHDRAWAL streams
+   * Use for TEntities of GROUP | STATE | DEPOSIT | TRANSFER | WITHDRAWAL streams
    */
   private _getNonInstrumentConsumers ({ result, stream }: {
     result: TEntities
@@ -288,6 +287,8 @@ export class WS {
         ].filter(Boolean).join('-')
         const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {
+          case EStream.GROUP:
+            return [...acc, ...Object.values(value)]
           case EStream.STATE:
             return [...acc, ...Object.values(value)]
           case EStream.DEPOSIT:
@@ -328,7 +329,6 @@ export class WS {
         }
 
         const hasSubAccountId = [
-          EStream.GROUP,
           EStream.ORDER,
           // EStream.STATE,
           EStream.POSITION,
@@ -346,11 +346,11 @@ export class WS {
         }
 
         // has sub account id handling
-        const subAccountId = String((result as IClientOrderIDsByGroup | IOrder | IPositions | IFill).sub_account_id)
+        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id)
         // const subAccountId = String((result as IPositions).sub_account_id)
         // const subAccountId = String((result as IFill).sub_account_id)
         const feed = this._parseStream({
-          stream: stream as EStream.GROUP | EStream.ORDER | EStream.POSITION | EStream.FILL,
+          stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
           params: {
             sub_account_id: subAccountId,
             instrument
