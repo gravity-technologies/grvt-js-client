@@ -102,7 +102,8 @@ export const ECurrencyInt: Record<ECurrency, number> = Object.freeze({
   [ECurrency.BERA]: 35,
   [ECurrency.VINE]: 36,
   [ECurrency.PENDLE]: 37,
-  [ECurrency.UXLINK]: 38
+  [ECurrency.UXLINK]: 38,
+  [ECurrency.KAITO]: 39
 })
 
 export const EEpochBadgeTypeInt: Record<EEpochBadgeType, number> = Object.freeze({
