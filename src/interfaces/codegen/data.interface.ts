@@ -148,6 +148,8 @@ export enum ECurrency {
   PENDLE = 'PENDLE',
   // the UXLINK token
   UXLINK = 'UXLINK',
+  // the KAITO token
+  KAITO = 'KAITO',
 }
 
 export enum EEpochBadgeType {
@@ -463,7 +465,7 @@ export interface IApiCancelOrderRequest {
   // This mechanism helps mitigate time-of-flight issues where cancellations might arrive before the corresponding orders.
   // Hence, cancellation by `order_id` ignores this field as the exchange can only assign `order_id`s to already-processed order creations.
   // The duration cannot be negative, is rounded down to the nearest 100ms (e.g., `'670'` -> `'600'`, `'30'` -> `'0'`) and capped at 5 seconds (i.e., `'5000'`).
-  // Value of `'0'` or omission disables the TTL mechanism, so only orders already existing in matching engine state at request time will be searched.
+  // Value of `'0'` or omission results in the default time-to-live value being applied.
   // If the caller requests multiple successive cancellations for a given order, such that the time-to-live windows overlap, only the first request will be considered.
   //
   time_to_live_ms?: bigint
