@@ -150,6 +150,8 @@ export enum ECurrency {
   UXLINK = 'UXLINK',
   // the KAITO token
   KAITO = 'KAITO',
+  // the IP token
+  IP = 'IP',
 }
 
 export enum EEpochBadgeType {
@@ -1548,6 +1550,8 @@ export interface IEcosystemPoint {
   rank?: number
   // The epoch number of the ecosystem point
   epoch?: number
+  // Brokered trading volume
+  brokered_trading_volume?: bigint
 }
 
 export interface IEpoch {
