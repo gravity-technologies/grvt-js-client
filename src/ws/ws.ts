@@ -202,12 +202,12 @@ export class WS {
       if (!result) {
         // if no entity found and not a subscription message
         if (!message.s1?.length) {
-          console.error('Error: something went wrong with message', message)
+          console.warn('Error: something went wrong with message', message)
         }
         return
       }
       if (!stream) {
-        console.error('Error: cannot parse stream or feed from message', message)
+        console.warn('Error: cannot parse stream or feed from message', message)
         return
       }
 
@@ -566,7 +566,7 @@ export class WS {
           feed: [withdrawalFeed(params as IWSTdgWithDrawalRequest['params'])]
         }
       default:
-        console.error('Unknown stream: ' + stream)
+        console.warn('Unknown stream: ' + stream)
     }
   }
 
@@ -602,7 +602,7 @@ export class WS {
       case EStream.WITHDRAWAL:
         return (Utils.schemaMap(message, WS_WITHDRAWAL_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSWithdrawalFeedDataV1).feed
       default:
-        console.error('Unknown message:', message)
+        console.warn('Unknown message:', message)
     }
   }
 
