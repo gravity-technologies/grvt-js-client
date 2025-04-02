@@ -26,6 +26,7 @@ export const EBridgeTypeInt: Record<EBridgeType, number> = Object.freeze({
 })
 
 export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({
+  [EBrokerTag.UNSPECIFIED]: 0,
   [EBrokerTag.COIN_ROUTES]: 1,
   [EBrokerTag.ALERTATRON]: 2,
   [EBrokerTag.ORIGAMI]: 3

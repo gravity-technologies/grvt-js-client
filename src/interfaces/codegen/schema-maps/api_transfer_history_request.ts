@@ -8,7 +8,8 @@ export const API_TRANSFER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     end_time: 'et',
     limit: 'l',
     cursor: 'c1',
-    tx_id: 'ti'
+    tx_id: 'ti',
+    main_account_id: 'ma'
   },
   LITE_TO_FULL: {
     c: 'currency',
@@ -16,6 +17,7 @@ export const API_TRANSFER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     et: 'end_time',
     l: 'limit',
     c1: 'cursor',
-    ti: 'tx_id'
+    ti: 'tx_id',
+    ma: 'main_account_id'
   }
 })

@@ -5,6 +5,7 @@ export enum EBridgeType {
 
 // BrokerTag is a tag for the broker that the order is sent from.
 export enum EBrokerTag {
+  UNSPECIFIED = 'UNSPECIFIED',
   // CoinRoutes
   COIN_ROUTES = 'COIN_ROUTES',
   // Alertatron
@@ -561,6 +562,7 @@ export interface IApiDepositHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
+  main_account_id?: bigint
 }
 
 export interface IApiDepositHistoryResponse {
@@ -568,6 +570,14 @@ export interface IApiDepositHistoryResponse {
   result?: IDepositHistory[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+export interface IApiDropClientWsRequest {
+  main_account_id?: bigint
+}
+
+export interface IApiDropClientWsResponse {
+  num_dropped?: number
 }
 
 // Query for all historical fills made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
@@ -877,6 +887,10 @@ export interface IApiGetListRewardEpochResponse {
   ecosystem_epochs?: IRewardEpochInfo[]
   // The list of epoch for trader reward and lp reward
   trading_epochs?: IRewardEpochInfo[]
+}
+
+export interface IApiGetMarginTiersResponse {
+  results?: IAssetMarginTierResponse[]
 }
 
 // Retrieves the grouping of non-cancelled, non-filled client orders for a given subaccount when the grouping exist.
@@ -1298,6 +1312,7 @@ export interface IApiTransferHistoryRequest {
   cursor?: string
   // The transaction ID to query for
   tx_id?: bigint
+  main_account_id?: bigint
 }
 
 export interface IApiTransferHistoryResponse {
@@ -1353,6 +1368,7 @@ export interface IApiWithdrawalHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
+  main_account_id?: bigint
 }
 
 export interface IApiWithdrawalHistoryResponse {
@@ -1405,6 +1421,11 @@ export interface IApproximateLPSnapshot {
   liquidity_score?: bigint
   // The time when the snapshot was calculated
   calculate_at?: bigint
+}
+
+export interface IAssetMarginTierResponse {
+  asset?: string
+  tiers?: IMarginTierResponse[]
 }
 
 export interface IAssetMaxQty {
@@ -1552,6 +1573,12 @@ export interface IEcosystemPoint {
   epoch?: number
   // Brokered trading volume
   brokered_trading_volume?: bigint
+  // Brokered trading point
+  brokered_trading_point?: bigint
+  // Referee KYC point
+  referee_kyc_point?: bigint
+  // Referrer KYC point
+  referrer_kyc_point?: bigint
 }
 
 export interface IEpoch {
@@ -1695,6 +1722,8 @@ export interface IFlatReferral {
   kyc_completed_at?: bigint
   // The KYC type, can be 'individual' or 'business'
   kyc_type?: string
+  // The first KYC completed time
+  kyc_first_completed_at?: bigint
 }
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
@@ -1847,6 +1876,11 @@ export interface ILPSnapshot {
   liquidity_score?: bigint
   // The time when the snapshot was calculated
   calculate_at?: bigint
+}
+
+export interface IMarginTierResponse {
+  lower_bound?: string
+  rate?: string
 }
 
 export interface IMiniTicker {
@@ -2385,11 +2419,16 @@ export interface IWSCancelFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // Data relating to the status of the cancellation attempt
   feed?: ICancelStatusFeed
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2409,11 +2448,16 @@ export interface IWSCandlestickFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A candlestick entry matching the request filters
   feed?: ICandlestick
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2434,11 +2478,16 @@ export interface IWSDepositFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The Deposit object
   feed?: IDeposit
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2454,11 +2503,16 @@ export interface IWSFillFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A private trade matching the request filter
   feed?: IFill
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2483,11 +2537,16 @@ export interface IWSMiniTickerFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A mini ticker matching the request filter
   feed?: IMiniTicker
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2511,11 +2570,16 @@ export interface IWSOrderFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The order object being created or updated
   feed?: IOrder
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2535,11 +2599,16 @@ export interface IWSOrderGroupFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The order object being created or updated
   feed?: IClientOrderIDsByGroup
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2555,11 +2624,16 @@ export interface IWSOrderStateFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The Order State Feed
   feed?: IOrderStateFeed
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2580,11 +2654,16 @@ export interface IWSOrderbookLevelsFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // An orderbook levels object matching the request filter
   feed?: IOrderbookLevels
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2614,11 +2693,16 @@ export interface IWSPositionsFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A Position being created or updated matching the request filter
   feed?: IPositions
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2632,8 +2716,12 @@ export interface IWSPositionsFeedSelectorV1 {
   instrument?: string
 }
 
-// All V1 Websocket Subscription Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
+// All V1 Websocket Subscription Requests are housed in this wrapper. You may specify a stream and a list of feeds to subscribe to.
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
+// Sequence numbers can be either gateway-specific or global:
+// - **Gateway Unique Sequence Number**: Increments by one per stream, resets to 0 on gateway restart.
+// - **Global Unique Sequence Number**: A cluster-wide unique number assigned to each cluster payload, does not reset on gateway restarts, and can be used to track and identify message order across streams using `sequence_number` and `prev_sequence_number` in the feed response.
+// Set `useGlobalSequenceNumber = true` if you need a persistent, unique identifier across all streams or ordering across multiple feeds.
 export interface IWSSubscribeParams {
   // The channel to subscribe to (eg: ticker.s / ticker.d)
   stream?: string
@@ -2704,11 +2792,16 @@ export interface IWSTickerFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A ticker matching the request filter
   feed?: ITicker
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2732,11 +2825,16 @@ export interface IWSTradeFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // A public trade matching the request filter
   feed?: ITrade
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2754,11 +2852,16 @@ export interface IWSTransferFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The transfer history matching the requested filters
   feed?: ITransferHistory
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 
@@ -2778,7 +2881,7 @@ export interface IWSUnsubscribeAllResult {
   stream_reference?: IStreamReference[]
 }
 
-// All V1 Websocket Unsubscription Requests are housed in this wrapper. You may specify a stream, and a list of feeds to unsubscribe from.
+// All V1 Websocket Unsubscription Requests are housed in this wrapper. You may specify a stream, a list of feeds and whether those feeds use global sequence numbers to unsubscribe from.
 export interface IWSUnsubscribeParams {
   // The channel to unsubscribe from (eg: ticker.s / ticker.d)
   stream?: string
@@ -2802,11 +2905,16 @@ export interface IWSWithdrawalFeedDataV1 {
   stream?: string
   // Primary selector
   selector?: string
-  // A running sequence number that determines global message order within the specific stream
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
   sequence_number?: bigint
   // The Withdrawal object
   feed?: IWithdrawal
-  // The previous sequence number that determines global message order within the specific stream
+  // The previous sequence number that determines the message order
   prev_sequence_number?: bigint
 }
 

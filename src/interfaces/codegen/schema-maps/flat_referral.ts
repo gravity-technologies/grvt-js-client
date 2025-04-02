@@ -12,7 +12,8 @@ export const FLAT_REFERRAL_MAP: SchemaPairMap = Object.freeze({
     is_business: 'ib',
     is_kyc_completed: 'ik',
     kyc_completed_at: 'kc',
-    kyc_type: 'kt'
+    kyc_type: 'kt',
+    kyc_first_completed_at: 'kf'
   },
   LITE_TO_FULL: {
     ai: 'account_id',
@@ -24,6 +25,7 @@ export const FLAT_REFERRAL_MAP: SchemaPairMap = Object.freeze({
     ib: 'is_business',
     ik: 'is_kyc_completed',
     kc: 'kyc_completed_at',
-    kt: 'kyc_type'
+    kt: 'kyc_type',
+    kf: 'kyc_first_completed_at'
   }
 })
