@@ -35,6 +35,8 @@ import {
   API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
   API_PRE_ORDER_CHECK_REQUEST_MAP,
   API_PRE_ORDER_CHECK_RESPONSE_MAP,
+  API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP,
+  API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
   API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
   API_SET_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
@@ -83,6 +85,8 @@ import {
   type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
+  type IApiQueryTradingPerformanceRequest,
+  type IApiQueryTradingPerformanceResponse,
   type IApiSetInitialLeverageRequest,
   type IApiSetInitialLeverageResponse,
   type IApiSocializedLossStatusResponse,
@@ -452,6 +456,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiAggregatedAccountSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  tradingPerformance (payload: IApiQueryTradingPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/trading_performance',
+      Utils.schemaMap(payload, API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingPerformanceResponse
     }).catch(Utils.coverApiError)
   }
 }

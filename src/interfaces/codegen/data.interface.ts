@@ -314,6 +314,8 @@ export enum ESubAccountTradeInterval {
   SAT_1_D = 'SAT_1_D',
   // 1 hour
   SAT_1_H = 'SAT_1_H',
+  // 4 hour
+  SAT_4_H = 'SAT_4_H',
 }
 
 // |                       | Must Fill All | Can Fill Partial |
@@ -562,6 +564,7 @@ export interface IApiDepositHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
+  // Main account ID being queried. By default, applies the requestor's main account ID.
   main_account_id?: bigint
 }
 
@@ -1114,6 +1117,22 @@ export interface IApiQueryFlatReferralStatResponse {
   indirect_invite_count?: number
 }
 
+// Request to retrieve the trading volume
+export interface IApiQueryTradingPerformanceRequest {
+  // Optional: The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The asset to filter by
+  asset?: string
+}
+
+// Response to retrieve the trading volume
+export interface IApiQueryTradingPerformanceResponse {
+  // Trading volume in USDT
+  trading_volume?: bigint
+  // Realized PnL in USDT
+  realized_pnl?: string
+}
+
 export interface IApiResolveEpochEcosystemMetricResponse {
   // The name of the epoch
   epoch_name?: string
@@ -1312,6 +1331,7 @@ export interface IApiTransferHistoryRequest {
   cursor?: string
   // The transaction ID to query for
   tx_id?: bigint
+  // Main account ID being queried. By default, applies the requestor's main account ID.
   main_account_id?: bigint
 }
 
@@ -1368,6 +1388,7 @@ export interface IApiWithdrawalHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
+  // Main account ID being queried. By default, applies the requestor's main account ID.
   main_account_id?: bigint
 }
 
@@ -2180,6 +2201,18 @@ export interface ISignature {
   nonce?: number
 }
 
+// The funding account summary, that reports the total equity and spot balances of a funding (main) account
+export interface ISnapFundingAccountSummary {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: bigint
+  // Total equity of the main account, denominated in USD
+  total_equity?: string
+  // The list of spot assets owned by this main account, and their balances
+  spot_balances?: ISpotBalance[]
+}
+
 export interface ISpotBalance {
   // The currency you hold a spot balance in
   currency?: ECurrency
@@ -2246,6 +2279,8 @@ export interface ISubAccountTradeAggregation {
   positive_fee?: bigint
   // The signer of the trade
   signer?: bigint
+  // Realized PnL
+  realized_pnl?: bigint
 }
 
 // Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.

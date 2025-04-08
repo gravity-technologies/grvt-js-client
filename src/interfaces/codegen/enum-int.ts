@@ -200,7 +200,8 @@ export const ERewardProgramTypeInt: Record<ERewardProgramType, number> = Object.
 export const ESubAccountTradeIntervalInt: Record<ESubAccountTradeInterval, number> = Object.freeze({
   [ESubAccountTradeInterval.SAT_1_MO]: 1,
   [ESubAccountTradeInterval.SAT_1_D]: 2,
-  [ESubAccountTradeInterval.SAT_1_H]: 3
+  [ESubAccountTradeInterval.SAT_1_H]: 3,
+  [ESubAccountTradeInterval.SAT_4_H]: 4
 })
 
 export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
