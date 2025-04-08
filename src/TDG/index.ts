@@ -85,6 +85,8 @@ import {
   type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
+  type IApiQueryTradingPerformanceRequest,
+  type IApiQueryTradingPerformanceResponse,
   type IApiSetInitialLeverageRequest,
   type IApiSetInitialLeverageResponse,
   type IApiSocializedLossStatusResponse,
@@ -100,7 +102,6 @@ import {
   type IApiWithdrawalRequest,
   type IConfig
 } from '../interfaces'
-import { type IApiQueryTradingPerformanceRequest, type IApiQueryTradingPerformanceResponse } from '../interfaces/codegen/data.interface'
 import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
