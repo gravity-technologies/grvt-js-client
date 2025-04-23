@@ -334,6 +334,18 @@ export enum ETimeInForce {
   FILL_OR_KILL = 'FILL_OR_KILL',
 }
 
+// Time interval can be used as a filter in metric/portfolio management APIs
+export enum ETimeInterval {
+  // 1 day
+  INTERVAL_1_D = 'INTERVAL_1_D',
+  // 7 days
+  INTERVAL_7_D = 'INTERVAL_7_D',
+  // 30 days
+  INTERVAL_30_D = 'INTERVAL_30_D',
+  // 90 days
+  INTERVAL_90_D = 'INTERVAL_90_D',
+}
+
 export enum ETransferType {
   // Standard transfer that has nothing to do with bridging
   STANDARD = 'STANDARD',
@@ -506,6 +518,18 @@ export interface IApiCandlestickResponse {
   result?: ICandlestick[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+export interface IApiCategoryAffinityScoreRequest {
+  // The start time of query. Can leave empty to query from the beginning
+  start_time?: bigint
+  // The end time of query. Can leave empty to query until now
+  end_time?: bigint
+}
+
+export interface IApiCategoryAffinityScoreResponse {
+  // The list of categoryAffinities score
+  result?: IUserCategoryAffinityScore[]
 }
 
 // Create multiple orders simultaneously for this trading account.
@@ -1117,6 +1141,36 @@ export interface IApiQueryFlatReferralStatResponse {
   indirect_invite_count?: number
 }
 
+// Request to retrieve the funding account summary for a given main account
+export interface IApiQueryListFundingAccountSummaryRequest {
+  // The time interval to filter by
+  time_interval?: ETimeInterval
+}
+
+// Response to retrieve the funding account summary for a given main account
+export interface IApiQueryListFundingAccountSummaryResponse {
+  // The list of funding account summaries
+  result?: ISnapFundingAccountSummary[]
+  // The next cursor to fetch the next page of results
+  next?: string
+}
+
+// Request to retrieve the sub-account summary for a given sub-account
+export interface IApiQueryListSubAccountSummaryRequest {
+  // The time interval to filter
+  time_interval?: ETimeInterval
+  // The subaccount ID to filter by
+  sub_account_id?: bigint
+}
+
+// Response to retrieve the sub-account summary for a given sub-account
+export interface IApiQueryListSubAccountSummaryResponse {
+  // The list of sub-account summaries
+  result?: ISnapSubAccountSummary[]
+  // The next cursor to fetch the next page of results
+  next?: string
+}
+
 // Request to retrieve the trading volume
 export interface IApiQueryTradingPerformanceRequest {
   // Optional: The subaccount ID to filter by
@@ -1131,6 +1185,22 @@ export interface IApiQueryTradingPerformanceResponse {
   trading_volume?: bigint
   // Realized PnL in USDT
   realized_pnl?: string
+}
+
+// Request to retrieve the trading performance trend
+export interface IApiQueryTradingPerformanceTrendRequest {
+  // Optional: The subaccount ID to filter by
+  sub_account_id?: bigint
+  // The time interval to filter by
+  time_interval?: ETimeInterval
+}
+
+// Response to retrieve the trading performance trend
+export interface IApiQueryTradingPerformanceTrendResponse {
+  // The list of trading performance trends
+  result?: IApiTradingPerformanceTrend[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 export interface IApiResolveEpochEcosystemMetricResponse {
@@ -1275,6 +1345,24 @@ export interface IApiTickerResponse {
   result?: ITicker
 }
 
+// Returns the list of assets traded by users.
+export interface IApiTimedAssetExposureRequest {
+  // Whether the exposure is gross or net
+  is_gross_exposure?: boolean
+  // The time interval to filter
+  time_interval?: ETimeInterval
+  // Optional: The subaccount ID to filter by
+  sub_account_id?: bigint
+}
+
+// Returns the list of assets traded by users.
+export interface IApiTimedAssetExposureResponse {
+  // The list of assets traded by the user, ranked in descending order based on gross/net exposure
+  result?: ITimedAssetExposureSummary[]
+  // The next cursor to fetch the next page of results
+  next?: string
+}
+
 // Perform historical lookup of public trades in any given instrument.
 // This endpoint offers public trading data, use the Trading APIs instead to query for your personalized trade tape.
 // Only data from the last three months will be retained.
@@ -1312,6 +1400,16 @@ export interface IApiTradeRequest {
 export interface IApiTradeResponse {
   // The public trades matching the request asset
   result?: ITrade[]
+}
+
+// Trading performance trend returned by the service
+export interface IApiTradingPerformanceTrend {
+  // The start time of the interval
+  start_interval?: bigint
+  // The trading volume of the account
+  trading_volume?: bigint
+  // Realized PnL in USDT
+  realized_pnl?: string
 }
 
 // The request to get the historical transfers of an account
@@ -1371,6 +1469,20 @@ export interface IApiTransferRequest {
   transfer_type?: ETransferType
   // The metadata of the transfer
   transfer_metadata?: string
+}
+
+export interface IApiUserCategoryAffinityScoreRequest {
+  // The off chain account id
+  account_id?: string
+  // The start time of query. Can leave empty to query from the beginning
+  start_time?: bigint
+  // The end time of query. Can leave empty to query until now
+  end_time?: bigint
+}
+
+export interface IApiUserCategoryAffinityScoreResponse {
+  // The list of categoryAffinities score
+  result?: IUserCategoryAffinityScore[]
 }
 
 // The request to get the historical withdrawals of an account
@@ -1442,6 +1554,14 @@ export interface IApproximateLPSnapshot {
   liquidity_score?: bigint
   // The time when the snapshot was calculated
   calculate_at?: bigint
+}
+
+// The gross/net exposure of a asset.
+export interface IAssetExposureSummary {
+  // The asset
+  instruments?: string
+  // The gross/net notional of the asset
+  notional?: bigint
 }
 
 export interface IAssetMarginTierResponse {
@@ -1899,6 +2019,12 @@ export interface ILPSnapshot {
   calculate_at?: bigint
 }
 
+// Used for requests that take a MainAccountID
+export interface IMainAccIDRequest {
+  // MainAccountID being queried, passed as a hex string.
+  main_account_id?: bigint
+}
+
 export interface IMarginTierResponse {
   lower_bound?: string
   rate?: string
@@ -1954,7 +2080,7 @@ export interface IOrder {
   // RFQ Maker only supports (GTT, AON), RFQ Taker only supports (FOK)
   time_in_force?: ETimeInForce
   // If True, Order must be a maker order. It has to fill the orderbook instead of match it.
-  // If False, Order can be either a maker or taker order.
+  // If False, Order can be either a maker or taker order. <b>In this case, order creation is currently subject to a speedbump of 25ms to ensure orders are matched against updated orderbook quotes.</b>
   //
   // |               | Must Fill All | Can Fill Partial |
   // | -             | -             | -                |
@@ -2058,6 +2184,33 @@ export interface IOrderbookLevels {
   asks?: IOrderbookLevel[]
 }
 
+export interface IPositionSummary {
+  // The instrument being represented
+  instrument?: string
+  // The size of the position, expressed in base asset decimal units. Negative for short positions
+  size?: string
+  // The notional value of the position, negative for short assets, expressed in quote asset decimal units
+  notional?: string
+  // The entry price of the position, expressed in `9` decimals
+  // Whenever increasing the size of a position, the entry price is updated to the new average entry price
+  // `new_entry_price = (old_entry_price * old_size + trade_price * trade_size) / (old_size + trade_size)`
+  entry_price?: string
+  // The unrealized PnL of the position, expressed in quote asset decimal units
+  // `unrealized_pnl = (mark_price - entry_price) * size`
+  unrealized_pnl?: string
+  // The realized PnL of the position, expressed in quote asset decimal units
+  // `realized_pnl = (exit_price - entry_price) * exit_trade_size`
+  realized_pnl?: string
+  // The total PnL of the position, expressed in quote asset decimal units
+  // `total_pnl = realized_pnl + unrealized_pnl`
+  total_pnl?: string
+  // The ROI of the position, expressed as a percentage
+  // `roi = (total_pnl / (entry_price * abs(size))) * 100^`
+  roi?: string
+  // The index price of the quote currency. (reported in `USD`)
+  quote_index_price?: string
+}
+
 export interface IPositions {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
@@ -2095,6 +2248,8 @@ export interface IPositions {
   quote_index_price?: string
   // The estimated liquidation price
   est_liquidation_price?: string
+  // The current leverage value for this position
+  leverage?: string
 }
 
 export interface IPreOrderCheckResult {
@@ -2172,6 +2327,22 @@ export interface IQueryGetListEpochResponse {
   result?: IEpoch[]
 }
 
+// Request to retrieve the trading performance trend
+export interface IQueryTradingPerformanceTrendRequest {
+  // The subaccount IDs to filter by
+  sub_account_i_ds?: bigint[]
+  // The time interval to filter by
+  time_interval?: ETimeInterval
+}
+
+// Response to retrieve the trading performance trend
+export interface IQueryTradingPerformanceTrendResponse {
+  // The list of trading performance trends
+  result?: ITradingPerformancePoint[]
+  // The cursor to indicate when to start the next query from
+  next?: string
+}
+
 export interface IRewardEpochInfo {
   // The epoch number
   epoch?: number
@@ -2181,6 +2352,19 @@ export interface IRewardEpochInfo {
   epoch_end_time?: bigint
   // The status of the epoch
   status?: ERewardEpochStatus
+}
+
+export interface ISessionInformation {
+  // country code of user based on IP address
+  country_code?: string
+  // unique identity of the session generated from client
+  client_session_id?: string
+  // screen size
+  device_screen_size?: string
+  // OS of user's device
+  device_os?: string
+  // OS version of user's device
+  device_os_version?: string
 }
 
 export interface ISignature {
@@ -2205,12 +2389,31 @@ export interface ISignature {
 export interface ISnapFundingAccountSummary {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: bigint
+  // The start of the interval in unix nanoseconds
+  start_interval?: bigint
   // The main account ID of the account to which the summary belongs
   main_account_id?: bigint
   // Total equity of the main account, denominated in USD
   total_equity?: string
   // The list of spot assets owned by this main account, and their balances
   spot_balances?: ISpotBalance[]
+}
+
+export interface ISnapSubAccountSummary {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: bigint
+  // The start of the interval in unix nanoseconds
+  start_interval?: bigint
+  // The sub account ID this entry refers to
+  sub_account_id?: bigint
+  // The notional value of your account if all positions are closed, excluding trading fees (reported in `settle_currency`).
+  // `total_equity = sum(spot_balance.balance * spot_balance.index_price) / settle_index_price + unrealized_pnl`
+  total_equity?: string
+  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
+  // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
+  unrealized_pnl?: string
+  // The list of positions owned by this sub account
+  positions?: IPositionSummary[]
 }
 
 export interface ISpotBalance {
@@ -2360,6 +2563,14 @@ export interface ITicker {
   long_short_ratio?: string
 }
 
+// The gross/net exposure of a asset.
+export interface ITimedAssetExposureSummary {
+  // The start time of the interval
+  start_interval?: bigint
+  // The list of asset exposures
+  asset_exposures?: IAssetExposureSummary[]
+}
+
 // All private RFQs and Private AXEs will be filtered out from the responses
 export interface ITrade {
   // Time at which the event was emitted in unix nanoseconds
@@ -2410,6 +2621,16 @@ export interface ITraderMetric {
   total_point?: number
 }
 
+// Trading performance trend returned by clickhouse
+export interface ITradingPerformancePoint {
+  // The start time of the interval
+  start_interval?: bigint
+  // The trading volume of the account
+  trading_volume?: bigint
+  // Realized PnL in USDT
+  realized_pnl?: string
+}
+
 export interface ITransferHistory {
   // The transaction ID of the transfer
   tx_id?: bigint
@@ -2447,6 +2668,62 @@ export interface ITriggerOrderMetadata {
   //
   //
   tpsl?: ITPSLOrderMetadata
+}
+
+export interface IUserCategoryAffinityScore {
+  // The off chain account id
+  account_id?: string
+  // target category
+  category_id?: string
+  // affinity score
+  affinity_score?: number
+}
+
+// event of user
+export interface IUserTrackingEvent {
+  // uuid for event
+  event_id?: string
+  // version of tracking
+  tracking_version?: number
+  // timestamp of event
+  event_time?: bigint
+  // event type
+  event_type?: string
+  // event sub type
+  event_sub_type?: string
+  // unique identity of the session generated from client
+  client_session_id?: string
+  // OS of user's device
+  device_os?: string
+  // OS version of user's device
+  device_os_version?: string
+  // sub account id
+  sub_account_id?: string
+  // trading session key
+  trading_address?: string
+  // screen size
+  screen_size?: string
+  // event data
+  event_data?: string
+  // user id
+  user_id?: string
+  // account id
+  account_id?: string
+  // auth session hash of the authenticated session on backend
+  auth_session_hash?: string
+  // country code of user based on IP address
+  country_code?: string
+}
+
+export interface IUserVaultCategoryEventPayLoad {
+  // category ID of event
+  category_id?: string
+  // vault ID
+  vault_id?: string
+  // action of event. search/filter/invest...
+  action?: string
+  // number of bumps in this event. default 1
+  num_bumps?: bigint
 }
 
 export interface IWSCancelFeedDataV1 {
@@ -2741,7 +3018,8 @@ export interface IWSPositionsFeedDataV1 {
   prev_sequence_number?: bigint
 }
 
-// Subscribes to a feed of position updates. This happens when a trade is executed.
+// Subscribes to a feed of position updates.
+// Updates get published when a trade is executed, and when leverage configurations are changed for instruments with ongoing positions.
 // To subscribe to all positions, specify an empty `instrument` (eg. `2345123`).
 // Otherwise, specify the `instrument` to only receive positions for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSPositionsFeedSelectorV1 {

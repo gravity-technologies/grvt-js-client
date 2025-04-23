@@ -21,6 +21,7 @@ import {
   API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP,
   API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP,
+  API_GET_MARGIN_TIERS_RESPONSE_MAP,
   API_GET_ORDER_GROUP_REQUEST_MAP,
   API_GET_ORDER_GROUP_RESPONSE_MAP,
   API_GET_ORDER_REQUEST_MAP,
@@ -35,8 +36,14 @@ import {
   API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
   API_PRE_ORDER_CHECK_REQUEST_MAP,
   API_PRE_ORDER_CHECK_RESPONSE_MAP,
+  API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP,
+  API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
+  API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
+  API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
+  API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
   API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
   API_SET_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
@@ -44,6 +51,8 @@ import {
   API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
   API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_TIMED_ASSET_EXPOSURE_REQUEST_MAP,
+  API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP,
   API_TRANSFER_HISTORY_REQUEST_MAP,
   API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
@@ -71,6 +80,7 @@ import {
   type IApiFundingPaymentHistoryResponse,
   type IApiGetAllInitialLeverageRequest,
   type IApiGetAllInitialLeverageResponse,
+  type IApiGetMarginTiersResponse,
   type IApiGetOrderGroupRequest,
   type IApiGetOrderGroupResponse,
   type IApiGetOrderRequest,
@@ -85,8 +95,14 @@ import {
   type IApiPreDepositCheckResponse,
   type IApiPreOrderCheckRequest,
   type IApiPreOrderCheckResponse,
+  type IApiQueryListFundingAccountSummaryRequest,
+  type IApiQueryListFundingAccountSummaryResponse,
+  type IApiQueryListSubAccountSummaryRequest,
+  type IApiQueryListSubAccountSummaryResponse,
   type IApiQueryTradingPerformanceRequest,
   type IApiQueryTradingPerformanceResponse,
+  type IApiQueryTradingPerformanceTrendRequest,
+  type IApiQueryTradingPerformanceTrendResponse,
   type IApiSetInitialLeverageRequest,
   type IApiSetInitialLeverageResponse,
   type IApiSocializedLossStatusResponse,
@@ -94,6 +110,8 @@ import {
   type IApiSubAccountHistoryResponse,
   type IApiSubAccountSummaryRequest,
   type IApiSubAccountSummaryResponse,
+  type IApiTimedAssetExposureRequest,
+  type IApiTimedAssetExposureResponse,
   type IApiTransferHistoryRequest,
   type IApiTransferHistoryResponse,
   type IApiTransferRequest,
@@ -237,6 +255,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiSubAccountSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  subAccountSummaryHistory (payload: IApiQueryListSubAccountSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/sub_account_summary_history',
+      Utils.schemaMap(payload, API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryListSubAccountSummaryResponse
     }).catch(Utils.coverApiError)
   }
 
@@ -420,6 +448,16 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  getMarginTiers (config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/get_margin_tiers',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_MARGIN_TIERS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetMarginTiersResponse
+    }).catch(Utils.coverApiError)
+  }
+
   /**
    * @see https://api-docs.grvt.io/trading_api/#funding-payment-history
    */
@@ -446,6 +484,16 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  fundingAccountSummaryHistory (payload: IApiQueryListFundingAccountSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/funding_account_summary_history',
+      Utils.schemaMap(payload, API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryListFundingAccountSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
   /**
    * @see https://api-docs.grvt.io/trading_api/#aggregated-account-summary
    */
@@ -466,6 +514,26 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  tradingPerformanceTrend (payload: IApiQueryTradingPerformanceTrendRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/trading_performance_trend',
+      Utils.schemaMap(payload, API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingPerformanceTrendResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  assetExposure (payload: IApiTimedAssetExposureRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/asset_exposure',
+      Utils.schemaMap(payload, API_TIMED_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
     }).catch(Utils.coverApiError)
   }
 }
