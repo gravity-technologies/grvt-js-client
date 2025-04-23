@@ -15,6 +15,7 @@ import {
   ERewardProgramType,
   ESubAccountTradeInterval,
   ETimeInForce,
+  ETimeInterval,
   ETransferType,
   ETriggerBy,
   ETriggerType,
@@ -209,6 +210,13 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
   [ETimeInForce.ALL_OR_NONE]: 2,
   [ETimeInForce.IMMEDIATE_OR_CANCEL]: 3,
   [ETimeInForce.FILL_OR_KILL]: 4
+})
+
+export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
+  [ETimeInterval.INTERVAL_1_D]: 1,
+  [ETimeInterval.INTERVAL_7_D]: 2,
+  [ETimeInterval.INTERVAL_30_D]: 3,
+  [ETimeInterval.INTERVAL_90_D]: 4
 })
 
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({

@@ -20,5 +20,6 @@ export const HexStringMap = [
   'to_account_id',
   'to_eth_address',
   'total_trade_volume',
+  'trading_volume',
   'tx_hash'
 ]
