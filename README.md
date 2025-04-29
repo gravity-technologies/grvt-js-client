@@ -1,6 +1,6 @@
 # GRVT
 
-Node.js & JavaScript SDK for GRVT REST APIs & WebSockets
+**This package is deprecated. Please use the new [@grvt/client](https://www.npmjs.com/package/@grvt/client) package instead.**
 
 ## Installing
 
