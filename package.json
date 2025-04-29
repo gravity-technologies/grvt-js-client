@@ -1,7 +1,7 @@
 {
   "name": "@grvt/client",
   "version": "1.4.0",
-  "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
+  "description": "Node.js & JavaScript client for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gravity-technologies/grvt-js-client.git"
