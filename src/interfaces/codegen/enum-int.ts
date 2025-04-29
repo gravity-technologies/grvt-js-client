@@ -19,6 +19,7 @@ import {
   ETransferType,
   ETriggerBy,
   ETriggerType,
+  EVaultType,
   EVenue
 } from './data.interface'
 
@@ -235,6 +236,11 @@ export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
   [ETriggerType.UNSPECIFIED]: 0,
   [ETriggerType.TAKE_PROFIT]: 1,
   [ETriggerType.STOP_LOSS]: 2
+})
+
+export const EVaultTypeInt: Record<EVaultType, number> = Object.freeze({
+  [EVaultType.PRIME]: 1,
+  [EVaultType.LAUNCH_PAD]: 2
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({

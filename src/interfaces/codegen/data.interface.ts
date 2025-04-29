@@ -383,6 +383,13 @@ export enum ETriggerType {
   STOP_LOSS = 'STOP_LOSS',
 }
 
+export enum EVaultType {
+  // Prime vault
+  PRIME = 'PRIME',
+  // Launchpad vault
+  LAUNCH_PAD = 'LAUNCH_PAD',
+}
+
 // The list of Trading Venues that are supported on the GRVT exchange
 export enum EVenue {
   // the trade is cleared on the orderbook venue
@@ -397,7 +404,7 @@ export interface IAPISettlementPrice {
   // The quote currency of the settlement price
   quote?: ECurrency
   // The settlement timestamp of the settlement price, expressed in unix nanoseconds
-  settlement_time?: bigint
+  settlement_time?: string
   // The settlement price, expressed in `9` decimals
   settlement_price?: string
 }
@@ -415,7 +422,7 @@ export interface IAckResponse {
 
 export interface IAggregatedAccountSummary {
   // The main account ID of the account to which the summary belongs
-  main_account_id?: bigint
+  main_account_id?: string
   // Total equity of the main (+ sub) account, denominated in USD
   total_equity?: string
   // The list of spot assets owned by this main (+ sub) account, and their balances
@@ -431,7 +438,7 @@ export interface IApiAggregatedAccountSummaryResponse {
 // Cancel all orders on the orderbook for this trading account. This may not match new orders in flight.
 export interface IApiCancelAllOrdersRequest {
   // The subaccount ID cancelling all orders
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be cancelled
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be cancelled
@@ -456,7 +463,7 @@ export interface IApiCancelAllOrdersResponse {
 // If the server does not receive a heartbeat message within the countdown time, it will cancel all open orders for the specified Sub Account ID.
 export interface IApiCancelOnDisconnectRequest {
   // The subaccount ID cancelling the orders for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Countdown time in milliseconds (ex. 120000 for 120s).
   //
   // 0 to disable the timer.
@@ -466,17 +473,17 @@ export interface IApiCancelOnDisconnectRequest {
   // Minimum acceptable value is 1,000.
   //
   // Maximum acceptable value is 300,000
-  countdown_time?: bigint
+  countdown_time?: string
 }
 
 // Cancel an order on the orderbook for this trading account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiCancelOrderRequest {
   // The subaccount ID cancelling the order
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Cancel the order with this `order_id`
-  order_id?: bigint
+  order_id?: string
   // Cancel the order with this `client_order_id`
-  client_order_id?: bigint
+  client_order_id?: string
   // Specifies the time-to-live (in milliseconds) for this cancellation.
   // During this period, any order creation with a matching `client_order_id` will be cancelled and not be added to the GRVT matching engine.
   // This mechanism helps mitigate time-of-flight issues where cancellations might arrive before the corresponding orders.
@@ -485,7 +492,7 @@ export interface IApiCancelOrderRequest {
   // Value of `'0'` or omission results in the default time-to-live value being applied.
   // If the caller requests multiple successive cancellations for a given order, such that the time-to-live windows overlap, only the first request will be considered.
   //
-  time_to_live_ms?: bigint
+  time_to_live_ms?: string
 }
 
 export interface IApiCancelOrderResponse {
@@ -504,9 +511,9 @@ export interface IApiCandlestickRequest {
   // The type of candlestick data to retrieve
   type?: ECandlestickType
   // Start time of kline data in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // End time of kline data in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -522,9 +529,9 @@ export interface IApiCandlestickResponse {
 
 export interface IApiCategoryAffinityScoreRequest {
   // The start time of query. Can leave empty to query from the beginning
-  start_time?: bigint
+  start_time?: string
   // The end time of query. Can leave empty to query until now
-  end_time?: bigint
+  end_time?: string
 }
 
 export interface IApiCategoryAffinityScoreResponse {
@@ -581,15 +588,15 @@ export interface IApiDepositHistoryRequest {
   // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
   currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // The end time to query for in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
   // Main account ID being queried. By default, applies the requestor's main account ID.
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IApiDepositHistoryResponse {
@@ -600,7 +607,7 @@ export interface IApiDepositHistoryResponse {
 }
 
 export interface IApiDropClientWsRequest {
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IApiDropClientWsResponse {
@@ -612,7 +619,7 @@ export interface IApiDropClientWsResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiFillHistoryRequest {
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
@@ -620,9 +627,9 @@ export interface IApiFillHistoryRequest {
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
+  start_time?: string
   // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -644,7 +651,7 @@ export interface IApiFindEcosystemEpochMetricResponse {
   // The total number of accounts in the ecosystem
   total?: number
   // The time when the ecosystem points were last calculated
-  last_calculated_at?: bigint
+  last_calculated_at?: string
   // Direct invite count without relying on epochs
   total_direct_invite_count?: number
   // Indirect invite count without relying on epochs
@@ -666,9 +673,9 @@ export interface IApiFindFirstEpochMetricResponse {
   // The total number of accounts in the ecosystem
   total?: number
   // Total ecosystem point of the first epoch
-  total_point?: bigint
+  total_point?: string
   // The time when the ecosystem points were last calculated
-  last_calculated_at?: bigint
+  last_calculated_at?: string
 }
 
 export interface IApiFindTraderEpochMetricResponse {
@@ -679,7 +686,7 @@ export interface IApiFindTraderEpochMetricResponse {
   // The total number of accounts in the trader
   total?: number
   // The time when the trader points were last calculated
-  last_calculated_at?: bigint
+  last_calculated_at?: string
 }
 
 export interface IApiFindTraderLeaderboardResponse {
@@ -698,13 +705,13 @@ export interface IApiFundingAccountSummaryResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiFundingPaymentHistoryRequest {
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The perpetual instrument to filter for
   instrument?: string
   // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
+  start_time?: string
   // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -725,9 +732,9 @@ export interface IApiFundingRateRequest {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // Start time of funding rate in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // End time of funding rate in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -744,7 +751,7 @@ export interface IApiFundingRateResponse {
 // The request to get the initial leverage of a sub account
 export interface IApiGetAllInitialLeverageRequest {
   // The sub account ID to get the leverage for
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 // The response to get the initial leverage of a sub account
@@ -766,7 +773,7 @@ export interface IApiGetAllInstrumentsResponse {
 
 export interface IApiGetEcosystemLeaderboardRequest {
   // Start time of the epoch - phase
-  calculate_from?: bigint
+  calculate_from?: string
   // The number of accounts to return
   limit?: number
 }
@@ -782,9 +789,9 @@ export interface IApiGetEcosystemReferralStatResponse {
   // Indirect invite count
   indirect_invite_count?: number
   // Total volume traded by direct invites multiple by 1e9
-  direct_invite_trading_volume?: bigint
+  direct_invite_trading_volume?: string
   // Total volume traded by indirect invites multiple by 1e9
-  indirect_invite_trading_volume?: bigint
+  indirect_invite_trading_volume?: string
 }
 
 // Fetch a list of instruments based on the filters provided
@@ -828,15 +835,15 @@ export interface IApiGetLPInfoResponse {
   // Is LP maker
   is_lp_maker?: boolean
   // The spread score value multiplier
-  spread_score_value_multiplier?: bigint
+  spread_score_value_multiplier?: string
   // The depth score value multiplier
-  depth_score_value_multiplier?: bigint
+  depth_score_value_multiplier?: string
   // The market share value multiplier
-  market_share_value_multiplier?: bigint
+  market_share_value_multiplier?: string
   // Underlying multiplier
-  underlying_multiplier?: bigint
+  underlying_multiplier?: string
   // The market share multiplier, equal to the maker trading volume in the past 2 hours
-  market_share_multiplier?: bigint
+  market_share_multiplier?: string
   // Ask fast market multiplier
   ask_fast_market_multiplier?: number
   // Bid fast market multiplier
@@ -897,9 +904,9 @@ export interface IApiGetListFlatReferralRequest {
   // The off chain referrer account id to get all flat referrals
   referral_id?: string
   // Optional. Start time in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // Optional. End time in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The off chain account id to get all user's referrers
   account_id?: string
 }
@@ -925,7 +932,7 @@ export interface IApiGetMarginTiersResponse {
 // helping to identify TP/SL pairs or other order relationships within the account.
 export interface IApiGetOrderGroupRequest {
   // The subaccount ID for which the order groups should be retrieved.
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 export interface IApiGetOrderGroupResponse {
@@ -938,11 +945,11 @@ export interface IApiGetOrderGroupResponse {
 // Retrieve the order for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiGetOrderRequest {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Filter for `order_id`
-  order_id?: bigint
+  order_id?: string
   // Filter for `client_order_id`
-  client_order_id?: bigint
+  client_order_id?: string
 }
 
 export interface IApiGetOrderResponse {
@@ -952,14 +959,14 @@ export interface IApiGetOrderResponse {
 
 export interface IApiGetTraderStatResponse {
   // Total fee paid
-  total_fee?: bigint
+  total_fee?: string
 }
 
 export interface IApiGetUserEcosystemPointRequest {
   // The off chain account id
   account_id?: string
   // Start time of the epoch - phase
-  calculate_from?: bigint
+  calculate_from?: string
   // Include user rank in the response
   include_user_rank?: boolean
 }
@@ -971,16 +978,16 @@ export interface IApiGetUserEcosystemPointResponse {
 
 export interface IApiGetVerifiedEcosystemLeaderboardRequest {
   // Start time of the epoch
-  calculate_from?: bigint
+  calculate_from?: string
   // Completed KYC before this time
-  completed_kyc_before?: bigint
+  completed_kyc_before?: string
 }
 
 // The request to get the latest snapshot of list sub account
 //
 export interface IApiLatestSnapSubAccountsRequest {
   // The list of sub account ids to query
-  sub_account_i_ds?: bigint[]
+  sub_account_i_ds?: string[]
 }
 
 export interface IApiLatestSnapSubAccountsResponse {
@@ -1011,7 +1018,7 @@ export interface IApiMiniTickerResponse {
 
 export interface IApiOpenOrdersRequest {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
@@ -1031,7 +1038,7 @@ export interface IApiOpenOrdersResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiOrderHistoryRequest {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
@@ -1039,9 +1046,9 @@ export interface IApiOrderHistoryRequest {
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
   quote?: ECurrency[]
   // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
+  start_time?: string
   // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -1058,11 +1065,11 @@ export interface IApiOrderHistoryResponse {
 // Retrieve the order state for the account. Either `order_id` or `client_order_id` must be provided.
 export interface IApiOrderStateRequest {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Filter for `order_id`
-  order_id?: bigint
+  order_id?: string
   // Filter for `client_order_id`
-  client_order_id?: bigint
+  client_order_id?: string
 }
 
 export interface IApiOrderStateResponse {
@@ -1086,7 +1093,7 @@ export interface IApiOrderbookLevelsResponse {
 // Query the positions of a sub account
 export interface IApiPositionsRequest {
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
@@ -1118,7 +1125,7 @@ export interface IApiPreDepositCheckResponse {
 // Get pre-order check information for a new order
 export interface IApiPreOrderCheckRequest {
   // The subaccount ID of orders to query
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The order to do pre-order check
   orders?: IOrder[]
 }
@@ -1126,6 +1133,20 @@ export interface IApiPreOrderCheckRequest {
 export interface IApiPreOrderCheckResponse {
   // Pre order check for each new order in the request
   results?: IPreOrderCheckResult[]
+}
+
+// Request to retrieve the account summary for a given account
+export interface IApiQueryAccountSummaryRequest {
+  // The time interval to filter
+  time_interval?: ETimeInterval
+}
+
+// Response to retrieve the sub-account summary for a given sub-account
+export interface IApiQueryAccountSummaryResponse {
+  // The list of account summaries
+  result?: ISnapAccountSummary[]
+  // The next cursor to fetch the next page of results
+  next?: string
 }
 
 // Query flat referral stats
@@ -1160,7 +1181,7 @@ export interface IApiQueryListSubAccountSummaryRequest {
   // The time interval to filter
   time_interval?: ETimeInterval
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 // Response to retrieve the sub-account summary for a given sub-account
@@ -1174,7 +1195,7 @@ export interface IApiQueryListSubAccountSummaryResponse {
 // Request to retrieve the trading volume
 export interface IApiQueryTradingPerformanceRequest {
   // Optional: The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The asset to filter by
   asset?: string
 }
@@ -1182,7 +1203,7 @@ export interface IApiQueryTradingPerformanceRequest {
 // Response to retrieve the trading volume
 export interface IApiQueryTradingPerformanceResponse {
   // Trading volume in USDT
-  trading_volume?: bigint
+  trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
 }
@@ -1190,7 +1211,7 @@ export interface IApiQueryTradingPerformanceResponse {
 // Request to retrieve the trading performance trend
 export interface IApiQueryTradingPerformanceTrendRequest {
   // Optional: The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The time interval to filter by
   time_interval?: ETimeInterval
 }
@@ -1209,13 +1230,13 @@ export interface IApiResolveEpochEcosystemMetricResponse {
   // Ecosystem points up to the most recently calculated time within this epoch
   point?: number
   // The time in unix nanoseconds when the ecosystem points were last calculated
-  last_calculated_time?: bigint
+  last_calculated_time?: string
 }
 
 // The request to set the initial leverage of a sub account
 export interface IApiSetInitialLeverageRequest {
   // The sub account ID to set the leverage for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument to set the leverage for
   instrument?: string
   // The leverage to set for the sub account
@@ -1237,9 +1258,9 @@ export interface IApiSettlementPriceRequest {
   // The quote currency to select
   quote?: ECurrency
   // Start time of settlement price in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // End time of settlement price in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -1269,11 +1290,11 @@ export interface IApiSocializedLossStatusResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiSubAccountHistoryRequest {
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Start time of sub account history in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // End time of sub account history in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the next query from
@@ -1289,7 +1310,7 @@ export interface IApiSubAccountHistoryResponse {
 
 export interface IApiSubAccountSummaryRequest {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 // Query for sub-account details, including base currency balance, all derivative positions, margin levels, and P&L.
@@ -1305,13 +1326,13 @@ export interface IApiSubAccountTradeAggregationRequest {
   // The interval of each sub account trade
   interval?: ESubAccountTradeInterval
   // The list of sub account ids to query
-  sub_account_i_ds?: bigint[]
+  sub_account_i_ds?: string[]
   // Optional. The starting time in unix nanoseconds of a specific interval to query
-  start_interval?: bigint
+  start_interval?: string
   // Optional. Start time in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // Optional. End time in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // Filter on the maker of the trade
   is_maker?: boolean
   // Filter on the taker of the trade
@@ -1352,7 +1373,7 @@ export interface IApiTimedAssetExposureRequest {
   // The time interval to filter
   time_interval?: ETimeInterval
   // Optional: The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 // Returns the list of assets traded by users.
@@ -1372,9 +1393,9 @@ export interface IApiTradeHistoryRequest {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
-  start_time?: bigint
+  start_time?: string
   // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the query from
@@ -1405,9 +1426,9 @@ export interface IApiTradeResponse {
 // Trading performance trend returned by the service
 export interface IApiTradingPerformanceTrend {
   // The start time of the interval
-  start_interval?: bigint
+  start_interval?: string
   // The trading volume of the account
-  trading_volume?: bigint
+  trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
 }
@@ -1420,17 +1441,17 @@ export interface IApiTransferHistoryRequest {
   // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
   currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // The end time to query for in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
   // The transaction ID to query for
-  tx_id?: bigint
+  tx_id?: string
   // Main account ID being queried. By default, applies the requestor's main account ID.
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IApiTransferHistoryResponse {
@@ -1452,13 +1473,13 @@ export interface IApiTransferHistoryResponse {
 //
 export interface IApiTransferRequest {
   // The main account to transfer from
-  from_account_id?: bigint
+  from_account_id?: string
   // The subaccount to transfer from (0 if transferring from main account)
-  from_sub_account_id?: bigint
+  from_sub_account_id?: string
   // The main account to deposit into
-  to_account_id?: bigint
+  to_account_id?: string
   // The subaccount to transfer to (0 if transferring to main account)
-  to_sub_account_id?: bigint
+  to_sub_account_id?: string
   // The token currency to transfer
   currency?: ECurrency
   // The number of tokens to transfer, quoted in tokenCurrency decimal units
@@ -1475,9 +1496,9 @@ export interface IApiUserCategoryAffinityScoreRequest {
   // The off chain account id
   account_id?: string
   // The start time of query. Can leave empty to query from the beginning
-  start_time?: bigint
+  start_time?: string
   // The end time of query. Can leave empty to query until now
-  end_time?: bigint
+  end_time?: string
 }
 
 export interface IApiUserCategoryAffinityScoreResponse {
@@ -1493,15 +1514,15 @@ export interface IApiWithdrawalHistoryRequest {
   // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
   currency?: ECurrency[]
   // The start time to query for in unix nanoseconds
-  start_time?: bigint
+  start_time?: string
   // The end time to query for in unix nanoseconds
-  end_time?: bigint
+  end_time?: string
   // The limit to query for. Defaults to 500; Max 1000
   limit?: number
   // The cursor to indicate when to start the next query from
   cursor?: string
   // Main account ID being queried. By default, applies the requestor's main account ID.
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IApiWithdrawalHistoryResponse {
@@ -1519,9 +1540,9 @@ export interface IApiWithdrawalHistoryResponse {
 // Note that your funds will always remain in self-custory throughout the withdrawal process. At no stage does GRVT gain control over your funds.
 export interface IApiWithdrawalRequest {
   // The main account to withdraw from
-  from_account_id?: bigint
+  from_account_id?: string
   // The Ethereum wallet to withdraw into
-  to_eth_address?: bigint
+  to_eth_address?: string
   // The token currency to withdraw
   currency?: ECurrency
   // The number of tokens to withdraw, quoted in tokenCurrency decimal units
@@ -1534,26 +1555,26 @@ export interface IApproximateLPPoint {
   // The off chain account id
   off_chain_account_id?: string
   // Liquidity score
-  liquidity_score?: bigint
+  liquidity_score?: string
   // The rank of user in the LP leaderboard
   rank?: number
 }
 
 export interface IApproximateLPSnapshot {
   // The main account id
-  main_account_id?: bigint
+  main_account_id?: string
   // Underlying multiplier
-  underlying_multiplier?: bigint
+  underlying_multiplier?: string
   // Market share multiplier
-  market_share_multiplier?: bigint
+  market_share_multiplier?: string
   // Fast market multiplier
   bid_fast_market_multiplier?: number
   // Fast market multiplier
   ask_fast_market_multiplier?: number
   // Liquidity score
-  liquidity_score?: bigint
+  liquidity_score?: string
   // The time when the snapshot was calculated
-  calculate_at?: bigint
+  calculate_at?: string
 }
 
 // The gross/net exposure of a asset.
@@ -1561,7 +1582,7 @@ export interface IAssetExposureSummary {
   // The asset
   instruments?: string
   // The gross/net notional of the asset
-  notional?: bigint
+  notional?: string
 }
 
 export interface IAssetMarginTierResponse {
@@ -1580,24 +1601,24 @@ export interface IAssetMaxQty {
 
 export interface ICancelStatusFeed {
   // The subaccount ID that requested the cancellation
-  sub_account_id?: bigint
+  sub_account_id?: string
   // A unique identifier for the active order within a subaccount, specified by the client
-  client_order_id?: bigint
+  client_order_id?: string
   // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
-  order_id?: bigint
+  order_id?: string
   // The user-provided reason for cancelling the order
   reason?: EOrderRejectReason
   // [Filled by GRVT Backend] Time at which the cancellation status was updated by GRVT in unix nanoseconds
-  update_time?: bigint
+  update_time?: string
   // Status of the cancellation attempt
   cancel_status?: ECancelStatus
 }
 
 export interface ICandlestick {
   // Open time of kline bar in unix nanoseconds
-  open_time?: bigint
+  open_time?: string
   // Close time of kline bar in unix nanosecond
-  close_time?: bigint
+  close_time?: string
   // The open price, expressed in underlying currency resolution units
   open?: string
   // The close price, expressed in underlying currency resolution units
@@ -1626,18 +1647,18 @@ export interface IClaimEcosystemBadgeResponse {
 // This is used to define TP/SL pairs or other order groupings after loading the list of Open Orders.
 export interface IClientOrderIDsByGroup {
   // The group this order belongs to. It can be used to define TP/SL pairs or other order groupings
-  group_id?: bigint
+  group_id?: string
   // List of client order IDs in the group
-  client_order_id?: bigint[]
+  client_order_id?: string[]
   // The sub account ID that these orders belong to
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 export interface IDeposit {
   // The hash of the bridgemint event producing the deposit
-  tx_hash?: bigint
+  tx_hash?: string
   // The account to deposit into
-  to_account_id?: bigint
+  to_account_id?: string
   // The token currency to deposit
   currency?: ECurrency
   // The number of tokens to deposit
@@ -1646,21 +1667,21 @@ export interface IDeposit {
 
 export interface IDepositHistory {
   // The L1 txHash of the deposit
-  l_1_hash?: bigint
+  l_1_hash?: string
   // The L2 txHash of the deposit
-  l_2_hash?: bigint
+  l_2_hash?: string
   // The account to deposit into
-  to_account_id?: bigint
+  to_account_id?: string
   // The token currency to deposit
   currency?: ECurrency
   // The number of tokens to deposit
   num_tokens?: string
   // The timestamp when the deposit was initiated on L1 in unix nanoseconds
-  initiated_time?: bigint
+  initiated_time?: string
   // The timestamp when the deposit was confirmed on L2 in unix nanoseconds
-  confirmed_time?: bigint
+  confirmed_time?: string
   // The address of the sender
-  from_address?: bigint
+  from_address?: string
 }
 
 export interface IEcosystemLeaderboardUser {
@@ -1669,7 +1690,7 @@ export interface IEcosystemLeaderboardUser {
   // The rank of the account in the ecosystem
   rank?: number
   // Total ecosystem point
-  total_point?: bigint
+  total_point?: string
   // The twitter username of the account
   twitter_username?: string
 }
@@ -1680,80 +1701,80 @@ export interface IEcosystemMetric {
   // Indirect invite count
   indirect_invite_count?: number
   // Direct invite trading volume
-  direct_invite_trading_volume?: bigint
+  direct_invite_trading_volume?: string
   // Indirect invite trading volume
-  indirect_invite_trading_volume?: bigint
+  indirect_invite_trading_volume?: string
   // Total ecosystem point of this epoch/phase
-  total_point?: bigint
+  total_point?: string
 }
 
 export interface IEcosystemPoint {
   // The off chain account id
   account_id?: string
   // The main account id
-  main_account_id?: bigint
+  main_account_id?: string
   // Total ecosystem point
-  total_point?: bigint
+  total_point?: string
   // Direct invite count
   direct_invite_count?: number
   // Indirect invite count
   indirect_invite_count?: number
   // Direct invite trading volume
-  direct_invite_trading_volume?: bigint
+  direct_invite_trading_volume?: string
   // Indirect invite trading volume
-  indirect_invite_trading_volume?: bigint
+  indirect_invite_trading_volume?: string
   // The time when the ecosystem point is calculated
-  calculate_at?: bigint
+  calculate_at?: string
   // Start time of the epoch - phase
-  calculate_from?: bigint
+  calculate_from?: string
   // End time of the epoch - phase
-  calculate_to?: bigint
+  calculate_to?: string
   // The rank of the account in the ecosystem
   rank?: number
   // The epoch number of the ecosystem point
   epoch?: number
   // Brokered trading volume
-  brokered_trading_volume?: bigint
+  brokered_trading_volume?: string
   // Brokered trading point
-  brokered_trading_point?: bigint
+  brokered_trading_point?: string
   // Referee KYC point
-  referee_kyc_point?: bigint
+  referee_kyc_point?: string
   // Referrer KYC point
-  referrer_kyc_point?: bigint
+  referrer_kyc_point?: string
 }
 
 export interface IEpoch {
   // The epoch number
   epoch?: number
   // The start time of the epoch
-  start_time?: bigint
+  start_time?: string
   // The end time of the epoch
-  end_time?: bigint
+  end_time?: string
 }
 
 export interface IEpochBadge {
   // The off chain account id
   account_id?: string
   // The account ID
-  main_account_id?: bigint
+  main_account_id?: string
   // The type of the reward program
   type?: ERewardProgramType
   // The epoch number
   epoch?: number
   // The start time of the epoch
-  epoch_start_time?: bigint
+  epoch_start_time?: string
   // The end time of the epoch
-  epoch_end_time?: bigint
+  epoch_end_time?: string
   // The type of the badge
   badge?: EEpochBadgeType
   // The distributed badges
   distributed_badges?: EEpochBadgeType[]
   // Total point
-  total_point?: bigint
+  total_point?: string
   // Rank
   rank?: number
   // The time when the badge was claimed, or the epoch end time if the user has already completed the KYC process
-  claimed_at?: bigint
+  claimed_at?: string
 }
 
 export interface IEpochBadgePointDistribution {
@@ -1764,15 +1785,15 @@ export interface IEpochBadgePointDistribution {
   // The type of the reward program
   type?: ERewardProgramType
   // The minimum point to get the badge
-  min_point?: bigint
+  min_point?: string
   // The maximum point to get the badge
-  max_point?: bigint
+  max_point?: string
   // The minimum rank to get the badge
   min_rank?: number
   // The maximum rank to get the badge
   max_rank?: number
   // The total point to get the badge
-  total_point?: bigint
+  total_point?: string
   // The number of users to get the badge
   count?: number
 }
@@ -1787,9 +1808,9 @@ export interface IError {
 
 export interface IFill {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The sub account ID that participated in the trade
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument being represented
   instrument?: string
   // The side that the subaccount took on the trade
@@ -1819,7 +1840,7 @@ export interface IFill {
   // `trade_id` is guaranteed to be consistent across MarketData `Trade` and Trading `Fill`.
   trade_id?: string
   // An order identifier
-  order_id?: bigint
+  order_id?: string
   // The venue where the trade occurred
   venue?: EVenue
   // If the trade was a liquidation
@@ -1833,11 +1854,11 @@ export interface IFill {
   // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
   //
   // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
-  client_order_id?: bigint
+  client_order_id?: string
   // A trade index
   trade_index?: number
   // The address (public key) of the wallet signing the payload
-  signer?: bigint
+  signer?: string
   // Specifies the broker who brokered the order
   broker?: EBrokerTag
 }
@@ -1850,27 +1871,27 @@ export interface IFlatReferral {
   // The referrer level; 1: direct referrer, 2: indirect referrer
   referrer_level?: number
   // The account creation time
-  account_create_time?: bigint
+  account_create_time?: string
   // The main account id
-  main_account_id?: bigint
+  main_account_id?: string
   // The referrer main account id
-  referrer_main_account_id?: bigint
+  referrer_main_account_id?: string
   // The account is a business account or not
   is_business?: boolean
   // The account is KYC verified or not
   is_kyc_completed?: boolean
   // The KYC completed time
-  kyc_completed_at?: bigint
+  kyc_completed_at?: string
   // The KYC type, can be 'individual' or 'business'
   kyc_type?: string
   // The first KYC completed time
-  kyc_first_completed_at?: bigint
+  kyc_first_completed_at?: string
 }
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
 export interface IFundingAccountSummary {
   // The main account ID of the account to which the summary belongs
-  main_account_id?: bigint
+  main_account_id?: string
   // Total equity of the main account, denominated in USD
   total_equity?: string
   // The list of spot assets owned by this main account, and their balances
@@ -1879,9 +1900,9 @@ export interface IFundingAccountSummary {
 
 export interface IFundingPayment {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The sub account ID that made the funding payment
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The perpetual instrument being funded
   instrument?: string
   // The currency of the funding payment
@@ -1891,7 +1912,7 @@ export interface IFundingPayment {
   // The transaction ID of the funding payment.
   // Funding payments can be triggered by a trade, transfer, or liquidation.
   // The `tx_id` will match the corresponding `trade_id` or `tx_id`.
-  tx_id?: bigint
+  tx_id?: string
 }
 
 export interface IFundingRate {
@@ -1900,9 +1921,11 @@ export interface IFundingRate {
   // The funding rate of the instrument, expressed in percentage points
   funding_rate?: string
   // The funding timestamp of the funding rate, expressed in unix nanoseconds
-  funding_time?: bigint
+  funding_time?: string
   // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: string
+  // The 8h average funding rate of the instrument, expressed in percentage points
+  funding_rate_8_h_avg?: string
 }
 
 export interface IGetClaimableEcosystemBadgeResponse {
@@ -1911,7 +1934,7 @@ export interface IGetClaimableEcosystemBadgeResponse {
   // Whether the badge is claimable
   is_claimable?: boolean
   // The time when the badge is claimable
-  claimable_until?: bigint
+  claimable_until?: string
 }
 
 export interface IInitialLeverageResult {
@@ -1929,7 +1952,7 @@ export interface IInstrument {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The asset ID used for instrument signing.
-  instrument_hash?: bigint
+  instrument_hash?: string
   // The base currency
   base?: ECurrency
   // The quote currency
@@ -1937,7 +1960,7 @@ export interface IInstrument {
   // The kind of instrument
   kind?: EKind
   // The expiry time of the instrument in unix nanoseconds
-  expiry?: bigint
+  expiry?: string
   // The strike price of the instrument, expressed in `9` decimals
   strike_price?: string
   // Venues that this instrument can be traded at
@@ -1955,7 +1978,7 @@ export interface IInstrument {
   // The minimum block trade size, expressed in base asset decimal units
   min_block_trade_size?: string
   // Creation time in unix nanoseconds
-  create_time?: bigint
+  create_time?: string
   // The maximum position size, expressed in base asset decimal units
   max_position_size?: string
 }
@@ -1993,36 +2016,36 @@ export interface IJSONRPCResponse {
 
 export interface ILPPoint {
   // The main account id
-  main_account_id?: bigint
+  main_account_id?: string
   // Liquidity score
-  liquidity_score?: bigint
+  liquidity_score?: string
   // The rank of user in the LP leaderboard
   rank?: number
 }
 
 export interface ILPSnapshot {
   // The main account id
-  main_account_id?: bigint
+  main_account_id?: string
   // The LP Asset
-  lp_asset?: bigint
+  lp_asset?: string
   // Underlying multiplier
-  underlying_multiplier?: bigint
+  underlying_multiplier?: string
   // Maker trading volume
-  maker_trading_volume?: bigint
+  maker_trading_volume?: string
   // Fast market multiplier
   bid_fast_market_multiplier?: number
   // Fast market multiplier
   ask_fast_market_multiplier?: number
   // Liquidity score
-  liquidity_score?: bigint
+  liquidity_score?: string
   // The time when the snapshot was calculated
-  calculate_at?: bigint
+  calculate_at?: string
 }
 
 // Used for requests that take a MainAccountID
 export interface IMainAccIDRequest {
   // MainAccountID being queried, passed as a hex string.
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IMarginTierResponse {
@@ -2032,7 +2055,7 @@ export interface IMarginTierResponse {
 
 export interface IMiniTicker {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
@@ -2064,9 +2087,9 @@ export interface IMiniTicker {
 // This minimizes the amount of trust users have to offer to GRVT
 export interface IOrder {
   // [Filled by GRVT Backend] A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
-  order_id?: bigint
+  order_id?: string
   // The subaccount initiating the order
-  sub_account_id?: bigint
+  sub_account_id?: string
   // If the order is a market order
   // Market Orders do not have a limit price, and are always executed according to the maker order price.
   // Market Orders must always be taker orders
@@ -2131,9 +2154,9 @@ export interface IOrderMetadata {
   // To prevent any conflicts, client machines should generate a random clientOrderID in the range [2^63, 2^64 - 1]
   //
   // When GRVT Backend receives an order with an overlapping clientOrderID, we will reject the order with rejectReason set to overlappingClientOrderId
-  client_order_id?: bigint
+  client_order_id?: string
   // [Filled by GRVT Backend] Time at which the order was received by GRVT in unix nanoseconds
-  create_time?: bigint
+  create_time?: string
   // Trigger fields are used to support any type of trigger order such as TP/SL
   trigger?: ITriggerOrderMetadata
   // Specifies the broker who brokered the order
@@ -2150,16 +2173,16 @@ export interface IOrderState {
   // The total number of assets traded. Sorted in same order as Order.Legs
   traded_size?: string[]
   // Time at which the order was updated by GRVT, expressed in unix nanoseconds
-  update_time?: bigint
+  update_time?: string
   // The average fill price of the order. Sorted in same order as Order.Legs
   avg_fill_price?: string[]
 }
 
 export interface IOrderStateFeed {
   // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
-  order_id?: bigint
+  order_id?: string
   // A unique identifier for the active order within a subaccount, specified by the client
-  client_order_id?: bigint
+  client_order_id?: string
   // The order state object being created or updated
   order_state?: IOrderState
 }
@@ -2175,7 +2198,7 @@ export interface IOrderbookLevel {
 
 export interface IOrderbookLevels {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The list of best bids up till query depth
@@ -2213,9 +2236,9 @@ export interface IPositionSummary {
 
 export interface IPositions {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The sub account ID that participated in the trade
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument being represented
   instrument?: string
   // The size of the position, expressed in base asset decimal units. Negative for short positions
@@ -2265,6 +2288,16 @@ export interface IPreOrderCheckResult {
   settle_currency?: ECurrency
 }
 
+// Request to retrieve the account summary for a given account
+export interface IQueryAccountSummaryRequest {
+  // The time interval to filter
+  time_interval?: ETimeInterval
+  // The main account ID to request for
+  main_account_id?: string
+  // The list subaccount IDs to filter by
+  sub_account_i_ds?: string[]
+}
+
 // Query list of epoch badges
 export interface IQueryEpochBadgePointDistributionRequest {
   // The numerical epoch index
@@ -2302,7 +2335,7 @@ export interface IQueryEpochBadgeResponse {
 // Query epoch by time or epoch number
 export interface IQueryFindEpochRequest {
   // The time to query the epoch
-  time?: bigint
+  time?: string
   // The epoch number
   epoch?: number
 }
@@ -2330,7 +2363,7 @@ export interface IQueryGetListEpochResponse {
 // Request to retrieve the trading performance trend
 export interface IQueryTradingPerformanceTrendRequest {
   // The subaccount IDs to filter by
-  sub_account_i_ds?: bigint[]
+  sub_account_i_ds?: string[]
   // The time interval to filter by
   time_interval?: ETimeInterval
 }
@@ -2347,9 +2380,9 @@ export interface IRewardEpochInfo {
   // The epoch number
   epoch?: number
   // The start time of the epoch
-  epoch_start_time?: bigint
+  epoch_start_time?: string
   // The end time of the epoch
-  epoch_end_time?: bigint
+  epoch_end_time?: string
   // The status of the epoch
   status?: ERewardEpochStatus
 }
@@ -2369,15 +2402,15 @@ export interface ISessionInformation {
 
 export interface ISignature {
   // The address (public key) of the wallet signing the payload
-  signer?: bigint
+  signer?: string
   // Signature R
-  r?: bigint
+  r?: string
   // Signature S
-  s?: bigint
+  s?: string
   // Signature V
   v?: number
   // Timestamp after which this signature expires, expressed in unix nanoseconds. Must be capped at 30 days
-  expiration?: bigint
+  expiration?: string
   // Users can randomly generate this value, used as a signature deconflicting key.
   // ie. You can send the same exact instruction twice with different nonces.
   // When the same nonce is used, the same payload will generate the same signature.
@@ -2385,14 +2418,22 @@ export interface ISignature {
   nonce?: number
 }
 
+// All account summary returned by clickhouse
+export interface ISnapAccountSummary {
+  // The start of the interval in unix nanoseconds
+  start_interval?: string
+  // Total equity of the main account and all sub-accounts, denominated in USD
+  total_equity?: string
+}
+
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
 export interface ISnapFundingAccountSummary {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The start of the interval in unix nanoseconds
-  start_interval?: bigint
+  start_interval?: string
   // The main account ID of the account to which the summary belongs
-  main_account_id?: bigint
+  main_account_id?: string
   // Total equity of the main account, denominated in USD
   total_equity?: string
   // The list of spot assets owned by this main account, and their balances
@@ -2401,11 +2442,11 @@ export interface ISnapFundingAccountSummary {
 
 export interface ISnapSubAccountSummary {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The start of the interval in unix nanoseconds
-  start_interval?: bigint
+  start_interval?: string
   // The sub account ID this entry refers to
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The notional value of your account if all positions are closed, excluding trading fees (reported in `settle_currency`).
   // `total_equity = sum(spot_balance.balance * spot_balance.index_price) / settle_index_price + unrealized_pnl`
   total_equity?: string
@@ -2434,9 +2475,9 @@ export interface IStreamReference {
 
 export interface ISubAccount {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The sub account ID this entry refers to
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The type of margin algorithm this subaccount uses
   margin_type?: EMarginType
   // The settlement, margin, and reporting currency of this account.
@@ -2471,19 +2512,19 @@ export interface ISubAccount {
 // Similar to sub-account trade, but not divided by individual assets.
 export interface ISubAccountTradeAggregation {
   // The sub account id
-  sub_account_id?: bigint
+  sub_account_id?: string
   // Total fee paid
-  total_fee?: bigint
+  total_fee?: string
   // Total volume traded
-  total_trade_volume?: bigint
+  total_trade_volume?: string
   // Number of trades
-  num_traded?: bigint
+  num_traded?: string
   // Total positive fee paid by user
-  positive_fee?: bigint
+  positive_fee?: string
   // The signer of the trade
-  signer?: bigint
+  signer?: string
   // Realized PnL
-  realized_pnl?: bigint
+  realized_pnl?: string
 }
 
 // Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.
@@ -2514,7 +2555,7 @@ export interface ITPSLOrderMetadata {
 //
 export interface ITicker {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The mark price of the instrument, expressed in `9` decimals
@@ -2566,7 +2607,7 @@ export interface ITicker {
 // The gross/net exposure of a asset.
 export interface ITimedAssetExposureSummary {
   // The start time of the interval
-  start_interval?: bigint
+  start_interval?: string
   // The list of asset exposures
   asset_exposures?: IAssetExposureSummary[]
 }
@@ -2574,7 +2615,7 @@ export interface ITimedAssetExposureSummary {
 // All private RFQs and Private AXEs will be filtered out from the responses
 export interface ITrade {
   // Time at which the event was emitted in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // If taker was the buyer on the trade
@@ -2616,7 +2657,7 @@ export interface ITraderLeaderboardUser {
 
 export interface ITraderMetric {
   // Total fee paid
-  total_fee?: bigint
+  total_fee?: string
   // Total trader point of this epoch/phase
   total_point?: number
 }
@@ -2624,24 +2665,24 @@ export interface ITraderMetric {
 // Trading performance trend returned by clickhouse
 export interface ITradingPerformancePoint {
   // The start time of the interval
-  start_interval?: bigint
+  start_interval?: string
   // The trading volume of the account
-  trading_volume?: bigint
+  trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
 }
 
 export interface ITransferHistory {
   // The transaction ID of the transfer
-  tx_id?: bigint
+  tx_id?: string
   // The account to transfer from
-  from_account_id?: bigint
+  from_account_id?: string
   // The subaccount to transfer from (0 if transferring from main account)
-  from_sub_account_id?: bigint
+  from_sub_account_id?: string
   // The account to deposit into
-  to_account_id?: bigint
+  to_account_id?: string
   // The subaccount to transfer to (0 if transferring to main account)
-  to_sub_account_id?: bigint
+  to_sub_account_id?: string
   // The token currency to transfer
   currency?: ECurrency
   // The number of tokens to transfer
@@ -2649,7 +2690,7 @@ export interface ITransferHistory {
   // The signature of the transfer
   signature?: ISignature
   // The timestamp of the transfer in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
   // The type of transfer
   transfer_type?: ETransferType
   // The metadata of the transfer
@@ -2686,7 +2727,7 @@ export interface IUserTrackingEvent {
   // version of tracking
   tracking_version?: number
   // timestamp of event
-  event_time?: bigint
+  event_time?: string
   // event type
   event_type?: string
   // event sub type
@@ -2723,7 +2764,28 @@ export interface IUserVaultCategoryEventPayLoad {
   // action of event. search/filter/invest...
   action?: string
   // number of bumps in this event. default 1
-  num_bumps?: bigint
+  num_bumps?: string
+}
+
+export interface IVaultParams {
+  // Annualized management fee charged by the vault (0-400 centibeeps, i.e. 0-4%)
+  management_fee_centi_beeps?: string
+  // Performance fee percentage charged on profits upon LP Token redemption (0-4000 centibeeps, i.e. 0-40%)
+  performance_fee_centi_beeps?: string
+  // Marketing fee percentage taken from Vault Manager earnings (0-4000 centibeeps, i.e. 0-40%). User vaults: Must be 0%. Partner vaults: Must be >= 500 centibeeps (5%). Fee reductions based on vault valuation: 0-60%: Full fee, 60-70%: 20% reduction, 70-80%: 40% reduction, 80-90%: 60% reduction, 90%+: 80% reduction
+  marketing_fee_centi_beeps?: string
+  // Vault type
+  vault_type?: EVaultType
+  // Maximum valuation cap for the vault in USD (6 decimal places). Range: 1M-100M USD. No new investments accepted after cap is reached
+  valuation_cap_usd_6_dec?: string
+  // Minimum period (in seconds) for vault manager to service redemptions. Range: 1-28 days (86400-2419200 seconds). Redemption is only serviced after this period has elapsed from request
+  min_redemption_period_seconds?: number
+  // Maximum period (in seconds) for vault manager to service redemptions. Range: 1-28 days (86400-2419200 seconds). Forced redemption occurs if requests exceed this period
+  max_redemption_period_seconds?: number
+  // Multiplier of Initial Margin (IM) for automatic redemption processing. Range: 8000-20000 centibeeps (80%-200%). Auto-redemption occurs when: Total Equity > barrier * Initial Margin, or Available Balance > barrier * Initial Margin where Available Balance = Total Equity - Initial Margin - min(Unrealized PnL, 0)
+  auto_redemption_barrier_centi_beeps?: string
+  // Reward sharing ratio for the vault. GRVT points earned by the vault would be redistributed to investors in the ratio of this field. 0% indicates that vault manager get all rewards. Range: 0-10000 centibeeps (0%-100%). 10000 centibeeps = 100%
+  reward_sharing_ratio_centi_beeps?: string
 }
 
 export interface IWSCancelFeedDataV1 {
@@ -2737,11 +2799,11 @@ export interface IWSCancelFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // Data relating to the status of the cancellation attempt
   feed?: ICancelStatusFeed
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of time-to-live expiry events for order cancellations requested by a given subaccount.
@@ -2752,7 +2814,7 @@ export interface IWSCancelFeedDataV1 {
 //
 export interface IWSCancelFeedSelectorV1 {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 export interface IWSCandlestickFeedDataV1 {
@@ -2766,11 +2828,11 @@ export interface IWSCandlestickFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A candlestick entry matching the request filters
   feed?: ICandlestick
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a stream of Kline/Candlestick updates for an instrument. A Kline is uniquely identified by its open time.
@@ -2796,18 +2858,18 @@ export interface IWSDepositFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The Deposit object
   feed?: IDeposit
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of deposits. This will execute when there is any deposit to selected account.
 // To subscribe to a main account, specify the account ID (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a`).
 export interface IWSDepositFeedSelectorV1 {
   // The main account ID to request for
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IWSFillFeedDataV1 {
@@ -2821,11 +2883,11 @@ export interface IWSFillFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A private trade matching the request filter
   feed?: IFill
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of private trade updates. This happens when a trade is executed.
@@ -2833,7 +2895,7 @@ export interface IWSFillFeedDataV1 {
 // Otherwise, specify the `instrument` to only receive private trades for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSFillFeedSelectorV1 {
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument filter to apply.
   instrument?: string
 }
@@ -2855,11 +2917,11 @@ export interface IWSMiniTickerFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A mini ticker matching the request filter
   feed?: IMiniTicker
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a mini ticker feed for a single instrument. The `mini.s` channel offers simpler integration. To experience higher publishing rates, please use the `mini.d` channel.
@@ -2888,11 +2950,11 @@ export interface IWSOrderFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The order object being created or updated
   feed?: IOrder
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
@@ -2901,7 +2963,7 @@ export interface IWSOrderFeedDataV1 {
 // Otherwise, specify the `instrument` to only receive orders for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSOrderFeedSelectorV1 {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument filter to apply.
   instrument?: string
 }
@@ -2917,18 +2979,18 @@ export interface IWSOrderGroupFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The order object being created or updated
   feed?: IClientOrderIDsByGroup
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of order group to get updated when a new group is created for the subAccount specified.
 //
 export interface IWSOrderGroupFeedSelectorV1 {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 export interface IWSOrderStateFeedDataV1 {
@@ -2942,11 +3004,11 @@ export interface IWSOrderStateFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The Order State Feed
   feed?: IOrderStateFeed
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of order updates pertaining to orders made by your account.
@@ -2956,7 +3018,7 @@ export interface IWSOrderStateFeedDataV1 {
 // Otherwise, specify the `instrument` to only receive orders for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSOrderStateFeedSelectorV1 {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument filter to apply.
   instrument?: string
 }
@@ -2972,11 +3034,11 @@ export interface IWSOrderbookLevelsFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // An orderbook levels object matching the request filter
   feed?: IOrderbookLevels
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to aggregated orderbook updates for a single instrument. The `book.s` channel offers simpler integration. To experience higher publishing rates, please use the `book.d` channel.
@@ -3011,11 +3073,11 @@ export interface IWSPositionsFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A Position being created or updated matching the request filter
   feed?: IPositions
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of position updates.
@@ -3024,7 +3086,7 @@ export interface IWSPositionsFeedDataV1 {
 // Otherwise, specify the `instrument` to only receive positions for that instrument (eg. `2345123-BTC_USDT_Perp`).
 export interface IWSPositionsFeedSelectorV1 {
   // The subaccount ID to filter by
-  sub_account_id?: bigint
+  sub_account_id?: string
   // The instrument filter to apply.
   instrument?: string
 }
@@ -3078,9 +3140,9 @@ export interface IWSSubscribeResponseV1Legacy {
   // The number of snapshot payloads to expect for each subscribed feed. Returned in same order as `subs`
   num_snapshots?: number[]
   // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
-  first_sequence_number?: bigint[]
+  first_sequence_number?: string[]
   // The sequence number of the most recent message in the stream. Next received sequence number must be larger than this one. Returned in same order as `subs`
-  latest_sequence_number?: bigint[]
+  latest_sequence_number?: string[]
 }
 
 // To ensure you always know if you have missed any payloads, GRVT servers apply the following heuristics to sequence numbers:<ul><li>All snapshot payloads will have a sequence number of `0`. All delta payloads will have a sequence number of `1+`. So its easy to distinguish between snapshots, and deltas</li><li>Num snapshots returned in Response (per stream): You can ensure that you received the right number of snapshots</li><li>First sequence number returned in Response (per stream): You can ensure that you received the first stream, without gaps from snapshots</li><li>Sequence numbers should always monotonically increase by `1`. If it decreases, or increases by more than `1`. Please reconnect</li><li>Duplicate sequence numbers are possible due to network retries. If you receive a duplicate, please ignore it, or idempotently re-update it.</li></ul>
@@ -3095,9 +3157,9 @@ export interface IWSSubscribeResult {
   // The number of snapshot payloads to expect for each subscribed feed. Returned in same order as `subs`
   num_snapshots?: number[]
   // The first sequence number to expect for each subscribed feed. Returned in same order as `subs`
-  first_sequence_number?: bigint[]
+  first_sequence_number?: string[]
   // The sequence number of the most recent message in the stream. Next received sequence number must be larger than this one. Returned in same order as `subs`
-  latest_sequence_number?: bigint[]
+  latest_sequence_number?: string[]
 }
 
 export interface IWSTickerFeedDataV1 {
@@ -3111,11 +3173,11 @@ export interface IWSTickerFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A ticker matching the request filter
   feed?: ITicker
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a ticker feed for a single instrument. The `ticker.s` channel offers simpler integration. To experience higher publishing rates, please use the `ticker.d` channel.
@@ -3144,11 +3206,11 @@ export interface IWSTradeFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // A public trade matching the request filter
   feed?: ITrade
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a stream of Public Trades for an instrument.
@@ -3171,11 +3233,11 @@ export interface IWSTransferFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The transfer history matching the requested filters
   feed?: ITransferHistory
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of transfers. This will execute when there is any transfer to or from the selected account.
@@ -3183,9 +3245,9 @@ export interface IWSTransferFeedDataV1 {
 // To subscribe to a sub account, specify the main account and the sub account dash separated (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a-1920109784202388`).
 export interface IWSTransferFeedSelectorV1 {
   // The main account ID to request for
-  main_account_id?: bigint
+  main_account_id?: string
   // The sub account ID to request for
-  sub_account_id?: bigint
+  sub_account_id?: string
 }
 
 // Returns a list of all rooms the client has unsubscribed from.
@@ -3224,25 +3286,25 @@ export interface IWSWithdrawalFeedDataV1 {
   //   - A single cluster payload can be multiplexed into multiple stream payloads.
   //   - To distinguish each stream payload, a `dedupCounter` is included.
   //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
-  sequence_number?: bigint
+  sequence_number?: string
   // The Withdrawal object
   feed?: IWithdrawal
   // The previous sequence number that determines the message order
-  prev_sequence_number?: bigint
+  prev_sequence_number?: string
 }
 
 // Subscribes to a feed of withdrawals. This will execute when there is any withdrawal from the selected account.
 // To subscribe to a main account, specify the account ID (eg. `0x9fe3758b67ce7a2875ee4b452f01a5282d84ed8a`).
 export interface IWSWithdrawalFeedSelectorV1 {
   // The main account ID to request for
-  main_account_id?: bigint
+  main_account_id?: string
 }
 
 export interface IWithdrawal {
   // The subaccount to withdraw from
-  from_account_id?: bigint
+  from_account_id?: string
   // The ethereum address to withdraw to
-  to_eth_address?: bigint
+  to_eth_address?: string
   // The token currency to withdraw
   currency?: ECurrency
   // The number of tokens to withdraw
@@ -3253,11 +3315,11 @@ export interface IWithdrawal {
 
 export interface IWithdrawalHistory {
   // The transaction ID of the withdrawal
-  tx_id?: bigint
+  tx_id?: string
   // The subaccount to withdraw from
-  from_account_id?: bigint
+  from_account_id?: string
   // The ethereum address to withdraw to
-  to_eth_address?: bigint
+  to_eth_address?: string
   // The token currency to withdraw
   currency?: ECurrency
   // The number of tokens to withdraw
@@ -3265,5 +3327,5 @@ export interface IWithdrawalHistory {
   // The signature of the withdrawal
   signature?: ISignature
   // The timestamp of the withdrawal in unix nanoseconds
-  event_time?: bigint
+  event_time?: string
 }
