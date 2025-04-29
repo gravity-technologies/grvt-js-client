@@ -6,12 +6,14 @@ export const FUNDING_RATE_MAP: SchemaPairMap = Object.freeze({
     instrument: 'i',
     funding_rate: 'fr',
     funding_time: 'ft',
-    mark_price: 'mp'
+    mark_price: 'mp',
+    funding_rate_8_h_avg: 'fr1'
   },
   LITE_TO_FULL: {
     i: 'instrument',
     fr: 'funding_rate',
     ft: 'funding_time',
-    mp: 'mark_price'
+    mp: 'mark_price',
+    fr1: 'funding_rate_8_h_avg'
   }
 })
