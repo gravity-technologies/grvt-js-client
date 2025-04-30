@@ -1,7 +1,7 @@
 {
-  "name": "grvt",
-  "version": "1.4.0",
-  "description": "Node.js & JavaScript SDK for GRVT REST APIs & WebSockets",
+  "name": "@grvt/client",
+  "version": "1.4.1",
+  "description": "Node.js & JavaScript client for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gravity-technologies/grvt-js-client.git"
@@ -18,13 +18,15 @@
   "engines": {
     "node": ">=20"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
     "prebuild": "rimraf dist",
     "build": "tsc",
     "postbuild": "cp package.json dist/ && cp README.md dist/ && cp LICENSE dist/",
     "prerelease": "npm run build",
-    "release": "cd dist/ && npm publish",
+    "release": "cd dist/ && npm publish --access public",
     "link-local": "cp package.json dist/ && cd dist/ && npm link && cd ..",
     "lint": "npx eslint \"src/**/*.{js,ts}\"",
     "lint-fix": "npx eslint \"src/**/*.{js,ts}\" --fix",
