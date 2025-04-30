@@ -223,7 +223,9 @@ export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.STANDARD]: 1,
   [ETransferType.FAST_ARB_DEPOSIT]: 2,
-  [ETransferType.FAST_ARB_WITHDRAWAL]: 3
+  [ETransferType.FAST_ARB_WITHDRAWAL]: 3,
+  [ETransferType.NON_NATIVE_BRIDGE_DEPOSIT]: 4,
+  [ETransferType.NON_NATIVE_BRIDGE_WITHDRAWAL]: 5
 })
 
 export const ETriggerByInt: Record<ETriggerBy, number> = Object.freeze({
