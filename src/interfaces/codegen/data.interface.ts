@@ -353,6 +353,10 @@ export enum ETransferType {
   FAST_ARB_DEPOSIT = 'FAST_ARB_DEPOSIT',
   // Fast Arb Withdrawal Metadata type
   FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
+  // Transfer type for non native bridging deposit
+  NON_NATIVE_BRIDGE_DEPOSIT = 'NON_NATIVE_BRIDGE_DEPOSIT',
+  // Transfer type for non native bridging withdrawal
+  NON_NATIVE_BRIDGE_WITHDRAWAL = 'NON_NATIVE_BRIDGE_WITHDRAWAL',
 }
 
 // Defines the price type that activates a Take Profit (TP) or Stop Loss (SL) order.
