@@ -52,7 +52,7 @@ console.log(
 )
 ```
 
-## To use WebSocket (available only in browsers that support WebSocket)
+## To use WebSocket (available only in browsers/platforms that support WebSocket)
 
 [Browsers supported](https://caniuse.com/websockets)
 

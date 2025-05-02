@@ -24,7 +24,8 @@ import {
 } from './data.interface'
 
 export const EBridgeTypeInt: Record<EBridgeType, number> = Object.freeze({
-  [EBridgeType.XY]: 1
+  [EBridgeType.XY]: 1,
+  [EBridgeType.RHINO]: 2
 })
 
 export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({

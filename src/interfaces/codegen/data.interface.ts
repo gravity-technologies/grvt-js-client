@@ -1,6 +1,8 @@
 export enum EBridgeType {
   // XY Bridge type
   XY = 'XY',
+  // Rhino Bridge type
+  RHINO = 'RHINO',
 }
 
 // BrokerTag is a tag for the broker that the order is sent from.
@@ -1437,6 +1439,13 @@ export interface IApiTradingPerformanceTrend {
   realized_pnl?: string
 }
 
+export interface IApiTransferAck {
+  // Gravity has acknowledged that the transfer has been successfully processed. If true, a `tx_id` will be returned. If false, an error will be returned.
+  ack?: boolean
+  // The transaction ID of the transfer. This is only returned if the transfer is successful.
+  tx_id?: string
+}
+
 // The request to get the historical transfers of an account
 // The history is returned in reverse chronological order
 //
@@ -1494,6 +1503,12 @@ export interface IApiTransferRequest {
   transfer_type?: ETransferType
   // The metadata of the transfer
   transfer_metadata?: string
+}
+
+// Used to acknowledge a transfer request outcome
+export interface IApiTransferResponse {
+  // The Transfer response object
+  result?: IApiTransferAck
 }
 
 export interface IApiUserCategoryAffinityScoreRequest {
