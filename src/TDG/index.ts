@@ -56,6 +56,7 @@ import {
   API_TRANSFER_HISTORY_REQUEST_MAP,
   API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
+  API_TRANSFER_RESPONSE_MAP,
   API_WITHDRAWAL_HISTORY_REQUEST_MAP,
   API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
   API_WITHDRAWAL_REQUEST_MAP,
@@ -115,6 +116,7 @@ import {
   type IApiTransferHistoryRequest,
   type IApiTransferHistoryResponse,
   type IApiTransferRequest,
+  type IApiTransferResponse,
   type IApiWithdrawalHistoryRequest,
   type IApiWithdrawalHistoryResponse,
   type IApiWithdrawalRequest,
@@ -176,7 +178,7 @@ export class TDG {
       Utils.schemaMap(payload, API_TRANSFER_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as { acknowledgement: boolean }
+      return Utils.schemaMap(response.data, API_TRANSFER_RESPONSE_MAP.LITE_TO_FULL) as IApiTransferResponse
     }).catch(Utils.coverApiError)
   }
 
