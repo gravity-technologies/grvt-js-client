@@ -1433,6 +1433,8 @@ export interface IApiTradeResponse {
 export interface IApiTradingPerformanceTrend {
   // The start time of the interval
   start_interval?: string
+  // The end time of the interval
+  end_interval?: string
   // The trading volume of the account
   trading_volume?: string
   // Realized PnL in USDT

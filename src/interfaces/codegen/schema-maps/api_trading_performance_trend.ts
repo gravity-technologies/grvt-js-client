@@ -4,11 +4,13 @@ import { type SchemaPairMap } from './types'
 export const API_TRADING_PERFORMANCE_TREND_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     start_interval: 'si',
+    end_interval: 'ei',
     trading_volume: 'tv',
     realized_pnl: 'rp'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
+    ei: 'end_interval',
     tv: 'trading_volume',
     rp: 'realized_pnl'
   }
