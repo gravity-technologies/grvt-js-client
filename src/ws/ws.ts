@@ -55,9 +55,9 @@ import {
 
 interface IMessage {
   s: string
-  n: string
+  n: bigint
   f?: TEntities
-  s1?: string[]
+  s1?: Array<string | bigint>
   code?: number
   status?: number
 }
@@ -184,7 +184,10 @@ export class WS {
       if (this._retries) {
         this._retries = 0
       }
-      const message = JsonUtils.parse<IMessage>(e.data)
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
 
       /**
        * Ignore 400 status response messages
@@ -273,16 +276,16 @@ export class WS {
           return acc
         }
 
-        const depositDestinationAccountId = (result as IDeposit).to_account_id
+        const depositDestinationAccountId = (result as IDeposit).to_account_id?.toString(16)
         const transferSourceKey = [
-          (result as ITransferHistory).from_account_id,
-          (result as ITransferHistory).from_sub_account_id ? (result as ITransferHistory).from_sub_account_id : 0
+          (result as ITransferHistory).from_account_id?.toString(16),
+          (result as ITransferHistory).from_sub_account_id ? (result as ITransferHistory).from_sub_account_id?.toString() : 0
         ].filter(Boolean).join('-')
         const transferDestinationKey = [
-          (result as ITransferHistory).to_account_id,
-          (result as ITransferHistory).to_sub_account_id ? (result as ITransferHistory).to_sub_account_id : 0
+          (result as ITransferHistory).to_account_id?.toString(16),
+          (result as ITransferHistory).to_sub_account_id ? (result as ITransferHistory).to_sub_account_id?.toString() : 0
         ].filter(Boolean).join('-')
-        const withdrawalFromAccountId = (result as IWithdrawal).from_account_id
+        const withdrawalFromAccountId = (result as IWithdrawal).from_account_id?.toString(16)
         switch (stream) {
           case EStream.GROUP:
             return [...acc, ...Object.values(value)]
@@ -608,7 +611,7 @@ export class WS {
       this._ws.send(JSON.stringify({
         ...payload,
         stream: `${this._version}.${payload.stream}`
-      }))
+      }, JsonUtils.bigintReplacer))
     }
   }
 
@@ -742,19 +745,23 @@ export class WS {
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
-      const message = JsonUtils.parse<IMessage>(e.data)
+      const message = JsonUtils.parse<IMessage>(
+        e.data,
+        JsonUtils.bigintReviver
+      )
       if (!message?.s || !message?.s1?.length) {
         return
       }
       const responseStream = message.s?.replace?.(`${this._version}.`, '')
       const { stream, feed } = this._parsePair(pair)
       const asset = feed.split('@')[0]
-      const subs = message.s1
+      const subs = message.s1 // .map((s) => typeof s === 'bigint' ? `0x${s.toString(16)}` : s)
       const isResolved = stream === responseStream && (
         subs.includes(asset) ||
         subs.includes(asset.toLowerCase()) ||
         subs.includes(feed) ||
-        subs.includes(feed.toLowerCase())
+        subs.includes(feed.toLowerCase()) ||
+        subs.includes(StringUtils.toBigint(feed))
       )
       if (isResolved) {
         _resolve()
