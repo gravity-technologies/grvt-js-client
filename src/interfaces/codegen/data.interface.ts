@@ -1,6 +1,8 @@
 export enum EBridgeType {
   // XY Bridge type
   XY = 'XY',
+  // Rhino Bridge type
+  RHINO = 'RHINO',
 }
 
 // BrokerTag is a tag for the broker that the order is sent from.
@@ -353,6 +355,10 @@ export enum ETransferType {
   FAST_ARB_DEPOSIT = 'FAST_ARB_DEPOSIT',
   // Fast Arb Withdrawal Metadata type
   FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
+  // Transfer type for non native bridging deposit
+  NON_NATIVE_BRIDGE_DEPOSIT = 'NON_NATIVE_BRIDGE_DEPOSIT',
+  // Transfer type for non native bridging withdrawal
+  NON_NATIVE_BRIDGE_WITHDRAWAL = 'NON_NATIVE_BRIDGE_WITHDRAWAL',
 }
 
 // Defines the price type that activates a Take Profit (TP) or Stop Loss (SL) order.
@@ -381,6 +387,13 @@ export enum ETriggerType {
   TAKE_PROFIT = 'TAKE_PROFIT',
   // Stop Loss Order - Executes when the price reaches a specified level to limit losses.
   STOP_LOSS = 'STOP_LOSS',
+}
+
+export enum EVaultType {
+  // Prime vault
+  PRIME = 'PRIME',
+  // Launchpad vault
+  LAUNCH_PAD = 'LAUNCH_PAD',
 }
 
 // The list of Trading Venues that are supported on the GRVT exchange
@@ -1128,6 +1141,20 @@ export interface IApiPreOrderCheckResponse {
   results?: IPreOrderCheckResult[]
 }
 
+// Request to retrieve the account summary for a given account
+export interface IApiQueryAccountSummaryRequest {
+  // The time interval to filter
+  time_interval?: ETimeInterval
+}
+
+// Response to retrieve the sub-account summary for a given sub-account
+export interface IApiQueryAccountSummaryResponse {
+  // The list of account summaries
+  result?: ISnapAccountSummary[]
+  // The next cursor to fetch the next page of results
+  next?: string
+}
+
 // Query flat referral stats
 export interface IApiQueryFlatReferralStatRequest {
   // The off chain account id to get referral stats
@@ -1406,10 +1433,19 @@ export interface IApiTradeResponse {
 export interface IApiTradingPerformanceTrend {
   // The start time of the interval
   start_interval?: bigint
+  // The end time of the interval
+  end_interval?: bigint
   // The trading volume of the account
   trading_volume?: bigint
   // Realized PnL in USDT
   realized_pnl?: string
+}
+
+export interface IApiTransferAck {
+  // Gravity has acknowledged that the transfer has been successfully processed. If true, a `tx_id` will be returned. If false, an error will be returned.
+  ack?: boolean
+  // The transaction ID of the transfer. This is only returned if the transfer is successful.
+  tx_id?: string
 }
 
 // The request to get the historical transfers of an account
@@ -1469,6 +1505,12 @@ export interface IApiTransferRequest {
   transfer_type?: ETransferType
   // The metadata of the transfer
   transfer_metadata?: string
+}
+
+// Used to acknowledge a transfer request outcome
+export interface IApiTransferResponse {
+  // The Transfer response object
+  result?: IApiTransferAck
 }
 
 export interface IApiUserCategoryAffinityScoreRequest {
@@ -1903,6 +1945,8 @@ export interface IFundingRate {
   funding_time?: bigint
   // The mark price of the instrument at funding timestamp, expressed in `9` decimals
   mark_price?: string
+  // The 8h average funding rate of the instrument, expressed in percentage points
+  funding_rate_8_h_avg?: string
 }
 
 export interface IGetClaimableEcosystemBadgeResponse {
@@ -2265,6 +2309,16 @@ export interface IPreOrderCheckResult {
   settle_currency?: ECurrency
 }
 
+// Request to retrieve the account summary for a given account
+export interface IQueryAccountSummaryRequest {
+  // The time interval to filter
+  time_interval?: ETimeInterval
+  // The main account ID to request for
+  main_account_id?: string
+  // The list subaccount IDs to filter by
+  sub_account_i_ds?: string[]
+}
+
 // Query list of epoch badges
 export interface IQueryEpochBadgePointDistributionRequest {
   // The numerical epoch index
@@ -2383,6 +2437,14 @@ export interface ISignature {
   // When the same nonce is used, the same payload will generate the same signature.
   // Our system will consider the payload a duplicate, and ignore it.
   nonce?: number
+}
+
+// All account summary returned by clickhouse
+export interface ISnapAccountSummary {
+  // The start of the interval in unix nanoseconds
+  start_interval?: string
+  // Total equity of the main account and all sub-accounts, denominated in USD
+  total_equity?: string
 }
 
 // The funding account summary, that reports the total equity and spot balances of a funding (main) account
@@ -2724,6 +2786,27 @@ export interface IUserVaultCategoryEventPayLoad {
   action?: string
   // number of bumps in this event. default 1
   num_bumps?: bigint
+}
+
+export interface IVaultParams {
+  // Annualized management fee charged by the vault (0-400 centibeeps, i.e. 0-4%)
+  management_fee_centi_beeps?: string
+  // Performance fee percentage charged on profits upon LP Token redemption (0-4000 centibeeps, i.e. 0-40%)
+  performance_fee_centi_beeps?: string
+  // Marketing fee percentage taken from Vault Manager earnings (0-4000 centibeeps, i.e. 0-40%). User vaults: Must be 0%. Partner vaults: Must be >= 500 centibeeps (5%). Fee reductions based on vault valuation: 0-60%: Full fee, 60-70%: 20% reduction, 70-80%: 40% reduction, 80-90%: 60% reduction, 90%+: 80% reduction
+  marketing_fee_centi_beeps?: string
+  // Vault type
+  vault_type?: EVaultType
+  // Maximum valuation cap for the vault in USD (6 decimal places). Range: 1M-100M USD. No new investments accepted after cap is reached
+  valuation_cap_usd_6_dec?: string
+  // Minimum period (in seconds) for vault manager to service redemptions. Range: 1-28 days (86400-2419200 seconds). Redemption is only serviced after this period has elapsed from request
+  min_redemption_period_seconds?: number
+  // Maximum period (in seconds) for vault manager to service redemptions. Range: 1-28 days (86400-2419200 seconds). Forced redemption occurs if requests exceed this period
+  max_redemption_period_seconds?: number
+  // Multiplier of Initial Margin (IM) for automatic redemption processing. Range: 8000-20000 centibeeps (80%-200%). Auto-redemption occurs when: Total Equity > barrier * Initial Margin, or Available Balance > barrier * Initial Margin where Available Balance = Total Equity - Initial Margin - min(Unrealized PnL, 0)
+  auto_redemption_barrier_centi_beeps?: string
+  // Reward sharing ratio for the vault. GRVT points earned by the vault would be redistributed to investors in the ratio of this field. 0% indicates that vault manager get all rewards. Range: 0-10000 centibeeps (0%-100%). 10000 centibeeps = 100%
+  reward_sharing_ratio_centi_beeps?: string
 }
 
 export interface IWSCancelFeedDataV1 {

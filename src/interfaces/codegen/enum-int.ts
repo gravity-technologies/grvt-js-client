@@ -19,11 +19,13 @@ import {
   ETransferType,
   ETriggerBy,
   ETriggerType,
+  EVaultType,
   EVenue
 } from './data.interface'
 
 export const EBridgeTypeInt: Record<EBridgeType, number> = Object.freeze({
-  [EBridgeType.XY]: 1
+  [EBridgeType.XY]: 1,
+  [EBridgeType.RHINO]: 2
 })
 
 export const EBrokerTagInt: Record<EBrokerTag, number> = Object.freeze({
@@ -222,7 +224,9 @@ export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.STANDARD]: 1,
   [ETransferType.FAST_ARB_DEPOSIT]: 2,
-  [ETransferType.FAST_ARB_WITHDRAWAL]: 3
+  [ETransferType.FAST_ARB_WITHDRAWAL]: 3,
+  [ETransferType.NON_NATIVE_BRIDGE_DEPOSIT]: 4,
+  [ETransferType.NON_NATIVE_BRIDGE_WITHDRAWAL]: 5
 })
 
 export const ETriggerByInt: Record<ETriggerBy, number> = Object.freeze({
@@ -235,6 +239,11 @@ export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
   [ETriggerType.UNSPECIFIED]: 0,
   [ETriggerType.TAKE_PROFIT]: 1,
   [ETriggerType.STOP_LOSS]: 2
+})
+
+export const EVaultTypeInt: Record<EVaultType, number> = Object.freeze({
+  [EVaultType.PRIME]: 1,
+  [EVaultType.LAUNCH_PAD]: 2
 })
 
 export const EVenueInt: Record<EVenue, number> = Object.freeze({
