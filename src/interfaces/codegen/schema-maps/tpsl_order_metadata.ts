@@ -4,10 +4,12 @@ import { type SchemaPairMap } from './types'
 export const TPSL_ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     trigger_by: 'tb',
-    trigger_price: 'tp'
+    trigger_price: 'tp',
+    close_position: 'cp'
   },
   LITE_TO_FULL: {
     tb: 'trigger_by',
-    tp: 'trigger_price'
+    tp: 'trigger_price',
+    cp: 'close_position'
   }
 })

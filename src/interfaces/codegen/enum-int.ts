@@ -13,6 +13,7 @@ import {
   EOrderStatus,
   ERewardEpochStatus,
   ERewardProgramType,
+  ESource,
   ESubAccountTradeInterval,
   ETimeInForce,
   ETimeInterval,
@@ -177,7 +178,9 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.EXCEED_MAX_SIGNATURE_EXPIRATION]: 27,
   [EOrderRejectReason.MARKET_ORDER_WITH_LIMIT_PRICE]: 28,
   [EOrderRejectReason.CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED]: 29,
-  [EOrderRejectReason.OCO_COUNTER_PART_TRIGGERED]: 30
+  [EOrderRejectReason.OCO_COUNTER_PART_TRIGGERED]: 30,
+  [EOrderRejectReason.REDUCE_ONLY_LIMIT]: 31,
+  [EOrderRejectReason.CLIENT_REPLACE]: 32
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
@@ -200,6 +203,13 @@ export const ERewardProgramTypeInt: Record<ERewardProgramType, number> = Object.
   [ERewardProgramType.LP]: 3
 })
 
+export const ESourceInt: Record<ESource, number> = Object.freeze({
+  [ESource.WEB]: 1,
+  [ESource.MOBILE]: 2,
+  [ESource.API]: 3,
+  [ESource.LIQUIDATOR]: 4
+})
+
 export const ESubAccountTradeIntervalInt: Record<ESubAccountTradeInterval, number> = Object.freeze({
   [ESubAccountTradeInterval.SAT_1_MO]: 1,
   [ESubAccountTradeInterval.SAT_1_D]: 2,
@@ -211,7 +221,8 @@ export const ETimeInForceInt: Record<ETimeInForce, number> = Object.freeze({
   [ETimeInForce.GOOD_TILL_TIME]: 1,
   [ETimeInForce.ALL_OR_NONE]: 2,
   [ETimeInForce.IMMEDIATE_OR_CANCEL]: 3,
-  [ETimeInForce.FILL_OR_KILL]: 4
+  [ETimeInForce.FILL_OR_KILL]: 4,
+  [ETimeInForce.RETAIL_PRICE_IMPROVEMENT]: 5
 })
 
 export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({

@@ -44,6 +44,8 @@ import {
   API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
+  API_REPLACE_ORDERS_REQUEST_MAP,
+  API_REPLACE_ORDERS_RESPONSE_MAP,
   API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
   API_SET_INITIAL_LEVERAGE_RESPONSE_MAP,
   API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
@@ -104,6 +106,8 @@ import {
   type IApiQueryTradingPerformanceResponse,
   type IApiQueryTradingPerformanceTrendRequest,
   type IApiQueryTradingPerformanceTrendResponse,
+  type IApiReplaceOrdersRequest,
+  type IApiReplaceOrdersResponse,
   type IApiSetInitialLeverageRequest,
   type IApiSetInitialLeverageResponse,
   type IApiSocializedLossStatusResponse,
@@ -169,7 +173,6 @@ export class TDG {
   }
 
   /**
-   * TODO: missing response interface
    * @see https://api-docs.grvt.io/trading_api/#transfer
    */
   transfer (payload: IApiTransferRequest, config?: AxiosRequestConfig) {
@@ -196,7 +199,6 @@ export class TDG {
   }
 
   /**
-   * TODO: missing response interface
    * @see https://api-docs.grvt.io/trading_api/#withdrawal
    */
   withdrawal (payload: IApiWithdrawalRequest, config?: AxiosRequestConfig) {
@@ -368,14 +370,6 @@ export class TDG {
   }
 
   /**
-   * TODO: missing interfaces
-   * @see https://api-docs.grvt.io/trading_api/#cancel-all-session-orders
-   */
-  cancelAllSessionOrders () {
-    throw new Error('This has been marked as a POST-LAUNCH feature, see https://api-docs.grvt.io/trading_api/#cancel-all-session-orders')
-  }
-
-  /**
    * @see https://api-docs.grvt.io/trading_api/#get-order
    */
   order (payload: IApiGetOrderRequest, config?: AxiosRequestConfig) {
@@ -408,6 +402,19 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_GET_ORDER_GROUP_RESPONSE_MAP.LITE_TO_FULL) as IApiGetOrderGroupResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * Replace position's TP/SL orders
+   */
+  replaceOrders (payload: IApiReplaceOrdersRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/replace_orders',
+      Utils.schemaMap(payload, API_REPLACE_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_REPLACE_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiReplaceOrdersResponse
     }).catch(Utils.coverApiError)
   }
 

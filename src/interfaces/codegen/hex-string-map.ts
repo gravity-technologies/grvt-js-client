@@ -12,6 +12,7 @@ export const HexStringMap = [
   'liquidity_score',
   'main_account_id',
   'maker_trading_volume',
+  'order_i_ds',
   'order_id',
   'r',
   'referrer_main_account_id',
