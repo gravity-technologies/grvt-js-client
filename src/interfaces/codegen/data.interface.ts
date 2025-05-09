@@ -279,6 +279,10 @@ export enum EOrderRejectReason {
   CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED = 'CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED',
   // the OCO counter part order was triggered
   OCO_COUNTER_PART_TRIGGERED = 'OCO_COUNTER_PART_TRIGGERED',
+  // the remaining order size was cancelled because it exceeded current position size
+  REDUCE_ONLY_LIMIT = 'REDUCE_ONLY_LIMIT',
+  // the order was replaced by a client replace request
+  CLIENT_REPLACE = 'CLIENT_REPLACE',
 }
 
 export enum EOrderStatus {
@@ -309,6 +313,19 @@ export enum ERewardProgramType {
   LP = 'LP',
 }
 
+// Defines the source of the order or trade, such as a UI, API, or a bot.
+// This is used to track the source of the order, and is not signed by the client
+export enum ESource {
+  // The order/trade was created by a web client
+  WEB = 'WEB',
+  // The order/trade was created by a mobile client
+  MOBILE = 'MOBILE',
+  // The order/trade was created by an API client
+  API = 'API',
+  // The order/trade was created by the liquidator service
+  LIQUIDATOR = 'LIQUIDATOR',
+}
+
 export enum ESubAccountTradeInterval {
   // 1 month
   SAT_1_MO = 'SAT_1_MO',
@@ -334,6 +351,8 @@ export enum ETimeInForce {
   IMMEDIATE_OR_CANCEL = 'IMMEDIATE_OR_CANCEL',
   // FOK - Both AoN and IoC. Either fill the full order when hitting the orderbook, or cancel it
   FILL_OR_KILL = 'FILL_OR_KILL',
+  // RPI - A GTT + PostOnly maker order, that can only be taken by non-algorithmic UI users.
+  RETAIL_PRICE_IMPROVEMENT = 'RETAIL_PRICE_IMPROVEMENT',
 }
 
 // Time interval can be used as a filter in metric/portfolio management APIs
@@ -1230,6 +1249,30 @@ export interface IApiQueryTradingPerformanceTrendResponse {
   next?: string
 }
 
+// Replace multiple orders simultaneously for this trading account.
+//
+// This endpoint supports the following order scenarios:
+// - Replace a TP and/or SL attached to a positionUsage:
+// - subAccountID: The subaccount ID of the user creating the Request
+// - clientOrderIDs: List of client order IDs to replace
+// - orderIDs: List of order IDs to replace
+// - newOrders: List of new orders to replace the old orders(Note: either provide clientOrderIDs or orderIDs, if provided both, clientOrderIDs will be used)
+export interface IApiReplaceOrdersRequest {
+  // The subaccount ID of the user creating the Request
+  sub_account_id?: string
+  // The client order IDs of the orders to replace
+  client_order_i_ds?: string[]
+  // The order IDs of the orders to replace
+  order_i_ds?: string[]
+  // The new orders to replace the old orders
+  new_orders?: IOrder[]
+}
+
+export interface IApiReplaceOrdersResponse {
+  // The new orders in same order as requested
+  result?: IOrder[]
+}
+
 export interface IApiResolveEpochEcosystemMetricResponse {
   // The name of the epoch
   epoch_name?: string
@@ -1882,6 +1925,10 @@ export interface IFill {
   signer?: string
   // Specifies the broker who brokered the order
   broker?: EBrokerTag
+  // If the trade is a RPI trade
+  is_rpi?: boolean
+  // Specifies the source of the viewing party of the trade
+  source?: ESource
 }
 
 export interface IFlatReferral {
@@ -2182,6 +2229,8 @@ export interface IOrderMetadata {
   trigger?: ITriggerOrderMetadata
   // Specifies the broker who brokered the order
   broker?: EBrokerTag
+  // Specifies the source of the order
+  source?: ESource
 }
 
 export interface IOrderState {
@@ -2560,6 +2609,8 @@ export interface ITPSLOrderMetadata {
   trigger_by?: ETriggerBy
   // The Trigger Price of the order, expressed in `9` decimals.
   trigger_price?: string
+  // If True, the order will close the position when the trigger price is reached
+  close_position?: boolean
 }
 
 // Derived data such as the below, will not be included by default:
@@ -2663,6 +2714,8 @@ export interface ITrade {
   is_liquidation?: boolean
   // A trade index
   trade_index?: number
+  // If the trade is a RPI trade
+  is_rpi?: boolean
 }
 
 export interface ITraderLeaderboardUser {
