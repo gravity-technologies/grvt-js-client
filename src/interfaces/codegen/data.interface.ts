@@ -2841,6 +2841,26 @@ export interface IUserVaultCategoryEventPayLoad {
   num_bumps?: string
 }
 
+export interface IVaultInvestResults {
+  // The index price of the invested token at point of vault investment
+  token_index_price?: string
+  // The total equity of the vault at point of vault investment
+  vault_total_equity?: string
+  // The share price of the vault LP token at point of vault investment
+  vault_share_price?: string
+  // The number of LP tokens received upon vault investment
+  num_lp_tokens?: string
+}
+
+export interface IVaultManagementFeeTickResults {
+  // The total equity of the vault at point of vault redemption
+  vault_total_equity?: string
+  // The share price of the vault LP token at point of vault redemption
+  vault_share_price?: string
+  // The number of tokens paid as management fees to vault managers
+  fees_charged?: string
+}
+
 export interface IVaultParams {
   // Annualized management fee charged by the vault (0-400 centibeeps, i.e. 0-4%)
   management_fee_centi_beeps?: string
@@ -2860,6 +2880,23 @@ export interface IVaultParams {
   auto_redemption_barrier_centi_beeps?: string
   // Reward sharing ratio for the vault. GRVT points earned by the vault would be redistributed to investors in the ratio of this field. 0% indicates that vault manager get all rewards. Range: 0-10000 centibeeps (0%-100%). 10000 centibeeps = 100%
   reward_sharing_ratio_centi_beeps?: string
+}
+
+export interface IVaultRedeemResults {
+  // The index price of the redeemed token at point of vault redemption
+  token_index_price?: string
+  // The total equity of the vault at point of vault redemption
+  vault_total_equity?: string
+  // The share price of the vault LP token at point of vault redemption
+  vault_share_price?: string
+  // The currency to redeemed
+  currency?: ECurrency
+  // The number of tokens received upon vault redemption
+  num_tokens?: string
+  // The average entry share price at point of vault redemption. Used to compute performance fee payments
+  avg_entry_price?: string
+  // The number of tokens paid as performance fees upon vault redemption
+  fees_charged?: string
 }
 
 export interface IWSCancelFeedDataV1 {
