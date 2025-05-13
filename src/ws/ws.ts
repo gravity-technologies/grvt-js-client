@@ -372,14 +372,14 @@ export class WS {
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const bookDeltaFeed = (params: IWSBookRequest['params']): string => [
+    const rpiBookDeltaFeed = (params: IWSBookRequest['params']): string => [
       params.instrument,
       [
         params.rate ?? 1000
       ].filter(Boolean).join('-')
     ].filter(Boolean).join('@')
 
-    const bookFeed = (params: IWSBookRequest['params']): string => [
+    const rpiBookFeed = (params: IWSBookRequest['params']): string => [
       params.instrument,
       [
         params.rate ?? 1000,
@@ -496,14 +496,16 @@ export class WS {
           feed: [candleFeed(params as IWSCandleRequest['params'])]
         }
       case EStream.ORDERBOOK_DELTA:
+      case EStream.RPI_BOOK_DELTA:
         return {
           stream,
-          feed: [bookDeltaFeed(params as IWSBookRequest['params'])]
+          feed: [rpiBookDeltaFeed(params as IWSBookRequest['params'])]
         }
       case EStream.ORDERBOOK_SNAP:
+      case EStream.RPI_BOOK_SNAP:
         return {
           stream,
-          feed: [bookFeed(params as IWSBookRequest['params'])]
+          feed: [rpiBookFeed(params as IWSBookRequest['params'])]
         }
       case EStream.MINI_DELTA:
       case EStream.MINI_SNAP:
@@ -573,6 +575,8 @@ export class WS {
         return (Utils.schemaMap(message, WS_CANDLESTICK_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSCandlestickFeedDataV1).feed
       case EStream.ORDERBOOK_DELTA:
       case EStream.ORDERBOOK_SNAP:
+      case EStream.RPI_BOOK_DELTA:
+      case EStream.RPI_BOOK_SNAP:
         return (Utils.schemaMap(message, WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP.LITE_TO_FULL) as IWSOrderFeedDataV1).feed
       case EStream.MINI_DELTA:
       case EStream.MINI_SNAP:
@@ -736,9 +740,10 @@ export class WS {
   }
 
   private async _subscribe (pair: string, subscribePayload: IWSSubscribeRequestV1Legacy) {
-    if (Object.keys(this._pairs[pair] || {}).length) {
-      return
-    }
+    // Force send subscribe even if already subscribed
+    // if (Object.keys(this._pairs[pair] || {}).length) {
+    //   return
+    // }
     await this.ready()
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {

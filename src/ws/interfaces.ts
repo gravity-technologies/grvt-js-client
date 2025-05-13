@@ -32,8 +32,20 @@ export enum EStream {
   CANDLE = 'candle',
   MINI_DELTA = 'mini.d',
   MINI_SNAP = 'mini.s',
+  /**
+   * @deprecated
+   * @see {@link EStream.RPI_BOOK_DELTA}
+   * To be removed in future versions
+   */
   ORDERBOOK_DELTA = 'book.d',
+  /**
+   * @deprecated
+   * @see {@link EStream.RPI_BOOK_DELTA}
+   * To be removed in future versions
+   */
   ORDERBOOK_SNAP = 'book.s',
+  RPI_BOOK_DELTA = 'rpi.book.d',
+  RPI_BOOK_SNAP = 'rpi.book.s',
   TICKER_DELTA = 'ticker.d',
   TICKER_SNAP = 'ticker.s',
   TRADE = 'trade',
@@ -114,7 +126,7 @@ export interface IWSMiniRequest {
 }
 
 export interface IWSBookRequest {
-  stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}`
+  stream: `${EStream.ORDERBOOK_DELTA}` | `${EStream.ORDERBOOK_SNAP}` | `${EStream.RPI_BOOK_DELTA}` | `${EStream.RPI_BOOK_SNAP}`
   params: IWSOrderbookLevelsFeedSelectorV1
   onData?: TMessageHandler<Required<IWSOrderbookLevelsFeedDataV1>['feed']>
   onError?: (error: Error) => void
