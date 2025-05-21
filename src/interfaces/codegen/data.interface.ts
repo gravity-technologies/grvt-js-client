@@ -368,6 +368,8 @@ export enum ETimeInterval {
 }
 
 export enum ETransferType {
+  // Default transfer that has nothing to do with bridging
+  UNSPECIFIED = 'UNSPECIFIED',
   // Standard transfer that has nothing to do with bridging
   STANDARD = 'STANDARD',
   // Fast Arb Deposit Metadata type
