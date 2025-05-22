@@ -1,0 +1,13 @@
+import { type SchemaPairMap } from './types'
+
+// Schema map for the 'API_VAULT_INVESTOR_SUMMARY_REQUEST' struct.
+export const API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    main_account_id: 'ma',
+    vault_id: 'vi'
+  },
+  LITE_TO_FULL: {
+    ma: 'main_account_id',
+    vi: 'vault_id'
+  }
+})

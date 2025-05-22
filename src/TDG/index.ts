@@ -59,10 +59,17 @@ import {
   API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
   API_TRANSFER_RESPONSE_MAP,
+  API_VAULT_BURN_TOKENS_REQUEST_MAP,
+  API_VAULT_INVEST_REQUEST_MAP,
+  API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP,
+  API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP,
+  API_VAULT_REDEEM_CANCEL_REQUEST_MAP,
+  API_VAULT_REDEEM_REQUEST_MAP,
   API_WITHDRAWAL_HISTORY_REQUEST_MAP,
   API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
   API_WITHDRAWAL_REQUEST_MAP,
   validConfig,
+  type IAckResponse,
   type IApiAggregatedAccountSummaryResponse,
   type IApiCancelAllOrdersRequest,
   type IApiCancelAllOrdersResponse,
@@ -121,6 +128,12 @@ import {
   type IApiTransferHistoryResponse,
   type IApiTransferRequest,
   type IApiTransferResponse,
+  type IApiVaultBurnTokensRequest,
+  type IApiVaultInvestorSummaryRequest,
+  type IApiVaultInvestorSummaryResponse,
+  type IApiVaultInvestRequest,
+  type IApiVaultRedeemCancelRequest,
+  type IApiVaultRedeemRequest,
   type IApiWithdrawalHistoryRequest,
   type IApiWithdrawalHistoryResponse,
   type IApiWithdrawalRequest,
@@ -545,4 +558,62 @@ export class TDG {
       return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
     }).catch(Utils.coverApiError)
   }
+
+  /**
+   * START: Vault
+   */
+
+  vaultBurnTokens (payload: IApiVaultBurnTokensRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_burn_tokens',
+      Utils.schemaMap(payload, API_VAULT_BURN_TOKENS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultInvest (payload: IApiVaultInvestRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_invest',
+      Utils.schemaMap(payload, API_VAULT_INVEST_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultInvestorSummary (payload: IApiVaultInvestorSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_investor_summary',
+      Utils.schemaMap(payload, API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultInvestorSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultRedeem (payload: IApiVaultRedeemRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_redeem',
+      Utils.schemaMap(payload, API_VAULT_REDEEM_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultRedeemCancel (payload: IApiVaultRedeemCancelRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_redeem_cancel',
+      Utils.schemaMap(payload, API_VAULT_REDEEM_CANCEL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Vault
+   */
 }
