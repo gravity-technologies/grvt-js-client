@@ -65,6 +65,8 @@ import {
   API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP,
   API_VAULT_REDEEM_CANCEL_REQUEST_MAP,
   API_VAULT_REDEEM_REQUEST_MAP,
+  API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP,
+  API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP,
   API_WITHDRAWAL_HISTORY_REQUEST_MAP,
   API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
   API_WITHDRAWAL_REQUEST_MAP,
@@ -134,6 +136,8 @@ import {
   type IApiVaultInvestRequest,
   type IApiVaultRedeemCancelRequest,
   type IApiVaultRedeemRequest,
+  type IApiVaultViewRedemptionQueueRequest,
+  type IApiVaultViewRedemptionQueueResponse,
   type IApiWithdrawalHistoryRequest,
   type IApiWithdrawalHistoryResponse,
   type IApiWithdrawalRequest,
@@ -600,6 +604,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultViewRedemptionQueue (payload: IApiVaultViewRedemptionQueueRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_view_redemption_queue',
+      Utils.schemaMap(payload, API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultViewRedemptionQueueResponse
     }).catch(Utils.coverApiError)
   }
 

@@ -10,6 +10,7 @@ export const HexStringMap = [
   'l_1_hash',
   'l_2_hash',
   'liquidity_score',
+  'lp_address',
   'main_account_id',
   'maker_trading_volume',
   'order_i_ds',

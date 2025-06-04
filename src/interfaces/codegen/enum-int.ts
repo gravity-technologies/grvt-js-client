@@ -229,7 +229,8 @@ export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
   [ETimeInterval.INTERVAL_1_D]: 1,
   [ETimeInterval.INTERVAL_7_D]: 2,
   [ETimeInterval.INTERVAL_30_D]: 3,
-  [ETimeInterval.INTERVAL_90_D]: 4
+  [ETimeInterval.INTERVAL_90_D]: 4,
+  [ETimeInterval.INTERVAL_LIFETIME]: 5
 })
 
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({

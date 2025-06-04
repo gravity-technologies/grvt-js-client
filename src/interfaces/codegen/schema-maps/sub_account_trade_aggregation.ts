@@ -9,7 +9,8 @@ export const SUB_ACCOUNT_TRADE_AGGREGATION_MAP: SchemaPairMap = Object.freeze({
     num_traded: 'nt',
     positive_fee: 'pf',
     signer: 's',
-    realized_pnl: 'rp'
+    realized_pnl: 'rp',
+    source: 's1'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
@@ -18,6 +19,7 @@ export const SUB_ACCOUNT_TRADE_AGGREGATION_MAP: SchemaPairMap = Object.freeze({
     nt: 'num_traded',
     pf: 'positive_fee',
     s: 'signer',
-    rp: 'realized_pnl'
+    rp: 'realized_pnl',
+    s1: 'source'
   }
 })
