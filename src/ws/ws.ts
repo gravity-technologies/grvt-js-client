@@ -53,6 +53,8 @@ import {
   type TWSRequest
 } from './interfaces'
 
+const omitZeroStr = (str?: string) => str === '0' ? '' : str
+
 interface IMessage {
   s: string
   n: string
@@ -273,16 +275,16 @@ export class WS {
           return acc
         }
 
-        const depositDestinationAccountId = (result as IDeposit).to_account_id
+        const depositDestinationAccountId = omitZeroStr((result as IDeposit).to_account_id)
         const transferSourceKey = [
-          (result as ITransferHistory).from_account_id,
-          (result as ITransferHistory).from_sub_account_id ? (result as ITransferHistory).from_sub_account_id : 0
+          omitZeroStr((result as ITransferHistory).from_account_id),
+          omitZeroStr((result as ITransferHistory).from_sub_account_id) ? (result as ITransferHistory).from_sub_account_id : 0
         ].filter(Boolean).join('-')
         const transferDestinationKey = [
-          (result as ITransferHistory).to_account_id,
-          (result as ITransferHistory).to_sub_account_id ? (result as ITransferHistory).to_sub_account_id : 0
+          omitZeroStr((result as ITransferHistory).to_account_id),
+          omitZeroStr((result as ITransferHistory).to_sub_account_id) ? (result as ITransferHistory).to_sub_account_id : 0
         ].filter(Boolean).join('-')
-        const withdrawalFromAccountId = (result as IWithdrawal).from_account_id
+        const withdrawalFromAccountId = omitZeroStr((result as IWithdrawal).from_account_id)
         switch (stream) {
           case EStream.GROUP:
             return [...acc, ...Object.values(value)]
@@ -343,13 +345,13 @@ export class WS {
         }
 
         // has sub account id handling
-        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id)
+        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id ?? '')
         // const subAccountId = String((result as IPositions).sub_account_id)
         // const subAccountId = String((result as IFill).sub_account_id)
         const feed = this._parseStream({
           stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
           params: {
-            sub_account_id: subAccountId,
+            sub_account_id: omitZeroStr(subAccountId),
             instrument
           }
         })?.feed
