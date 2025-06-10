@@ -607,16 +607,6 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
-  vaultViewRedemptionQueue (payload: IApiVaultViewRedemptionQueueRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_view_redemption_queue',
-      Utils.schemaMap(payload, API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultViewRedemptionQueueResponse
-    }).catch(Utils.coverApiError)
-  }
-
   vaultRedeemCancel (payload: IApiVaultRedeemCancelRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_redeem_cancel',
@@ -624,6 +614,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultViewRedemptionQueue (payload: IApiVaultViewRedemptionQueueRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_view_redemption_queue',
+      Utils.schemaMap(payload, API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultViewRedemptionQueueResponse
     }).catch(Utils.coverApiError)
   }
 
