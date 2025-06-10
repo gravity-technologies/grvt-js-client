@@ -142,6 +142,7 @@ import {
   type IApiSubAccountSummaryResponse,
   type IApiTimedAssetExposureRequest,
   type IApiTimedAssetExposureResponse,
+  type IApiTimedVaultAssetExposureRequest,
   type IApiTransferHistoryRequest,
   type IApiTransferHistoryResponse,
   type IApiTransferRequest,
@@ -680,6 +681,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultSummaryHistoryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultAssetExposure (payload: IApiTimedVaultAssetExposureRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_asset_exposure',
+      Utils.schemaMap(payload, API_TIMED_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
     }).catch(Utils.coverApiError)
   }
 
