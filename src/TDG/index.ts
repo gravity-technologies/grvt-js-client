@@ -44,6 +44,14 @@ import {
   API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
+  API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
+  API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
+  API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
+  API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP,
+  API_QUERY_VAULT_RISK_METRIC_REQUEST_MAP,
+  API_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP,
+  API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP,
+  API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP,
   API_REPLACE_ORDERS_REQUEST_MAP,
   API_REPLACE_ORDERS_RESPONSE_MAP,
   API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
@@ -115,6 +123,14 @@ import {
   type IApiQueryTradingPerformanceResponse,
   type IApiQueryTradingPerformanceTrendRequest,
   type IApiQueryTradingPerformanceTrendResponse,
+  type IApiQueryVaultPerformanceRequest,
+  type IApiQueryVaultPerformanceResponse,
+  type IApiQueryVaultPerformanceTrendRequest,
+  type IApiQueryVaultPerformanceTrendResponse,
+  type IApiQueryVaultRiskMetricRequest,
+  type IApiQueryVaultRiskMetricResponse,
+  type IApiQueryVaultSummaryHistoryRequest,
+  type IApiQueryVaultSummaryHistoryResponse,
   type IApiReplaceOrdersRequest,
   type IApiReplaceOrdersResponse,
   type IApiSetInitialLeverageRequest,
@@ -607,6 +623,16 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  vaultRedeemCancel (payload: IApiVaultRedeemCancelRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_redeem_cancel',
+      Utils.schemaMap(payload, API_VAULT_REDEEM_CANCEL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
   vaultViewRedemptionQueue (payload: IApiVaultViewRedemptionQueueRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_view_redemption_queue',
@@ -617,13 +643,43 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
-  vaultRedeemCancel (payload: IApiVaultRedeemCancelRequest, config?: AxiosRequestConfig) {
+  vaultPerformance (payload: IApiQueryVaultPerformanceRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
-      this._liteUrl + '/vault_redeem_cancel',
-      Utils.schemaMap(payload, API_VAULT_REDEEM_CANCEL_REQUEST_MAP.FULL_TO_LITE, true),
+      this._liteUrl + '/vault_performance',
+      Utils.schemaMap(payload, API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
-      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultPerformanceTrend (payload: IApiQueryVaultPerformanceTrendRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_performance_trend',
+      Utils.schemaMap(payload, API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceTrendResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultRiskMetric (payload: IApiQueryVaultRiskMetricRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_risk_metric',
+      Utils.schemaMap(payload, API_QUERY_VAULT_RISK_METRIC_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultRiskMetricResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultSummaryHistory (payload: IApiQueryVaultSummaryHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_summary_history',
+      Utils.schemaMap(payload, API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultSummaryHistoryResponse
     }).catch(Utils.coverApiError)
   }
 
