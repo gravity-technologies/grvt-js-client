@@ -63,6 +63,7 @@ import {
   API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_TIMED_ASSET_EXPOSURE_REQUEST_MAP,
   API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP,
+  API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP,
   API_TRANSFER_HISTORY_REQUEST_MAP,
   API_TRANSFER_HISTORY_RESPONSE_MAP,
   API_TRANSFER_REQUEST_MAP,
@@ -687,7 +688,7 @@ export class TDG {
   vaultAssetExposure (payload: IApiTimedVaultAssetExposureRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_asset_exposure',
-      Utils.schemaMap(payload, API_TIMED_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
+      Utils.schemaMap(payload, API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
