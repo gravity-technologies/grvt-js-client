@@ -18,7 +18,9 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     positions: ['p', [POSITIONS_MAP.FULL_TO_LITE]],
     settle_index_price: 'si',
     is_vault: 'iv',
-    vault_im_additions: 'vi'
+    vault_im_additions: 'vi',
+    derisk_margin: 'dm',
+    derisk_to_maintenance_margin_ratio: 'dt'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -34,6 +36,8 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     p: ['positions', [POSITIONS_MAP.LITE_TO_FULL]],
     si: 'settle_index_price',
     iv: 'is_vault',
-    vi: 'vault_im_additions'
+    vi: 'vault_im_additions',
+    dm: 'derisk_margin',
+    dt: 'derisk_to_maintenance_margin_ratio'
   }
 })

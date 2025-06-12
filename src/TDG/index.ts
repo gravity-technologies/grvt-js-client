@@ -40,6 +40,8 @@ import {
   API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP,
+  API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
@@ -120,6 +122,8 @@ import {
   type IApiQueryListFundingAccountSummaryResponse,
   type IApiQueryListSubAccountSummaryRequest,
   type IApiQueryListSubAccountSummaryResponse,
+  type IApiQuerySnapVaultPositionRequest,
+  type IApiQuerySnapVaultPositionResponse,
   type IApiQueryTradingPerformanceRequest,
   type IApiQueryTradingPerformanceResponse,
   type IApiQueryTradingPerformanceTrendRequest,
@@ -692,6 +696,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  snapVaultPosition (payload: IApiQuerySnapVaultPositionRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/snap_vault_position',
+      Utils.schemaMap(payload, API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySnapVaultPositionResponse
     }).catch(Utils.coverApiError)
   }
 

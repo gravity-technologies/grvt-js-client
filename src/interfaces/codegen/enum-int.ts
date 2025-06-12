@@ -180,7 +180,11 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED]: 29,
   [EOrderRejectReason.OCO_COUNTER_PART_TRIGGERED]: 30,
   [EOrderRejectReason.REDUCE_ONLY_LIMIT]: 31,
-  [EOrderRejectReason.CLIENT_REPLACE]: 32
+  [EOrderRejectReason.CLIENT_REPLACE]: 32,
+  [EOrderRejectReason.DERISK_MUST_BE_IOC]: 33,
+  [EOrderRejectReason.DERISK_MUST_BE_REDUCE_ONLY]: 34,
+  [EOrderRejectReason.DERISK_NOT_SUPPORTED]: 35,
+  [EOrderRejectReason.INVALID_ORDER_TYPE]: 36
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
