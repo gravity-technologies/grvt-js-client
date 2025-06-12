@@ -71,6 +71,8 @@ import {
   API_TRANSFER_REQUEST_MAP,
   API_TRANSFER_RESPONSE_MAP,
   API_VAULT_BURN_TOKENS_REQUEST_MAP,
+  API_VAULT_DETAIL_REQUEST_MAP,
+  API_VAULT_DETAIL_RESPONSE_MAP,
   API_VAULT_INVEST_REQUEST_MAP,
   API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP,
   API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP,
@@ -153,6 +155,8 @@ import {
   type IApiTransferRequest,
   type IApiTransferResponse,
   type IApiVaultBurnTokensRequest,
+  type IApiVaultDetailRequest,
+  type IApiVaultDetailResponse,
   type IApiVaultInvestorSummaryRequest,
   type IApiVaultInvestorSummaryResponse,
   type IApiVaultInvestRequest,
@@ -706,6 +710,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySnapVaultPositionResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultDetail (payload: IApiVaultDetailRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_detail',
+      Utils.schemaMap(payload, API_VAULT_DETAIL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_VAULT_DETAIL_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultDetailResponse
     }).catch(Utils.coverApiError)
   }
 

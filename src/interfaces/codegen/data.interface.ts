@@ -1702,6 +1702,26 @@ export interface IApiVaultBurnTokensRequest {
   signature?: ISignature
 }
 
+// Request payload for fetching the detail of a vault.
+//
+// This API allows a client to retrieve the detail of a vault.
+export interface IApiVaultDetailRequest {
+  // The unique identifier of the vault to fetch the detail for.
+  vault_id?: string
+}
+
+// Response payload for the detail of a vault.
+//
+// This API provides the detail of a vault.
+export interface IApiVaultDetailResponse {
+  // The share price of the vault.
+  share_price?: string
+  // The total equity of the vault.
+  total_equity?: string
+  // The valuation cap of the vault.
+  valuation_cap?: string
+}
+
 // Request payload for investing in a vault.
 //
 // This API allows a client to invest a specified amount of tokens in a particular vault.
@@ -3273,6 +3293,10 @@ export interface IVaultRedemption {
   num_lp_tokens?: string
   // The valuation of the redemption request.
   request_valuation?: string
+  // [Filled by GRVT Backend] Time at which the redemption request was received by GRVT in unix nanoseconds
+  request_time?: string
+  // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
+  max_redemption_period_timestamp?: string
 }
 
 // Representation of a pending redemption request for a given vault.
@@ -3283,6 +3307,8 @@ export interface IVaultRedemptionReqView {
   currency?: ECurrency
   // The number of LP tokens to redeem
   num_lp_tokens?: string
+  // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
+  max_redemption_period_timestamp?: string
 }
 
 export interface IWSCancelFeedDataV1 {
