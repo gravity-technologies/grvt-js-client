@@ -17,7 +17,8 @@ export const ORDER_MAP: SchemaPairMap = Object.freeze({
     signature: ['s', SIGNATURE_MAP.FULL_TO_LITE],
     metadata: ['m', ORDER_METADATA_MAP.FULL_TO_LITE],
     state: ['s1', ORDER_STATE_MAP.FULL_TO_LITE],
-    is_liquidation: 'il'
+    is_liquidation: 'il',
+    is_derisk: 'id'
   },
   LITE_TO_FULL: {
     oi: 'order_id',
@@ -30,6 +31,7 @@ export const ORDER_MAP: SchemaPairMap = Object.freeze({
     s: ['signature', SIGNATURE_MAP.LITE_TO_FULL],
     m: ['metadata', ORDER_METADATA_MAP.LITE_TO_FULL],
     s1: ['state', ORDER_STATE_MAP.LITE_TO_FULL],
-    il: 'is_liquidation'
+    il: 'is_liquidation',
+    id: 'is_derisk'
   }
 })

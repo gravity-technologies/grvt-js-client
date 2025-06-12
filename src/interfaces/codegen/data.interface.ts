@@ -283,6 +283,14 @@ export enum EOrderRejectReason {
   REDUCE_ONLY_LIMIT = 'REDUCE_ONLY_LIMIT',
   // the order was replaced by a client replace request
   CLIENT_REPLACE = 'CLIENT_REPLACE',
+  // the derisk order must be an IOC order
+  DERISK_MUST_BE_IOC = 'DERISK_MUST_BE_IOC',
+  // the derisk order must be a reduce-only order
+  DERISK_MUST_BE_REDUCE_ONLY = 'DERISK_MUST_BE_REDUCE_ONLY',
+  // derisk is not supported
+  DERISK_NOT_SUPPORTED = 'DERISK_NOT_SUPPORTED',
+  // the order type is invalid
+  INVALID_ORDER_TYPE = 'INVALID_ORDER_TYPE',
 }
 
 export enum EOrderStatus {
@@ -1221,6 +1229,20 @@ export interface IApiQueryListSubAccountSummaryResponse {
   next?: string
 }
 
+// Request to query latest vault position snapshot
+export interface IApiQuerySnapVaultPositionRequest {
+  // The unique identifier for the vault
+  vault_id?: string
+}
+
+// Response to query latest vault position snapshot
+export interface IApiQuerySnapVaultPositionResponse {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: string
+  // The list of positions owned by this vault
+  positions?: IPositionSummary[]
+}
+
 // Request to retrieve the trading volume
 export interface IApiQueryTradingPerformanceRequest {
   // Optional: The subaccount ID to filter by
@@ -1344,6 +1366,22 @@ export interface IApiResolveEpochEcosystemMetricResponse {
   point?: number
   // The time in unix nanoseconds when the ecosystem points were last calculated
   last_calculated_time?: string
+}
+
+// The request to set the derisk margin to maintenance margin ratio of a sub account
+export interface IApiSetDeriskToMaintenanceMarginRatioRequest {
+  // The sub account ID to set the leverage for
+  sub_account_id?: string
+  // The derisk margin to maintenance margin ratio of this sub account
+  ratio?: string
+  // The signature of this operation
+  signature?: ISignature
+}
+
+// The response to set the derisk margin to maintenance margin ratio of a sub account
+export interface IApiSetDeriskToMaintenanceMarginRatioResponse {
+  // Whether the derisk margin to maintenance margin ratio was set successfully
+  success?: boolean
 }
 
 // The request to set the initial leverage of a sub account
@@ -2410,6 +2448,10 @@ export interface IOrder {
   // Liquidation Orders can be signed by the insurance fund, however, SubAccount must be provably under MM.
   // Trade.FeeCharged will mean liquidation fee. Sent to insurance fund instead of fee collection fund.
   is_liquidation?: boolean
+  // If the order is a derisk order.
+  // Derisk orders are signed by the insurance fund, and are always reduce only IOC orders.
+  // Trade.FeeCharged will mean derisk fee. Sent to insurance fund instead of fee collection fund.
+  is_derisk?: boolean
 }
 
 export interface IOrderLeg {
@@ -2645,6 +2687,18 @@ export interface IQueryGetListEpochResponse {
   result?: IEpoch[]
 }
 
+// Request to retrieve the latest sub-account summary for a given sub-account
+export interface IQueryLatestSubAccountSummaryRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: string
+}
+
+// Response to retrieve the latest sub-account summary for a given sub-account
+export interface IQueryLatestSubAccountSummaryResponse {
+  // The latest sub-account summary
+  result?: ISnapSubAccountSummary
+}
+
 // Request to retrieve the trading performance trend
 export interface IQueryTradingPerformanceTrendRequest {
   // The subaccount IDs to filter by
@@ -2834,6 +2888,10 @@ export interface ISubAccount {
   is_vault?: boolean
   // Total amount of IM (reported in `settle_currency`) deducted from the vault due to redemptions nearing the end of their redemption period
   vault_im_additions?: string
+  // The derisk margin of this sub account
+  derisk_margin?: string
+  // The derisk margin to maintenance margin ratio of this sub account
+  derisk_to_maintenance_margin_ratio?: string
 }
 
 // Similar to sub-account trade, but not divided by individual assets.
