@@ -1287,6 +1287,10 @@ export interface IApiQueryVaultPerformanceResponse {
   trading_volume?: string
   // Returns ROI normalized to an annualized number.
   apr?: number
+  // Realized PnL in USDT
+  realized_pnl?: string
+  // PnL in USDT
+  pnl?: string
 }
 
 // Request to retrieve the trading performance trend
@@ -1720,6 +1724,15 @@ export interface IApiVaultDetailResponse {
   total_equity?: string
   // The valuation cap of the vault.
   valuation_cap?: string
+  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
+  // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
+  unrealized_pnl?: string
+  // The `total_equity` required to open positions in the account (reported in `settle_currency`).
+  // Computation is different depending on account's `margin_type`
+  initial_margin?: string
+  // The `total_equity` required to avoid liquidation of positions in the account (reported in `settle_currency`).
+  // Computation is different depending on account's `margin_type`
+  maintenance_margin?: string
 }
 
 // Request payload for investing in a vault.
