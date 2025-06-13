@@ -4,10 +4,14 @@ import { type SchemaPairMap } from './types'
 export const API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     trading_volume: 'tv',
-    apr: 'a'
+    apr: 'a',
+    realized_pnl: 'rp',
+    pnl: 'p'
   },
   LITE_TO_FULL: {
     tv: 'trading_volume',
-    a: 'apr'
+    a: 'apr',
+    rp: 'realized_pnl',
+    p: 'pnl'
   }
 })

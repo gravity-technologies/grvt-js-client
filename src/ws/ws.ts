@@ -278,11 +278,11 @@ export class WS {
         const depositDestinationAccountId = omitZeroStr((result as IDeposit).to_account_id)
         const transferSourceKey = [
           omitZeroStr((result as ITransferHistory).from_account_id),
-          omitZeroStr((result as ITransferHistory).from_sub_account_id) ? (result as ITransferHistory).from_sub_account_id : 0
+          omitZeroStr((result as ITransferHistory).from_sub_account_id)
         ].filter(Boolean).join('-')
         const transferDestinationKey = [
           omitZeroStr((result as ITransferHistory).to_account_id),
-          omitZeroStr((result as ITransferHistory).to_sub_account_id) ? (result as ITransferHistory).to_sub_account_id : 0
+          omitZeroStr((result as ITransferHistory).to_sub_account_id)
         ].filter(Boolean).join('-')
         const withdrawalFromAccountId = omitZeroStr((result as IWithdrawal).from_account_id)
         switch (stream) {
@@ -480,10 +480,7 @@ export class WS {
     }
 
     const transferFeed = (params: IWSTdgTransferRequest['params']): string => {
-      if (params.sub_account_id) {
-        return [params.main_account_id, params.sub_account_id].join('-')
-      }
-      return params.main_account_id
+      return [params.main_account_id, params.sub_account_id].filter(Boolean).join('-')
     }
 
     const withdrawalFeed = (params: IWSTdgWithDrawalRequest['params']): string => {
