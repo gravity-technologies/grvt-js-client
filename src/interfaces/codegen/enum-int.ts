@@ -11,6 +11,7 @@ import {
   EMarginType,
   EOrderRejectReason,
   EOrderStatus,
+  EQueryMainAccountLeaderboardOrderBy,
   ERewardEpochStatus,
   ERewardProgramType,
   ESource,
@@ -193,6 +194,11 @@ export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
   [EOrderStatus.FILLED]: 3,
   [EOrderStatus.REJECTED]: 4,
   [EOrderStatus.CANCELLED]: 5
+})
+
+export const EQueryMainAccountLeaderboardOrderByInt: Record<EQueryMainAccountLeaderboardOrderBy, number> = Object.freeze({
+  [EQueryMainAccountLeaderboardOrderBy.PNL]: 1,
+  [EQueryMainAccountLeaderboardOrderBy.TRADING_VOLUME]: 2
 })
 
 export const ERewardEpochStatusInt: Record<ERewardEpochStatus, number> = Object.freeze({
