@@ -40,12 +40,16 @@ import {
   API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
   API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
+  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
   API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP,
   API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
   API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
+  API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP,
+  API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP,
   API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
   API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
@@ -124,12 +128,16 @@ import {
   type IApiQueryListFundingAccountSummaryResponse,
   type IApiQueryListSubAccountSummaryRequest,
   type IApiQueryListSubAccountSummaryResponse,
+  type IApiQueryListVaultSubAccountSummaryRequest,
+  type IApiQueryListVaultSubAccountSummaryResponse,
   type IApiQuerySnapVaultPositionRequest,
   type IApiQuerySnapVaultPositionResponse,
   type IApiQueryTradingPerformanceRequest,
   type IApiQueryTradingPerformanceResponse,
   type IApiQueryTradingPerformanceTrendRequest,
   type IApiQueryTradingPerformanceTrendResponse,
+  type IApiQueryVaultInvestorHistoryRequest,
+  type IApiQueryVaultInvestorHistoryResponse,
   type IApiQueryVaultPerformanceRequest,
   type IApiQueryVaultPerformanceResponse,
   type IApiQueryVaultPerformanceTrendRequest,
@@ -690,6 +698,26 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultSummaryHistoryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultSubAccountSummaryHistory (payload: IApiQueryListVaultSubAccountSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_sub_account_summary_history',
+      Utils.schemaMap(payload, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryListVaultSubAccountSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultInvestorHistory (payload: IApiQueryVaultInvestorHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_investor_history',
+      Utils.schemaMap(payload, API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultInvestorHistoryResponse
     }).catch(Utils.coverApiError)
   }
 

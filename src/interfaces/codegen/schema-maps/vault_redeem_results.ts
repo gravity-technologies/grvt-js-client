@@ -9,7 +9,8 @@ export const VAULT_REDEEM_RESULTS_MAP: SchemaPairMap = Object.freeze({
     currency: 'c',
     num_tokens: 'nt',
     avg_entry_price: 'ae',
-    fees_charged: 'fc'
+    fees_charged: 'fc',
+    realized_pnl: 'rp'
   },
   LITE_TO_FULL: {
     ti: 'token_index_price',
@@ -18,6 +19,7 @@ export const VAULT_REDEEM_RESULTS_MAP: SchemaPairMap = Object.freeze({
     c: 'currency',
     nt: 'num_tokens',
     ae: 'avg_entry_price',
-    fc: 'fees_charged'
+    fc: 'fees_charged',
+    rp: 'realized_pnl'
   }
 })
