@@ -1,10 +1,10 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'VAULT_INVESTOR_HISTORY' struct.
-export const VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'API_VAULT_INVESTOR_HISTORY' struct.
+export const API_VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
-    main_account_id: 'ma',
+    funding_address: 'fa',
     vault_id: 'vi',
     type: 't',
     price: 'p',
@@ -14,7 +14,7 @@ export const VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
   },
   LITE_TO_FULL: {
     et: 'event_time',
-    ma: 'main_account_id',
+    fa: 'funding_address',
     vi: 'vault_id',
     t: 'type',
     p: 'price',

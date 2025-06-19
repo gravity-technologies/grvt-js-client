@@ -50,6 +50,8 @@ import {
   API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
   API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP,
   API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP,
+  API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP,
+  API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP,
   API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
   API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
   API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
@@ -138,6 +140,8 @@ import {
   type IApiQueryTradingPerformanceTrendResponse,
   type IApiQueryVaultInvestorHistoryRequest,
   type IApiQueryVaultInvestorHistoryResponse,
+  type IApiQueryVaultManagerInvestorHistoryRequest,
+  type IApiQueryVaultManagerInvestorHistoryResponse,
   type IApiQueryVaultPerformanceRequest,
   type IApiQueryVaultPerformanceResponse,
   type IApiQueryVaultPerformanceTrendRequest,
@@ -748,6 +752,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_VAULT_DETAIL_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultDetailResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultManagerInvestorHistory (payload: IApiQueryVaultManagerInvestorHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_manager_investor_history',
+      Utils.schemaMap(payload, API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultManagerInvestorHistoryResponse
     }).catch(Utils.coverApiError)
   }
 
