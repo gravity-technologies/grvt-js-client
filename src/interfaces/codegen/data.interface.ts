@@ -73,7 +73,10 @@ export enum ECandlestickType {
   MID = 'MID',
 }
 
-// The list of Currencies that are supported on the GRVT exchange
+/**
+ * The list of Currencies that are supported on the GRVT exchange
+ * @deprecated
+ */
 export enum ECurrency {
   // the USD fiat currency
   USD = 'USD',
@@ -384,6 +387,57 @@ export enum ETimeInterval {
   INTERVAL_LIFETIME = 'INTERVAL_LIFETIME',
 }
 
+export enum ETransactionType {
+  UNSPECIFIED_1 = 'UNSPECIFIED_1',
+  UNSPECIFIED_2 = 'UNSPECIFIED_2',
+  UNSPECIFIED_3 = 'UNSPECIFIED_3',
+  CREATE_ACCOUNT = 'CREATE_ACCOUNT',
+  CREATE_SUB_ACCOUNT = 'CREATE_SUB_ACCOUNT',
+  SET_ACCOUNT_MULTI_SIG_THRESHOLD = 'SET_ACCOUNT_MULTI_SIG_THRESHOLD',
+  ADD_ACCOUNT_SIGNER = 'ADD_ACCOUNT_SIGNER',
+  REMOVE_ACCOUNT_SIGNER = 'REMOVE_ACCOUNT_SIGNER',
+  ADD_WITHDRAWAL_ADDRESS = 'ADD_WITHDRAWAL_ADDRESS',
+  REMOVE_WITHDRAWAL_ADDRESS = 'REMOVE_WITHDRAWAL_ADDRESS',
+  ADD_TRANSFER_ACCOUNT = 'ADD_TRANSFER_ACCOUNT',
+  REMOVE_TRANSFER_ACCOUNT = 'REMOVE_TRANSFER_ACCOUNT',
+  SET_SUB_ACCOUNT_MARGIN_TYPE = 'SET_SUB_ACCOUNT_MARGIN_TYPE',
+  ADD_SUB_ACCOUNT_SIGNER = 'ADD_SUB_ACCOUNT_SIGNER',
+  REMOVE_SUB_ACCOUNT_SIGNER = 'REMOVE_SUB_ACCOUNT_SIGNER',
+  ADD_SESSION_KEY = 'ADD_SESSION_KEY',
+  REMOVE_SESSION_KEY = 'REMOVE_SESSION_KEY',
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
+  TRANSFER = 'TRANSFER',
+  MARK_PRICE_TICK = 'MARK_PRICE_TICK',
+  SETTLEMENT_PRICE_TICK = 'SETTLEMENT_PRICE_TICK',
+  FUNDING_TICK = 'FUNDING_TICK',
+  INTEREST_RATE_TICK = 'INTEREST_RATE_TICK',
+  SCHEDULE_CONFIG = 'SCHEDULE_CONFIG',
+  SET_CONFIG = 'SET_CONFIG',
+  TRADE = 'TRADE',
+  ADD_RECOVERY_ADDRESS = 'ADD_RECOVERY_ADDRESS',
+  REMOVE_RECOVERY_ADDRESS = 'REMOVE_RECOVERY_ADDRESS',
+  RECOVER_ADDRESS = 'RECOVER_ADDRESS',
+  SETTLE_START = 'SETTLE_START',
+  SETTLE_INSTRUMENTS = 'SETTLE_INSTRUMENTS',
+  SETTLE_SOCIALISED_LOSS = 'SETTLE_SOCIALISED_LOSS',
+  SETTLE_END = 'SETTLE_END',
+  SCHEDULE_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS = 'SCHEDULE_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS',
+  SET_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS = 'SET_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS',
+  INITIALIZE_CONFIG = 'INITIALIZE_CONFIG',
+  CREATE_ACCOUNT_WITH_SUB_ACCOUNT = 'CREATE_ACCOUNT_WITH_SUB_ACCOUNT',
+  VAULT_CREATE = 'VAULT_CREATE',
+  VAULT_UPDATE = 'VAULT_UPDATE',
+  VAULT_DELIST = 'VAULT_DELIST',
+  VAULT_CLOSE = 'VAULT_CLOSE',
+  VAULT_INVEST = 'VAULT_INVEST',
+  VAULT_BURN_LP_TOKEN = 'VAULT_BURN_LP_TOKEN',
+  VAULT_REDEEM = 'VAULT_REDEEM',
+  VAULT_MANAGEMENT_FEE_TICK = 'VAULT_MANAGEMENT_FEE_TICK',
+  ADD_CURRENCY = 'ADD_CURRENCY',
+  SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO = 'SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO',
+}
+
 export enum ETransferType {
   // Default transfer that has nothing to do with bridging
   UNSPECIFIED = 'UNSPECIFIED',
@@ -486,9 +540,9 @@ export interface IApiCancelAllOrdersRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be cancelled
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be cancelled
-  base?: ECurrency[]
+  base?: string[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be cancelled
-  quote?: ECurrency[]
+  quote?: string[]
 }
 
 export interface IApiCancelAllOrdersResponse {
@@ -630,7 +684,7 @@ export interface IApiDedustPositionResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiDepositHistoryRequest {
   // The token currency to query for, if nil or empty, return all deposits. Otherwise, only entries matching the filter will be returned
-  currency?: ECurrency[]
+  currency?: string[]
   // The start time to query for in unix nanoseconds
   start_time?: string
   // The end time to query for in unix nanoseconds
@@ -667,9 +721,9 @@ export interface IApiFillHistoryRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
-  base?: ECurrency[]
+  base?: string[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
+  quote?: string[]
   // The start time to apply in unix nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
   start_time?: string
   // The end time to apply in unix nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
@@ -872,7 +926,7 @@ export interface IApiGetLPInfoRequest {
   // The kind filter to apply
   kind?: EKind
   // The base filter to apply
-  base?: ECurrency
+  base?: string
 }
 
 export interface IApiGetLPInfoResponse {
@@ -902,7 +956,7 @@ export interface IApiGetLPLeaderboardRequest {
   // The kind filter to apply
   kind?: EKind
   // The base filter to apply
-  base?: ECurrency
+  base?: string
 }
 
 export interface IApiGetLPLeaderboardResponse {
@@ -916,7 +970,7 @@ export interface IApiGetLPPointRequest {
   // Optional. The kind filter to apply
   kind?: EKind
   // Optional. The base filter to apply
-  base?: ECurrency
+  base?: string
 }
 
 export interface IApiGetLPPointResponse {
@@ -930,7 +984,7 @@ export interface IApiGetLatestLPSnapshotRequest {
   // The kind filter to apply
   kind?: EKind
   // The base filter to apply
-  base?: ECurrency
+  base?: string
 }
 
 export interface IApiGetLatestLPSnapshotResponse {
@@ -1066,9 +1120,9 @@ export interface IApiOpenOrdersRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
-  base?: ECurrency[]
+  base?: string[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
+  quote?: string[]
 }
 
 // Retrieves all open orders for the account. This may not match new orders in flight.
@@ -1086,9 +1140,9 @@ export interface IApiOrderHistoryRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
-  base?: ECurrency[]
+  base?: string[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
+  quote?: string[]
   // The start time to apply in nanoseconds. If nil, this defaults to all start times. Otherwise, only entries matching the filter will be returned
   start_time?: string
   // The end time to apply in nanoseconds. If nil, this defaults to all end times. Otherwise, only entries matching the filter will be returned
@@ -1141,9 +1195,9 @@ export interface IApiPositionsRequest {
   // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
   kind?: EKind[]
   // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
-  base?: ECurrency[]
+  base?: string[]
   // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
-  quote?: ECurrency[]
+  quote?: string[]
 }
 
 export interface IApiPositionsResponse {
@@ -1154,7 +1208,7 @@ export interface IApiPositionsResponse {
 // UI only for bridge deposits through non native bridge. Currently only supports XY Finance bridge account.
 export interface IApiPreDepositCheckRequest {
   // The currency you hold the deposit in
-  currency?: ECurrency
+  currency?: string
   // The bridge type to conduct checks for
   bridge?: EBridgeType
 }
@@ -1163,7 +1217,7 @@ export interface IApiPreDepositCheckResponse {
   // Max Deposit Limit reported for the Bridge Account reported in the currency balance
   max_deposit_limit?: string
   // The currency you hold the deposit in
-  currency?: ECurrency
+  currency?: string
 }
 
 // Get pre-order check information for a new order
@@ -1296,7 +1350,7 @@ export interface IApiQueryTradingPerformanceTrendResponse {
   next?: string
 }
 
-// Request to retrieve the sub-account summary for a given sub-account
+// Request for user to retrieve their vault's investment history
 export interface IApiQueryVaultInvestorHistoryRequest {
   // Optional. The unique identifier of the vault.
   vault_id?: string
@@ -1304,8 +1358,22 @@ export interface IApiQueryVaultInvestorHistoryRequest {
 
 // Response to retrieve the vault summary for a given vault
 export interface IApiQueryVaultInvestorHistoryResponse {
-  // The list of vault summaries
-  result?: IVaultInvestorHistory[]
+  // The list of vault investor history
+  result?: IApiVaultInvestorHistory[]
+}
+
+// Request for the manager to retrieve the vault investor history for their vault
+export interface IApiQueryVaultManagerInvestorHistoryRequest {
+  // The unique identifier of the vault to filter by
+  vault_id?: string
+  // Whether to only return investments made by the manager
+  only_own_investments?: boolean
+}
+
+// Response to retrieve the vault summary for a given vault
+export interface IApiQueryVaultManagerInvestorHistoryResponse {
+  // The list of vault investor history belong to the manager
+  result?: IApiVaultInvestorHistory[]
 }
 
 // Request to retrieve the trading volume
@@ -1648,7 +1716,7 @@ export interface IApiTransferAck {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiTransferHistoryRequest {
   // The token currency to query for, if nil or empty, return all transfers. Otherwise, only entries matching the filter will be returned
-  currency?: ECurrency[]
+  currency?: string[]
   // The start time to query for in unix nanoseconds
   start_time?: string
   // The end time to query for in unix nanoseconds
@@ -1690,7 +1758,7 @@ export interface IApiTransferRequest {
   // The subaccount to transfer to (0 if transferring to main account)
   to_sub_account_id?: string
   // The token currency to transfer
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to transfer, quoted in tokenCurrency decimal units
   num_tokens?: string
   // The signature of the transfer
@@ -1744,7 +1812,7 @@ export interface IApiVaultBurnTokensRequest {
   // The unique identifier of the vault to burn tokens from.
   vault_id?: string
   // The currency used for the burn (e.g., USDT, DAI).
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to burn, in base units (e.g., 6 decimals for USDT).
   num_tokens?: string
   // The digital signature from the investing account.
@@ -1791,13 +1859,33 @@ export interface IApiVaultInvestRequest {
   // The unique identifier of the vault to invest in.
   vault_id?: string
   // The currency used for the investment (e.g., USDT, DAI).
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to invest, in base units (e.g., 6 decimals for USDT).
   num_tokens?: string
   // The digital signature from the investing account.
   // This signature must be generated by the main account ID and is used to verify the authenticity of the request.
   // The signature must comply with AccountPermExternalTransfer permission.
   signature?: ISignature
+}
+
+// The vault investor history returned by the service to client
+export interface IApiVaultInvestorHistory {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: string
+  // The masked funding address of the investor, only visible to the manager
+  funding_address?: string
+  // The unique identifier of the vault.
+  vault_id?: string
+  // The type of transaction that occurred. List of types: vaultInvest, vaultBurnLpToken, vaultRedeem
+  type?: ETransactionType
+  // The price of the vault LP tokens at the time of the event.
+  price?: string
+  // The amount of Vault LP tokens invested or redeemed.
+  size?: string
+  // The realized PnL of the vault.
+  realized_pnl?: string
+  // The performance fee of the vault.
+  performance_fee?: string
 }
 
 // Request payload for fetching the summary of a vault investor.
@@ -1847,7 +1935,7 @@ export interface IApiVaultRedeemRequest {
   // The unique identifier of the vault to redeem from.
   vault_id?: string
   // The currency used for the redemption (e.g., USDT, DAI).
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to redeem, in base units (e.g., 6 decimals for USDT).
   num_tokens?: string
   // The digital signature from the investing account.
@@ -1909,7 +1997,7 @@ export interface IApiVaultViewRedemptionQueueResponse {
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
 export interface IApiWithdrawalHistoryRequest {
   // The token currency to query for, if nil or empty, return all withdrawals. Otherwise, only entries matching the filter will be returned
-  currency?: ECurrency[]
+  currency?: string[]
   // The start time to query for in unix nanoseconds
   start_time?: string
   // The end time to query for in unix nanoseconds
@@ -1941,7 +2029,7 @@ export interface IApiWithdrawalRequest {
   // The Ethereum wallet to withdraw into
   to_eth_address?: string
   // The token currency to withdraw
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to withdraw, quoted in tokenCurrency decimal units
   num_tokens?: string
   // The signature of the withdrawal
@@ -2057,7 +2145,7 @@ export interface IDeposit {
   // The account to deposit into
   to_account_id?: string
   // The token currency to deposit
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to deposit
   num_tokens?: string
 }
@@ -2070,7 +2158,7 @@ export interface IDepositHistory {
   // The account to deposit into
   to_account_id?: string
   // The token currency to deposit
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to deposit
   num_tokens?: string
   // The timestamp when the deposit was initiated on L1 in unix nanoseconds
@@ -2311,7 +2399,7 @@ export interface IFundingPayment {
   // The perpetual instrument being funded
   instrument?: string
   // The currency of the funding payment
-  currency?: ECurrency
+  currency?: string
   // The amount of the funding payment. Positive if paid, negative if received
   amount?: string
   // The transaction ID of the funding payment.
@@ -2359,9 +2447,9 @@ export interface IInstrument {
   // The asset ID used for instrument signing.
   instrument_hash?: string
   // The base currency
-  base?: ECurrency
+  base?: string
   // The quote currency
-  quote?: ECurrency
+  quote?: string
   // The kind of instrument
   kind?: EKind
   // The expiry time of the instrument in unix nanoseconds
@@ -2719,7 +2807,7 @@ export interface IPreOrderCheckResult {
   // The reason the order is invalid, if any
   reason?: string
   // The subAccount settle currency
-  settle_currency?: ECurrency
+  settle_currency?: string
 }
 
 // Request to retrieve the account summary for a given account
@@ -2852,6 +2940,12 @@ export interface IQueryVaultInvestorHistoryRequest {
   vault_id?: string
 }
 
+// Response to retrieve the vault summary for a given vault
+export interface IQueryVaultInvestorHistoryResponse {
+  // The list of vault investor history
+  result?: IVaultInvestorHistory[]
+}
+
 // Request to retrieve the vault summary for a given vault
 export interface IQueryVaultSummaryHistoryRequest {
   // The vault ID to filter by
@@ -2973,7 +3067,7 @@ export interface ISnapVaultSummary {
 
 export interface ISpotBalance {
   // The currency you hold a spot balance in
-  currency?: ECurrency
+  currency?: string
   // This currency's balance in this trading account.
   balance?: string
   // The index price of this currency. (reported in `USD`)
@@ -2999,7 +3093,7 @@ export interface ISubAccount {
   //
   // In the future, when users select a Multi-Currency Margin Type, this will be USD
   // All other assets are converted to this currency for the purpose of calculating margin
-  settle_currency?: ECurrency
+  settle_currency?: string
   // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
   // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
   unrealized_pnl?: string
@@ -3212,7 +3306,7 @@ export interface ITransferHistory {
   // The subaccount to transfer to (0 if transferring to main account)
   to_sub_account_id?: string
   // The token currency to transfer
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to transfer
   num_tokens?: string
   // The signature of the transfer
@@ -3314,8 +3408,8 @@ export interface IVaultInvestorHistory {
   main_account_id?: string
   // The unique identifier of the vault.
   vault_id?: string
-  // Whether the investor is currently investing in the vault.
-  is_investing?: boolean
+  // The type of transaction that occurred. List of types: vaultInvest, vaultBurnLpToken, vaultRedeem
+  type?: ETransactionType
   // The price of the vault LP tokens at the time of the event.
   price?: string
   // The amount of Vault LP tokens invested or redeemed.
@@ -3393,7 +3487,7 @@ export interface IVaultRedeemResults {
   // The share price of the vault LP token at point of vault redemption
   vault_share_price?: string
   // The currency to redeemed
-  currency?: ECurrency
+  currency?: string
   // The number of tokens received upon vault redemption
   num_tokens?: string
   // The average entry share price at point of vault redemption. Used to compute performance fee payments
@@ -3423,7 +3517,7 @@ export interface IVaultRedemptionReqView {
   // [Filled by GRVT Backend] Time at which the redemption request was received by GRVT in unix nanoseconds
   request_time?: string
   // The currency to redeem in
-  currency?: ECurrency
+  currency?: string
   // The number of LP tokens to redeem
   num_lp_tokens?: string
   // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
@@ -3956,7 +4050,7 @@ export interface IWithdrawal {
   // The ethereum address to withdraw to
   to_eth_address?: string
   // The token currency to withdraw
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to withdraw
   num_tokens?: string
   // The signature of the withdrawal
@@ -3971,7 +4065,7 @@ export interface IWithdrawalHistory {
   // The ethereum address to withdraw to
   to_eth_address?: string
   // The token currency to withdraw
-  currency?: ECurrency
+  currency?: string
   // The number of tokens to withdraw
   num_tokens?: string
   // The signature of the withdrawal
