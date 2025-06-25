@@ -73,93 +73,6 @@ export enum ECandlestickType {
   MID = 'MID',
 }
 
-/**
- * The list of Currencies that are supported on the GRVT exchange
- * @deprecated
- */
-export enum ECurrency {
-  // the USD fiat currency
-  USD = 'USD',
-  // the USDC token
-  USDC = 'USDC',
-  // the USDT token
-  USDT = 'USDT',
-  // the ETH token
-  ETH = 'ETH',
-  // the BTC token
-  BTC = 'BTC',
-  // the SOL token
-  SOL = 'SOL',
-  // the ARB token
-  ARB = 'ARB',
-  // the BNB token
-  BNB = 'BNB',
-  // the ZK token
-  ZK = 'ZK',
-  // the POL token
-  POL = 'POL',
-  // the OP token
-  OP = 'OP',
-  // the ATOM token
-  ATOM = 'ATOM',
-  // the 1000PEPE token
-  KPEPE = 'KPEPE',
-  // the TON token
-  TON = 'TON',
-  // the XRP token
-  XRP = 'XRP',
-  // the XLM token
-  XLM = 'XLM',
-  // the WLD token
-  WLD = 'WLD',
-  // the WIF token
-  WIF = 'WIF',
-  // the VIRTUAL token
-  VIRTUAL = 'VIRTUAL',
-  // the TRUMP token
-  TRUMP = 'TRUMP',
-  // the SUI token
-  SUI = 'SUI',
-  // the 1000SHIB token
-  KSHIB = 'KSHIB',
-  // the POPCAT token
-  POPCAT = 'POPCAT',
-  // the PENGU token
-  PENGU = 'PENGU',
-  // the LINK token
-  LINK = 'LINK',
-  // the 1000BONK token
-  KBONK = 'KBONK',
-  // the JUP token
-  JUP = 'JUP',
-  // the FARTCOIN token
-  FARTCOIN = 'FARTCOIN',
-  // the ENA token
-  ENA = 'ENA',
-  // the DOGE token
-  DOGE = 'DOGE',
-  // the AIXBT token
-  AIXBT = 'AIXBT',
-  // the AI16Z token
-  AI16Z = 'AI16Z',
-  // the ADA token
-  ADA = 'ADA',
-  // the AAVE token
-  AAVE = 'AAVE',
-  // the BERA token
-  BERA = 'BERA',
-  // the VINE token
-  VINE = 'VINE',
-  // the PENDLE token
-  PENDLE = 'PENDLE',
-  // the UXLINK token
-  UXLINK = 'UXLINK',
-  // the KAITO token
-  KAITO = 'KAITO',
-  // the IP token
-  IP = 'IP',
-}
-
 export enum EEpochBadgeType {
   // Champion
   CHAMPION = 'CHAMPION',
@@ -294,6 +207,8 @@ export enum EOrderRejectReason {
   DERISK_NOT_SUPPORTED = 'DERISK_NOT_SUPPORTED',
   // the order type is invalid
   INVALID_ORDER_TYPE = 'INVALID_ORDER_TYPE',
+  // the currency is not defined
+  CURRENCY_NOT_DEFINED = 'CURRENCY_NOT_DEFINED',
 }
 
 export enum EOrderStatus {
@@ -1914,6 +1829,8 @@ export interface IApiVaultPerformanceTrend {
   end_interval?: string
   // The trading volume of the account
   trading_volume?: string
+  // Realized PnL in USDT
+  realized_pnl?: string
 }
 
 // Request payload for canceling a vault redemption.
@@ -3047,6 +2964,8 @@ export interface ISnapSubAccountSummary {
   is_vault?: boolean
   // Total amount of IM (reported in `settle_currency`) deducted from the vault due to redemptions nearing the end of their redemption period
   vault_im_additions?: string
+  // The list of spot assets owned by this sub account, and their balances
+  spot_balances?: ISpotBalance[]
 }
 
 // The vault summary snapshot
@@ -3387,6 +3306,11 @@ export interface IUserVaultCategoryEventPayLoad {
   action?: string
   // number of bumps in this event. default 1
   num_bumps?: string
+}
+
+export interface IVaultBurnLpTokenResults {
+  // The share price of the vault LP token at point of LP token burn
+  vault_share_price?: string
 }
 
 export interface IVaultInvestResults {

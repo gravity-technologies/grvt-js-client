@@ -142,7 +142,8 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.DERISK_MUST_BE_IOC]: 33,
   [EOrderRejectReason.DERISK_MUST_BE_REDUCE_ONLY]: 34,
   [EOrderRejectReason.DERISK_NOT_SUPPORTED]: 35,
-  [EOrderRejectReason.INVALID_ORDER_TYPE]: 36
+  [EOrderRejectReason.INVALID_ORDER_TYPE]: 36,
+  [EOrderRejectReason.CURRENCY_NOT_DEFINED]: 37
 })
 
 export const EOrderStatusInt: Record<EOrderStatus, number> = Object.freeze({
