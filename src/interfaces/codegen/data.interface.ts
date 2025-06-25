@@ -294,6 +294,8 @@ export enum EOrderRejectReason {
   DERISK_NOT_SUPPORTED = 'DERISK_NOT_SUPPORTED',
   // the order type is invalid
   INVALID_ORDER_TYPE = 'INVALID_ORDER_TYPE',
+  // the currency is not defined
+  CURRENCY_NOT_DEFINED = 'CURRENCY_NOT_DEFINED',
 }
 
 export enum EOrderStatus {
@@ -1914,6 +1916,8 @@ export interface IApiVaultPerformanceTrend {
   end_interval?: string
   // The trading volume of the account
   trading_volume?: string
+  // Realized PnL in USDT
+  realized_pnl?: string
 }
 
 // Request payload for canceling a vault redemption.
@@ -3047,6 +3051,8 @@ export interface ISnapSubAccountSummary {
   is_vault?: boolean
   // Total amount of IM (reported in `settle_currency`) deducted from the vault due to redemptions nearing the end of their redemption period
   vault_im_additions?: string
+  // The list of spot assets owned by this sub account, and their balances
+  spot_balances?: ISpotBalance[]
 }
 
 // The vault summary snapshot
@@ -3387,6 +3393,11 @@ export interface IUserVaultCategoryEventPayLoad {
   action?: string
   // number of bumps in this event. default 1
   num_bumps?: string
+}
+
+export interface IVaultBurnLpTokenResults {
+  // The share price of the vault LP token at point of LP token burn
+  vault_share_price?: string
 }
 
 export interface IVaultInvestResults {
