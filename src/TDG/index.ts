@@ -665,6 +665,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultPerformance (payload: IApiQueryVaultPerformanceRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_performance',
@@ -675,6 +679,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultPerformanceTrend (payload: IApiQueryVaultPerformanceTrendRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_performance_trend',
@@ -685,6 +693,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultRiskMetric (payload: IApiQueryVaultRiskMetricRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_risk_metric',
@@ -695,6 +707,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultSummaryHistory (payload: IApiQueryVaultSummaryHistoryRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_summary_history',
@@ -705,6 +721,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultSubAccountSummaryHistory (payload: IApiQueryListVaultSubAccountSummaryRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_sub_account_summary_history',
@@ -725,6 +745,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultAssetExposure (payload: IApiTimedVaultAssetExposureRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_asset_exposure',
@@ -735,6 +759,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   snapVaultPosition (payload: IApiQuerySnapVaultPositionRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/snap_vault_position',
@@ -745,6 +773,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultDetail (payload: IApiVaultDetailRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_detail',

@@ -73,93 +73,6 @@ export enum ECandlestickType {
   MID = 'MID',
 }
 
-/**
- * The list of Currencies that are supported on the GRVT exchange
- * @deprecated
- */
-export enum ECurrency {
-  // the USD fiat currency
-  USD = 'USD',
-  // the USDC token
-  USDC = 'USDC',
-  // the USDT token
-  USDT = 'USDT',
-  // the ETH token
-  ETH = 'ETH',
-  // the BTC token
-  BTC = 'BTC',
-  // the SOL token
-  SOL = 'SOL',
-  // the ARB token
-  ARB = 'ARB',
-  // the BNB token
-  BNB = 'BNB',
-  // the ZK token
-  ZK = 'ZK',
-  // the POL token
-  POL = 'POL',
-  // the OP token
-  OP = 'OP',
-  // the ATOM token
-  ATOM = 'ATOM',
-  // the 1000PEPE token
-  KPEPE = 'KPEPE',
-  // the TON token
-  TON = 'TON',
-  // the XRP token
-  XRP = 'XRP',
-  // the XLM token
-  XLM = 'XLM',
-  // the WLD token
-  WLD = 'WLD',
-  // the WIF token
-  WIF = 'WIF',
-  // the VIRTUAL token
-  VIRTUAL = 'VIRTUAL',
-  // the TRUMP token
-  TRUMP = 'TRUMP',
-  // the SUI token
-  SUI = 'SUI',
-  // the 1000SHIB token
-  KSHIB = 'KSHIB',
-  // the POPCAT token
-  POPCAT = 'POPCAT',
-  // the PENGU token
-  PENGU = 'PENGU',
-  // the LINK token
-  LINK = 'LINK',
-  // the 1000BONK token
-  KBONK = 'KBONK',
-  // the JUP token
-  JUP = 'JUP',
-  // the FARTCOIN token
-  FARTCOIN = 'FARTCOIN',
-  // the ENA token
-  ENA = 'ENA',
-  // the DOGE token
-  DOGE = 'DOGE',
-  // the AIXBT token
-  AIXBT = 'AIXBT',
-  // the AI16Z token
-  AI16Z = 'AI16Z',
-  // the ADA token
-  ADA = 'ADA',
-  // the AAVE token
-  AAVE = 'AAVE',
-  // the BERA token
-  BERA = 'BERA',
-  // the VINE token
-  VINE = 'VINE',
-  // the PENDLE token
-  PENDLE = 'PENDLE',
-  // the UXLINK token
-  UXLINK = 'UXLINK',
-  // the KAITO token
-  KAITO = 'KAITO',
-  // the IP token
-  IP = 'IP',
-}
-
 export enum EEpochBadgeType {
   // Champion
   CHAMPION = 'CHAMPION',
@@ -467,6 +380,10 @@ export enum ETriggerBy {
   INDEX = 'INDEX',
   // LAST - Order is activated when the last trade price reaches the trigger price
   LAST = 'LAST',
+  // MID - Order is activated when the mid price reaches the trigger price
+  MID = 'MID',
+  // MARK - Order is activated when the mark price reaches the trigger price
+  MARK = 'MARK',
 }
 
 // Defines the type of trigger order used in trading, such as Take Profit or Stop Loss.
@@ -533,6 +450,46 @@ export interface IAggregatedAccountSummary {
 export interface IApiAggregatedAccountSummaryResponse {
   // The aggregated account summary
   result?: IAggregatedAccountSummary
+}
+
+// Request payload for fetching the detail of a vault.
+//
+// This API allows a client to retrieve the detail of a vault.
+export interface IApiBatchQueryVaultDetailRequest {
+  // The list of vault IDs to fetch the detail for.
+  vault_i_ds?: string[]
+}
+
+// Response payload for the detail of a vault.
+//
+// This API provides the detail of a vault.
+export interface IApiBatchQueryVaultDetailResponse {
+  // The list of vault details.
+  result?: IApiVaultDetail[]
+}
+
+// Request to retrieve the trading volume
+export interface IApiBatchQueryVaultPerformanceRequest {
+  // The list of vault IDs to filter by
+  vault_i_ds?: string[]
+}
+
+// Response to retrieve the trading volume
+export interface IApiBatchQueryVaultPerformanceResponse {
+  // The list of vault performances
+  result?: IApiVaultPerformance[]
+}
+
+// Request to retrieve the trading volume
+export interface IApiBatchQueryVaultRiskMetricRequest {
+  // The list of vault IDs to filter by
+  vault_i_ds?: string[]
+}
+
+// Response to retrieve the trading volume
+export interface IApiBatchQueryVaultRiskMetricResponse {
+  // The list of vault risk metrics
+  result?: IVaultRiskMetric[]
 }
 
 // Cancel all orders on the orderbook for this trading account. This may not match new orders in flight.
@@ -869,6 +826,16 @@ export interface IApiGetAllInstrumentsRequest {
 export interface IApiGetAllInstrumentsResponse {
   // List of instruments
   result?: IInstrument[]
+}
+
+// Fetch all currencies
+export interface IApiGetCurrencyRequest {
+}
+
+// The list of currencies
+export interface IApiGetCurrencyResponse {
+  // The list of currencies
+  result?: ICurrencyDetail[]
 }
 
 export interface IApiGetEcosystemLeaderboardRequest {
@@ -1823,6 +1790,23 @@ export interface IApiVaultBurnTokensRequest {
   signature?: ISignature
 }
 
+// Response payload for the detail of a vault.
+//
+// This API provides the detail of a vault.
+export interface IApiVaultDetail {
+  // The unique identifier of the vault to fetch the detail for.
+  vault_id?: string
+  // The share price of the vault.
+  share_price?: string
+  // The total equity of the vault.
+  total_equity?: string
+  // The valuation cap of the vault.
+  valuation_cap?: string
+  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
+  // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
+  unrealized_pnl?: string
+}
+
 // Request payload for fetching the detail of a vault.
 //
 // This API allows a client to retrieve the detail of a vault.
@@ -1908,6 +1892,20 @@ export interface IApiVaultInvestorSummaryResponse {
   vault_investor_summary?: IVaultInvestorSummary[]
 }
 
+// Response to retrieve the trading volume
+export interface IApiVaultPerformance {
+  // The unique identifier of the vault
+  vault_id?: string
+  // Trading volume in USDT
+  trading_volume?: string
+  // Returns ROI normalized to an annualized number.
+  apr?: number
+  // Realized PnL in USDT
+  realized_pnl?: string
+  // PnL in USDT
+  pnl?: string
+}
+
 // Trading performance trend returned by the service
 export interface IApiVaultPerformanceTrend {
   // The start time of the interval
@@ -1990,9 +1988,23 @@ export interface IApiVaultViewRedemptionQueueRequest {
 }
 
 // Response payload for a vault manager to view the redemption queue for their vault, ordered by descending priority.
+//
+// Excludes requests that have not yet aged past the minmimum redemption period.
+//
+// Also includes counters for total redemption sizes pending as well as urgent (refer to API integration guide for more detail on redemption request classifications).
+//
+//
 export interface IApiVaultViewRedemptionQueueResponse {
-  // Representation of a pending vault redemption request.
+  // Outstanding vault redemption requests, ordered by descending priority. Excludes requests that have not yet aged past the minmimum redemption period.
   redemption_queue?: IVaultRedemptionReqView[]
+  // Number of LP Tokens pending redemption (at least held in queue for minimum redemption period).
+  pending_redemption_token_count?: string
+  // Number of LP Tokens due for urgent redemption (>= 90% of maximum redemption period).
+  urgent_redemption_token_count?: string
+  // Amount available for automated redemption request servicing, expressed in terms of the vault's quote currency.
+  auto_redeemable_balance_vault_quote_cur?: string
+  // This vault's quote currency.
+  currency?: string
 }
 
 // The request to get the historical withdrawals of an account
@@ -2141,6 +2153,17 @@ export interface IClientOrderIDsByGroup {
   client_order_id?: string[]
   // The sub account ID that these orders belong to
   sub_account_id?: string
+}
+
+export interface ICurrencyDetail {
+  // The integer value of the currency
+  id?: number
+  // The name of the currency
+  symbol?: string
+  // The balance decimals of the currency
+  balance_decimals?: number
+  // The quantity multiplier of the currency
+  quantity_multiplier?: string
 }
 
 export interface IDeposit {
@@ -3533,6 +3556,18 @@ export interface IVaultRedemptionReqView {
   num_lp_tokens?: string
   // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
   max_redemption_period_timestamp?: string
+}
+
+// Response to retrieve the trading volume
+export interface IVaultRiskMetric {
+  // The vault ID to filter by
+  vault_id?: string
+  // Returns ROI normalized to an annualized number.
+  sharpe_ratio?: number
+  // Returns ROI normalized to an annualized number.
+  sortino_ratio?: number
+  // Returns ROI normalized to an annualized number.
+  max_drawdown?: number
 }
 
 export interface IWSCancelFeedDataV1 {
