@@ -1,5 +1,11 @@
 import { type AxiosRequestConfig } from 'axios'
 import {
+  API_BATCH_QUERY_VAULT_DETAIL_REQUEST_MAP,
+  API_BATCH_QUERY_VAULT_DETAIL_RESPONSE_MAP,
+  API_BATCH_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
+  API_BATCH_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
+  API_BATCH_QUERY_VAULT_RISK_METRIC_REQUEST_MAP,
+  API_BATCH_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP,
   API_CANDLESTICK_REQUEST_MAP,
   API_CANDLESTICK_RESPONSE_MAP,
   API_FUNDING_RATE_REQUEST_MAP,
@@ -33,6 +39,12 @@ import {
   API_TRADE_REQUEST_MAP,
   API_TRADE_RESPONSE_MAP,
   validConfig,
+  type IApiBatchQueryVaultDetailRequest,
+  type IApiBatchQueryVaultDetailResponse,
+  type IApiBatchQueryVaultPerformanceRequest,
+  type IApiBatchQueryVaultPerformanceResponse,
+  type IApiBatchQueryVaultRiskMetricRequest,
+  type IApiBatchQueryVaultRiskMetricResponse,
   type IApiCandlestickRequest,
   type IApiCandlestickResponse,
   type IApiFundingRateRequest,
@@ -285,6 +297,26 @@ export class MDG {
     }).catch(Utils.coverApiError)
   }
 
+  vaultDetail (payload: IApiBatchQueryVaultDetailRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_detail',
+      Utils.schemaMap(payload, API_BATCH_QUERY_VAULT_DETAIL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_BATCH_QUERY_VAULT_DETAIL_RESPONSE_MAP.LITE_TO_FULL) as IApiBatchQueryVaultDetailResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultPerformance (payload: IApiBatchQueryVaultPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_performance',
+      Utils.schemaMap(payload, API_BATCH_QUERY_VAULT_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_BATCH_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiBatchQueryVaultPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
   vaultPerformanceTrend (payload: IApiQueryVaultPerformanceTrendRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_performance_trend',
@@ -292,6 +324,16 @@ export class MDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceTrendResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultRiskMetric (payload: IApiBatchQueryVaultRiskMetricRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_risk_metric',
+      Utils.schemaMap(payload, API_BATCH_QUERY_VAULT_RISK_METRIC_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_BATCH_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP.LITE_TO_FULL) as IApiBatchQueryVaultRiskMetricResponse
     }).catch(Utils.coverApiError)
   }
 

@@ -665,6 +665,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultPerformance (payload: IApiQueryVaultPerformanceRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_performance',
@@ -689,6 +693,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultRiskMetric (payload: IApiQueryVaultRiskMetricRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_risk_metric',
@@ -765,6 +773,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
+  /**
+   * @deprecated
+   * Use MDG
+   */
   vaultDetail (payload: IApiVaultDetailRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_detail',
