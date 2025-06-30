@@ -14,10 +14,20 @@ import {
   API_MINI_TICKER_RESPONSE_MAP,
   API_ORDERBOOK_LEVELS_REQUEST_MAP,
   API_ORDERBOOK_LEVELS_RESPONSE_MAP,
+  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
+  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
+  API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP,
+  API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP,
+  API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
+  API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP,
+  API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP,
+  API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP,
   API_SETTLEMENT_PRICE_REQUEST_MAP,
   API_SETTLEMENT_PRICE_RESPONSE_MAP,
   API_TICKER_REQUEST_MAP,
   API_TICKER_RESPONSE_MAP,
+  API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP,
+  API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP,
   API_TRADE_HISTORY_REQUEST_MAP,
   API_TRADE_HISTORY_RESPONSE_MAP,
   API_TRADE_REQUEST_MAP,
@@ -37,10 +47,20 @@ import {
   type IApiMiniTickerResponse,
   type IApiOrderbookLevelsRequest,
   type IApiOrderbookLevelsResponse,
+  type IApiQueryListVaultSubAccountSummaryRequest,
+  type IApiQueryListVaultSubAccountSummaryResponse,
+  type IApiQuerySnapVaultPositionRequest,
+  type IApiQuerySnapVaultPositionResponse,
+  type IApiQueryVaultPerformanceTrendRequest,
+  type IApiQueryVaultPerformanceTrendResponse,
+  type IApiQueryVaultSummaryHistoryRequest,
+  type IApiQueryVaultSummaryHistoryResponse,
   type IApiSettlementPriceRequest,
   type IApiSettlementPriceResponse,
   type IApiTickerRequest,
   type IApiTickerResponse,
+  type IApiTimedAssetExposureResponse,
+  type IApiTimedVaultAssetExposureRequest,
   type IApiTradeHistoryRequest,
   type IApiTradeHistoryResponse,
   type IApiTradeRequest,
@@ -240,4 +260,62 @@ export class MDG {
       return Utils.schemaMap(response.data, API_CANDLESTICK_RESPONSE_MAP.LITE_TO_FULL) as IApiCandlestickResponse
     }).catch(Utils.coverApiError)
   }
+
+  /**
+   * SECTION: Vault
+   */
+
+  vaultAssetExposure (payload: IApiTimedVaultAssetExposureRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_asset_exposure',
+      Utils.schemaMap(payload, API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  snapVaultPosition (payload: IApiQuerySnapVaultPositionRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/snap_vault_position',
+      Utils.schemaMap(payload, API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySnapVaultPositionResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultPerformanceTrend (payload: IApiQueryVaultPerformanceTrendRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_performance_trend',
+      Utils.schemaMap(payload, API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceTrendResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultSummaryHistory (payload: IApiQueryVaultSummaryHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_summary_history',
+      Utils.schemaMap(payload, API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultSummaryHistoryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultSubAccountSummaryHistory (payload: IApiQueryListVaultSubAccountSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_sub_account_summary_history',
+      Utils.schemaMap(payload, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryListVaultSubAccountSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Vault
+   */
 }
