@@ -339,7 +339,7 @@ export class WS {
 
         // no sub account id handling
         if (!hasSubAccountId) {
-          return key.includes(instrument)
+          return key.startsWith(`${stream}__${instrument}`)
             ? [...acc, ...Object.values(value)]
             : acc
         }
