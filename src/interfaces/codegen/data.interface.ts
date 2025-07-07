@@ -671,6 +671,25 @@ export interface IApiDropClientWsResponse {
   num_dropped?: number
 }
 
+export interface IApiECNFromBrokerRequest {
+  // The sub account ID of the ECN order
+  sub_account_id?: string
+  // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
+  order_id?: string
+  // A unique client order ID for the ECN order
+  client_order_id?: string
+  // The asset of the ECN order
+  asset?: string
+  // A sequence number used to determine message order for this ECN orders
+  seq_no?: string
+  // The cumulative confirmed size for this ECN order
+  cumulative_confirmed_size?: string
+}
+
+export interface IApiECNFromBrokerResponse {
+  result?: boolean
+}
+
 // Query for all historical fills made by a single account. A single order can be matched multiple times, hence there is no real way to uniquely identify a trade.
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
@@ -2196,6 +2215,31 @@ export interface IDepositHistory {
   from_address?: string
 }
 
+export interface IECNToBrokerFeed {
+  // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
+  order_id?: string
+  // A unique identifier for the active order within a subaccount, specified by the client
+  client_order_id?: string
+  // The subaccount initiating the order
+  sub_account_id?: string
+  // The asset of the ECN order
+  asset?: string
+  // A sequence number used to determine message order for this ECN orders
+  seq_no?: string
+  // The cumulative request size for this ECN order
+  cumulative_request_size?: string
+  // The cumulative filled size for this ECN order
+  cumulative_filled_size?: string
+  // The cumulative shortfall for this ECN order
+  cumulative_shortfall?: string
+  // The status of the ECN order
+  status?: EOrderStatus
+  // The reason for rejection or cancellation
+  reject_reason?: EOrderRejectReason
+  // [Filled by GRVT Backend] Time at which the ECN order will expire in unix nanoseconds
+  expiry_time?: string
+}
+
 export interface IEcosystemLeaderboardUser {
   // The off chain account id
   account_id?: string
@@ -2710,6 +2754,8 @@ export interface IOrderMetadata {
   broker?: EBrokerTag
   // Specifies the source of the order
   source?: ESource
+  // Specifies if the order is an ECN order
+  is_ecn?: boolean
 }
 
 export interface IOrderState {
@@ -3652,6 +3698,35 @@ export interface IWSDepositFeedDataV1 {
 export interface IWSDepositFeedSelectorV1 {
   // The main account ID to request for
   main_account_id?: string
+}
+
+export interface IWSECNToBrokerFeedDataV1 {
+  // Stream name
+  stream?: string
+  // Primary selector
+  selector?: string
+  // A sequence number used to determine message order within a stream.
+  // - If `useGlobalSequenceNumber` is **false**, this returns the gateway sequence number, which increments by one locally within each stream and resets on gateway restarts.
+  // - If `useGlobalSequenceNumber` is **true**, this returns the global sequence number, which uniquely identifies messages across the cluster.
+  //   - A single cluster payload can be multiplexed into multiple stream payloads.
+  //   - To distinguish each stream payload, a `dedupCounter` is included.
+  //   - The returned sequence number is computed as: `cluster_sequence_number * 10^5 + dedupCounter`.
+  sequence_number?: string
+  // ECN to broker message
+  feed?: IECNToBrokerFeed
+  // The previous sequence number that determines the message order
+  prev_sequence_number?: string
+}
+
+// Subscribes to a feed of order updates pertaining to orders made by your account.
+// Each Order can be uniquely identified by its `order_id` or `client_order_id`.
+// To subscribe to all orders, specify an empty `instrument` (eg. `2345123`).
+// Otherwise, specify the `instrument` to only receive orders for that instrument (eg. `2345123-BTC_USDT_Perp`).
+export interface IWSECNToBrokerFeedSelectorV1 {
+  // The subaccount ID to filter by
+  sub_account_id?: string
+  // The instrument filter to apply.
+  instrument?: string
 }
 
 export interface IWSFillFeedDataV1 {
