@@ -21,6 +21,7 @@ import {
   ETransferType,
   ETriggerBy,
   ETriggerType,
+  EVaultRedemptionReqAgeCategory,
   EVaultType,
   EVenue
 } from './data.interface'
@@ -273,6 +274,13 @@ export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
   [ETriggerType.UNSPECIFIED]: 0,
   [ETriggerType.TAKE_PROFIT]: 1,
   [ETriggerType.STOP_LOSS]: 2
+})
+
+export const EVaultRedemptionReqAgeCategoryInt: Record<EVaultRedemptionReqAgeCategory, number> = Object.freeze({
+  [EVaultRedemptionReqAgeCategory.NORMAL]: 1,
+  [EVaultRedemptionReqAgeCategory.URGENT]: 2,
+  [EVaultRedemptionReqAgeCategory.OVERDUE]: 3,
+  [EVaultRedemptionReqAgeCategory.PRE_MIN]: 4
 })
 
 export const EVaultTypeInt: Record<EVaultType, number> = Object.freeze({
