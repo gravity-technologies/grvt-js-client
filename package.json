@@ -1,6 +1,6 @@
 {
   "name": "@grvt/client",
-  "version": "1.4.24",
+  "version": "1.4.25",
   "description": "Node.js & JavaScript client for GRVT REST APIs & WebSockets",
   "repository": {
     "type": "git",
