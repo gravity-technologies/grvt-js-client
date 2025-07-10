@@ -10,7 +10,8 @@ export const API_VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
     price: 'p',
     size: 's',
     realized_pnl: 'rp',
-    performance_fee: 'pf'
+    performance_fee: 'pf',
+    off_chain_account_id: 'oc'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -20,6 +21,7 @@ export const API_VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
     p: 'price',
     s: 'size',
     rp: 'realized_pnl',
-    pf: 'performance_fee'
+    pf: 'performance_fee',
+    oc: 'off_chain_account_id'
   }
 })
