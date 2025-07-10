@@ -7,14 +7,12 @@ export const API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP: SchemaPairMap = Objec
     redemption_queue: ['rq', [VAULT_REDEMPTION_REQ_VIEW_MAP.FULL_TO_LITE]],
     pending_redemption_token_count: 'pr',
     urgent_redemption_token_count: 'ur',
-    auto_redeemable_balance_vault_quote_cur: 'ar',
-    currency: 'c'
+    auto_redeemable_balance: 'ar'
   },
   LITE_TO_FULL: {
     rq: ['redemption_queue', [VAULT_REDEMPTION_REQ_VIEW_MAP.LITE_TO_FULL]],
     pr: 'pending_redemption_token_count',
     ur: 'urgent_redemption_token_count',
-    ar: 'auto_redeemable_balance_vault_quote_cur',
-    c: 'currency'
+    ar: 'auto_redeemable_balance'
   }
 })
