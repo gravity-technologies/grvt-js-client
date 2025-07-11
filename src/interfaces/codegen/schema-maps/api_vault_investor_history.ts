@@ -4,24 +4,22 @@ import { type SchemaPairMap } from './types'
 export const API_VAULT_INVESTOR_HISTORY_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     event_time: 'et',
-    funding_address: 'fa',
+    off_chain_account_id: 'oc',
     vault_id: 'vi',
     type: 't',
     price: 'p',
     size: 's',
     realized_pnl: 'rp',
-    performance_fee: 'pf',
-    off_chain_account_id: 'oc'
+    performance_fee: 'pf'
   },
   LITE_TO_FULL: {
     et: 'event_time',
-    fa: 'funding_address',
+    oc: 'off_chain_account_id',
     vi: 'vault_id',
     t: 'type',
     p: 'price',
     s: 'size',
     rp: 'realized_pnl',
-    pf: 'performance_fee',
-    oc: 'off_chain_account_id'
+    pf: 'performance_fee'
   }
 })

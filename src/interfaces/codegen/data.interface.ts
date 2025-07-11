@@ -1891,8 +1891,8 @@ export interface IApiVaultInvestRequest {
 export interface IApiVaultInvestorHistory {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: string
-  // The masked funding address of the investor, only visible to the manager
-  funding_address?: string
+  // The off chain account id of the investor, only visible to the manager
+  off_chain_account_id?: string
   // The unique identifier of the vault.
   vault_id?: string
   // The type of transaction that occurred. List of types: vaultInvest, vaultBurnLpToken, vaultRedeem
@@ -1905,8 +1905,6 @@ export interface IApiVaultInvestorHistory {
   realized_pnl?: string
   // The performance fee of the vault.
   performance_fee?: string
-  // The off chain account id
-  off_chain_account_id?: string
 }
 
 // Request payload for fetching the summary of a vault investor.
@@ -2372,6 +2370,19 @@ export interface IEpochBadgePointDistribution {
   count?: number
 }
 
+export interface IEpochLPPoint {
+  // The epoch
+  epoch?: string
+  // The main account id
+  main_account_id?: string
+  // The LP Asset
+  lp_asset?: string
+  // Liquidity score
+  liquidity_score?: string
+  // Vault liquidity score
+  vault_liquidity_score?: string
+}
+
 // An error response
 export interface IError {
   // The error code for the request
@@ -2614,6 +2625,45 @@ export interface ILPSnapshot {
   bid_fast_market_multiplier?: number
   // Fast market multiplier
   ask_fast_market_multiplier?: number
+  // Liquidity score
+  liquidity_score?: string
+  // The time when the snapshot was calculated
+  calculate_at?: string
+}
+
+export interface ILPSubAccountSnapshot {
+  // The sub account id
+  sub_account_id?: string
+  // Is vault
+  is_vault?: boolean
+  // The main account id
+  main_account_id?: string
+  // The LP Asset
+  lp_asset?: string
+  // Underlying multiplier
+  underlying_multiplier?: string
+  // Maker trading volume
+  maker_trading_volume?: string
+  // Fast market multiplier
+  bid_fast_market_multiplier?: number
+  // Bid prices
+  bid_prices?: string[]
+  // Bid sizes
+  bid_sizes?: string[]
+  // Bid depth scores
+  bid_depth_scores?: string[]
+  // Bid spread scores
+  bid_spread_scores?: number[]
+  // Fast market multiplier
+  ask_fast_market_multiplier?: number
+  // Ask prices
+  ask_prices?: string[]
+  // Ask sizes
+  ask_sizes?: string[]
+  // Ask depth scores
+  ask_depth_scores?: string[]
+  // Ask spread scores
+  ask_spread_scores?: number[]
   // Liquidity score
   liquidity_score?: string
   // The time when the snapshot was calculated
@@ -3618,6 +3668,8 @@ export interface IVaultRedemptionReqView {
   max_redemption_period_timestamp?: string
   // Age category of this redemption request.
   age_category?: EVaultRedemptionReqAgeCategory
+  // The address of the investor who submitted the request.
+  investor_id?: string
 }
 
 // Response to retrieve the trading volume

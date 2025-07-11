@@ -7,13 +7,15 @@ export const VAULT_REDEMPTION_REQ_VIEW_MAP: SchemaPairMap = Object.freeze({
     currency: 'c',
     num_lp_tokens: 'nl',
     max_redemption_period_timestamp: 'mr',
-    age_category: 'ac'
+    age_category: 'ac',
+    investor_id: 'ii'
   },
   LITE_TO_FULL: {
     rt: 'request_time',
     c: 'currency',
     nl: 'num_lp_tokens',
     mr: 'max_redemption_period_timestamp',
-    ac: 'age_category'
+    ac: 'age_category',
+    ii: 'investor_id'
   }
 })
