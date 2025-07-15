@@ -21,6 +21,7 @@ import {
   ETransferType,
   ETriggerBy,
   ETriggerType,
+  EVaultInvestorAction,
   EVaultRedemptionReqAgeCategory,
   EVaultType,
   EVenue
@@ -274,6 +275,13 @@ export const ETriggerTypeInt: Record<ETriggerType, number> = Object.freeze({
   [ETriggerType.UNSPECIFIED]: 0,
   [ETriggerType.TAKE_PROFIT]: 1,
   [ETriggerType.STOP_LOSS]: 2
+})
+
+export const EVaultInvestorActionInt: Record<EVaultInvestorAction, number> = Object.freeze({
+  [EVaultInvestorAction.UNSPECIFIED]: 0,
+  [EVaultInvestorAction.VAULT_INVEST]: 1,
+  [EVaultInvestorAction.VAULT_BURN_LP_TOKEN]: 2,
+  [EVaultInvestorAction.VAULT_REDEEM]: 3
 })
 
 export const EVaultRedemptionReqAgeCategoryInt: Record<EVaultRedemptionReqAgeCategory, number> = Object.freeze({
