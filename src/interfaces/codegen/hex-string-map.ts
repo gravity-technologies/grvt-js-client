@@ -9,7 +9,6 @@ export const HexStringMap = [
   'group_id',
   'indirect_invite_trading_volume',
   'instrument_hash',
-  'investor_id',
   'l_1_hash',
   'l_2_hash',
   'liquidity_score',

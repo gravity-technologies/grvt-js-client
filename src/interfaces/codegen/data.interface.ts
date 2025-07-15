@@ -400,6 +400,13 @@ export enum ETriggerType {
   STOP_LOSS = 'STOP_LOSS',
 }
 
+export enum EVaultInvestorAction {
+  UNSPECIFIED = 'UNSPECIFIED',
+  VAULT_INVEST = 'VAULT_INVEST',
+  VAULT_BURN_LP_TOKEN = 'VAULT_BURN_LP_TOKEN',
+  VAULT_REDEEM = 'VAULT_REDEEM',
+}
+
 // Denotes the age category of a given redemption request.
 //
 //
@@ -788,6 +795,8 @@ export interface IApiFindTraderLeaderboardResponse {
 export interface IApiFundingAccountSummaryResponse {
   // The funding account summary
   result?: IFundingAccountSummary
+  // Client fee tier at the time of query
+  tier?: IClientTier
 }
 
 // Query for all historical funding payments made by a single account.
@@ -859,6 +868,11 @@ export interface IApiGetAllInstrumentsRequest {
 export interface IApiGetAllInstrumentsResponse {
   // List of instruments
   result?: IInstrument[]
+}
+
+// The response to get all client tiers
+export interface IApiGetClientTiersResponse {
+  tiers?: IClientTier[]
 }
 
 // Fetch all currencies
@@ -1475,6 +1489,11 @@ export interface IApiResolveEpochEcosystemMetricResponse {
   last_calculated_time?: string
 }
 
+// The request to set client tiers
+export interface IApiSetClientTiersRequest {
+  tiers?: IClientTier[]
+}
+
 // The request to set the derisk margin to maintenance margin ratio of a sub account
 export interface IApiSetDeriskToMaintenanceMarginRatioRequest {
   // The sub account ID to set the leverage for
@@ -1896,7 +1915,7 @@ export interface IApiVaultInvestorHistory {
   // The unique identifier of the vault.
   vault_id?: string
   // The type of transaction that occurred. List of types: vaultInvest, vaultBurnLpToken, vaultRedeem
-  type?: ETransactionType
+  type?: EVaultInvestorAction
   // The price of the vault LP tokens at the time of the event.
   price?: string
   // The amount of Vault LP tokens invested or redeemed.
@@ -2029,13 +2048,15 @@ export interface IApiVaultViewRedemptionQueueRequest {
 //
 export interface IApiVaultViewRedemptionQueueResponse {
   // Outstanding vault redemption requests, ordered by descending priority. Excludes requests that have not yet aged past the minmimum redemption period.
-  redemption_queue?: IVaultRedemptionReqView[]
-  // Number of LP Tokens pending redemption (at least held in queue for minimum redemption period).
+  redemption_queue?: IVaultRedemptionRequest[]
+  // Number of shares eligible for automated redemption (held in queue for at least the minimum redemption period).
   pending_redemption_token_count?: string
-  // Number of LP Tokens due for urgent redemption (>= 90% of maximum redemption period).
+  // Number of shares nearing the maximum redemption period (>= 90% of maximum redemption period).
   urgent_redemption_token_count?: string
   // Amount available for automated redemption request servicing (in USD).
   auto_redeemable_balance?: string
+  // Current share price (in USD).
+  share_price?: string
 }
 
 // The request to get the historical withdrawals of an account
@@ -2184,6 +2205,14 @@ export interface IClientOrderIDsByGroup {
   client_order_id?: string[]
   // The sub account ID that these orders belong to
   sub_account_id?: string
+}
+
+export interface IClientTier {
+  tier?: number
+  futures_taker_fee?: number
+  futures_maker_fee?: number
+  options_taker_fee?: number
+  options_maker_fee?: number
 }
 
 export interface ICurrencyDetail {
@@ -2372,9 +2401,11 @@ export interface IEpochBadgePointDistribution {
 
 export interface IEpochLPPoint {
   // The epoch
-  epoch?: string
+  epoch?: number
   // The main account id
   main_account_id?: string
+  // The off chain account id
+  off_chain_account_id?: string
   // The LP Asset
   lp_asset?: string
   // Liquidity score
@@ -3093,6 +3124,8 @@ export interface IQueryVaultSummaryHistoryRequest {
   end_time?: string
   // Optional. The time interval to query the vault summary from
   time_interval?: ETimeInterval
+  // Optional. The start interval to query the vault summary from
+  start_interval?: string
 }
 
 // Response to retrieve the vault summary for a given vault
@@ -3657,19 +3690,17 @@ export interface IVaultRedemption {
 }
 
 // Representation of a pending redemption request for a given vault.
-export interface IVaultRedemptionReqView {
+export interface IVaultRedemptionRequest {
   // [Filled by GRVT Backend] Time at which the redemption request was received by GRVT in unix nanoseconds
   request_time?: string
-  // The currency to redeem in
-  currency?: string
-  // The number of LP tokens to redeem
+  // The number of shares to redeem
   num_lp_tokens?: string
   // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
   max_redemption_period_timestamp?: string
   // Age category of this redemption request.
   age_category?: EVaultRedemptionReqAgeCategory
-  // The address of the investor who submitted the request.
-  investor_id?: string
+  // `true` if this request belongs to the vault manager, omitted otherwise.
+  is_manager?: boolean
 }
 
 // Response to retrieve the trading volume
