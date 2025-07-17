@@ -6,12 +6,14 @@ export const API_TRADING_PERFORMANCE_TREND_MAP: SchemaPairMap = Object.freeze({
     start_interval: 'si',
     end_interval: 'ei',
     trading_volume: 'tv',
-    realized_pnl: 'rp'
+    realized_pnl: 'rp',
+    pnl: 'p'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
     ei: 'end_interval',
     tv: 'trading_volume',
-    rp: 'realized_pnl'
+    rp: 'realized_pnl',
+    p: 'pnl'
   }
 })

@@ -465,6 +465,8 @@ export interface IAggregatedAccountSummary {
   total_equity?: string
   // The list of spot assets owned by this main (+ sub) account, and their balances
   spot_balances?: ISpotBalance[]
+  // The list of vault investments held by this main account
+  vault_investments?: IVaultInvestment[]
 }
 
 // The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
@@ -1722,6 +1724,8 @@ export interface IApiTradingPerformanceTrend {
   trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
+  // PnL in USDT
+  pnl?: string
 }
 
 export interface IApiTransferAck {
@@ -1968,6 +1972,8 @@ export interface IApiVaultPerformanceTrend {
   trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
+  // Realized PnL in USDT
+  pnl?: string
 }
 
 // Request payload for canceling a vault redemption.
@@ -2041,8 +2047,6 @@ export interface IApiVaultViewRedemptionQueueRequest {
 
 // Response payload for a vault manager to view the redemption queue for their vault, ordered by descending priority.
 //
-// Excludes requests that have not yet aged past the minmimum redemption period.
-//
 // Also includes counters for total redemption sizes pending as well as urgent (refer to API integration guide for more detail on redemption request classifications).
 //
 //
@@ -2057,6 +2061,8 @@ export interface IApiVaultViewRedemptionQueueResponse {
   auto_redeemable_balance?: string
   // Current share price (in USD).
   share_price?: string
+  // Dedicated section for requests yet to wait at least the minimum redemption period.
+  pre_min?: IPreMinRedemptions
 }
 
 // The request to get the historical withdrawals of an account
@@ -2516,6 +2522,8 @@ export interface IFundingAccountSummary {
   total_equity?: string
   // The list of spot assets owned by this main account, and their balances
   spot_balances?: ISpotBalance[]
+  // The list of vault investments held by this main account
+  vault_investments?: IVaultInvestment[]
 }
 
 export interface IFundingPayment {
@@ -2963,6 +2971,14 @@ export interface IPositions {
   est_liquidation_price?: string
   // The current leverage value for this position
   leverage?: string
+}
+
+// Vault redemption queue section hidden from main view. All requests here have yet to age past the vault's minimum redemption period.
+export interface IPreMinRedemptions {
+  // Pre-minimum-age redemption requests, ordered by age (first element is the oldest request that is pre-minimum-age).
+  requests?: IVaultRedemptionRequest[]
+  // Number of shares in the pre-minimum-age section of the vault's redemption queue.
+  token_count?: string
 }
 
 export interface IPreOrderCheckResult {
@@ -3464,6 +3480,8 @@ export interface ITradingPerformancePoint {
   trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
+  // Unrealized PnL in USDT
+  unrealized_pnl?: string
 }
 
 export interface ITransferHistory {
@@ -3575,6 +3593,16 @@ export interface IVaultInvestResults {
   vault_share_price?: string
   // The number of LP tokens received upon vault investment
   num_lp_tokens?: string
+}
+
+// Summarizes a vault investment held by a funding account
+export interface IVaultInvestment {
+  // The trading account ID of the vault invested in.
+  vault_id?: string
+  // The number of shares held by the investor.
+  num_lp_tokens?: string
+  // The current share price (in USD) of this vault investment.
+  share_price?: string
 }
 
 // The vault investor summary
@@ -3701,6 +3729,8 @@ export interface IVaultRedemptionRequest {
   age_category?: EVaultRedemptionReqAgeCategory
   // `true` if this request belongs to the vault manager, omitted otherwise.
   is_manager?: boolean
+  // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be eligible for automated redemption.
+  eligible_for_auto_redemption_timestamp?: string
 }
 
 // Response to retrieve the trading volume
