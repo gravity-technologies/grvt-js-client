@@ -3643,6 +3643,8 @@ export interface IVaultInvestorSummary {
   all_time_realized_pnl?: string
   // The singleton pending redemption (omitted if none).
   pending_redemption?: IVaultRedemption
+  // True if the requesting account is authorized to burn tokens on this vault, omitted otherwise.
+  can_burn?: boolean
 }
 
 export interface IVaultLpInfo {
