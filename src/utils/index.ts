@@ -1,5 +1,7 @@
-import { type AxiosError } from 'axios'
-import { ERROR_MAP, HexStringMap, type IError, type SchemaMap } from '../interfaces'
+import type { AxiosError } from 'axios'
+import type { IError, SchemaMap } from '../interfaces'
+import { HexStringMap } from '../interfaces'
+import { ERROR_MAP } from '../interfaces/codegen/schema-maps/error'
 
 export * from './json.utils'
 export * from './string.utils'

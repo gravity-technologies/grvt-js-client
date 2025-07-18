@@ -1,84 +1,84 @@
-import { type AxiosRequestConfig } from 'axios'
-import {
-  API_BATCH_QUERY_VAULT_DETAIL_REQUEST_MAP,
-  API_BATCH_QUERY_VAULT_DETAIL_RESPONSE_MAP,
-  API_BATCH_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
-  API_BATCH_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
-  API_BATCH_QUERY_VAULT_RISK_METRIC_REQUEST_MAP,
-  API_BATCH_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP,
-  API_CANDLESTICK_REQUEST_MAP,
-  API_CANDLESTICK_RESPONSE_MAP,
-  API_FUNDING_RATE_REQUEST_MAP,
-  API_FUNDING_RATE_RESPONSE_MAP,
-  API_GET_ALL_INSTRUMENTS_REQUEST_MAP,
-  API_GET_ALL_INSTRUMENTS_RESPONSE_MAP,
-  API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP,
-  API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP,
-  API_GET_INSTRUMENT_REQUEST_MAP,
-  API_GET_INSTRUMENT_RESPONSE_MAP,
-  API_MINI_TICKER_REQUEST_MAP,
-  API_MINI_TICKER_RESPONSE_MAP,
-  API_ORDERBOOK_LEVELS_REQUEST_MAP,
-  API_ORDERBOOK_LEVELS_RESPONSE_MAP,
-  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
-  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP,
-  API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP,
-  API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
-  API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP,
-  API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP,
-  API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP,
-  API_SETTLEMENT_PRICE_REQUEST_MAP,
-  API_SETTLEMENT_PRICE_RESPONSE_MAP,
-  API_TICKER_REQUEST_MAP,
-  API_TICKER_RESPONSE_MAP,
-  API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP,
-  API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP,
-  API_TRADE_HISTORY_REQUEST_MAP,
-  API_TRADE_HISTORY_RESPONSE_MAP,
-  API_TRADE_REQUEST_MAP,
-  API_TRADE_RESPONSE_MAP,
-  validConfig,
-  type IApiBatchQueryVaultDetailRequest,
-  type IApiBatchQueryVaultDetailResponse,
-  type IApiBatchQueryVaultPerformanceRequest,
-  type IApiBatchQueryVaultPerformanceResponse,
-  type IApiBatchQueryVaultRiskMetricRequest,
-  type IApiBatchQueryVaultRiskMetricResponse,
-  type IApiCandlestickRequest,
-  type IApiCandlestickResponse,
-  type IApiFundingRateRequest,
-  type IApiFundingRateResponse,
-  type IApiGetAllInstrumentsRequest,
-  type IApiGetAllInstrumentsResponse,
-  type IApiGetFilteredInstrumentsRequest,
-  type IApiGetFilteredInstrumentsResponse,
-  type IApiGetInstrumentRequest,
-  type IApiGetInstrumentResponse,
-  type IApiMiniTickerRequest,
-  type IApiMiniTickerResponse,
-  type IApiOrderbookLevelsRequest,
-  type IApiOrderbookLevelsResponse,
-  type IApiQueryListVaultSubAccountSummaryRequest,
-  type IApiQueryListVaultSubAccountSummaryResponse,
-  type IApiQuerySnapVaultPositionRequest,
-  type IApiQuerySnapVaultPositionResponse,
-  type IApiQueryVaultPerformanceTrendRequest,
-  type IApiQueryVaultPerformanceTrendResponse,
-  type IApiQueryVaultSummaryHistoryRequest,
-  type IApiQueryVaultSummaryHistoryResponse,
-  type IApiSettlementPriceRequest,
-  type IApiSettlementPriceResponse,
-  type IApiTickerRequest,
-  type IApiTickerResponse,
-  type IApiTimedAssetExposureResponse,
-  type IApiTimedVaultAssetExposureRequest,
-  type IApiTradeHistoryRequest,
-  type IApiTradeHistoryResponse,
-  type IApiTradeRequest,
-  type IApiTradeResponse,
-  type IConfig
+import type { AxiosRequestConfig } from 'axios'
+import type {
+  IApiBatchQueryVaultDetailRequest,
+  IApiBatchQueryVaultDetailResponse,
+  IApiBatchQueryVaultPerformanceRequest,
+  IApiBatchQueryVaultPerformanceResponse,
+  IApiBatchQueryVaultRiskMetricRequest,
+  IApiBatchQueryVaultRiskMetricResponse,
+  IApiCandlestickRequest,
+  IApiCandlestickResponse,
+  IApiFundingRateRequest,
+  IApiFundingRateResponse,
+  IApiGetAllInstrumentsRequest,
+  IApiGetAllInstrumentsResponse,
+  IApiGetFilteredInstrumentsRequest,
+  IApiGetFilteredInstrumentsResponse,
+  IApiGetInstrumentRequest,
+  IApiGetInstrumentResponse,
+  IApiMiniTickerRequest,
+  IApiMiniTickerResponse,
+  IApiOrderbookLevelsRequest,
+  IApiOrderbookLevelsResponse,
+  IApiQueryListVaultSubAccountSummaryRequest,
+  IApiQueryListVaultSubAccountSummaryResponse,
+  IApiQuerySnapVaultPositionRequest,
+  IApiQuerySnapVaultPositionResponse,
+  IApiQueryVaultPerformanceTrendRequest,
+  IApiQueryVaultPerformanceTrendResponse,
+  IApiQueryVaultSummaryHistoryRequest,
+  IApiQueryVaultSummaryHistoryResponse,
+  IApiSettlementPriceRequest,
+  IApiSettlementPriceResponse,
+  IApiTickerRequest,
+  IApiTickerResponse,
+  IApiTimedAssetExposureResponse,
+  IApiTimedVaultAssetExposureRequest,
+  IApiTradeHistoryRequest,
+  IApiTradeHistoryResponse,
+  IApiTradeRequest,
+  IApiTradeResponse,
+  IConfig
 } from '../interfaces'
+import { validConfig } from '../interfaces'
+import { API_BATCH_QUERY_VAULT_DETAIL_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_detail_request'
+import { API_BATCH_QUERY_VAULT_DETAIL_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_detail_response'
+import { API_BATCH_QUERY_VAULT_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_performance_request'
+import { API_BATCH_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_performance_response'
+import { API_BATCH_QUERY_VAULT_RISK_METRIC_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_risk_metric_request'
+import { API_BATCH_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_risk_metric_response'
+import { API_CANDLESTICK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_candlestick_request'
+import { API_CANDLESTICK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_candlestick_response'
+import { API_FUNDING_RATE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_funding_rate_request'
+import { API_FUNDING_RATE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_rate_response'
+import { API_GET_ALL_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_all_instruments_request'
+import { API_GET_ALL_INSTRUMENTS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_all_instruments_response'
+import { API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_filtered_instruments_request'
+import { API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_filtered_instruments_response'
+import { API_GET_INSTRUMENT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_request'
+import { API_GET_INSTRUMENT_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_response'
+import { API_MINI_TICKER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_mini_ticker_request'
+import { API_MINI_TICKER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_mini_ticker_response'
+import { API_ORDERBOOK_LEVELS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_orderbook_levels_request'
+import { API_ORDERBOOK_LEVELS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_orderbook_levels_response'
+import { API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_vault_sub_account_summary_request'
+import { API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_vault_sub_account_summary_response'
+import { API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_snap_vault_position_request'
+import { API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_snap_vault_position_response'
+import { API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_performance_trend_request'
+import { API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_performance_trend_response'
+import { API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_summary_history_request'
+import { API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_summary_history_response'
+import { API_SETTLEMENT_PRICE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_settlement_price_request'
+import { API_SETTLEMENT_PRICE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_settlement_price_response'
+import { API_TICKER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_ticker_request'
+import { API_TICKER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_ticker_response'
+import { API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_timed_asset_exposure_response'
+import { API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_timed_vault_asset_exposure_request'
+import { API_TRADE_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_trade_history_request'
+import { API_TRADE_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_trade_history_response'
+import { API_TRADE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_trade_request'
+import { API_TRADE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_trade_response'
 import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
