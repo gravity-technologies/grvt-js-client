@@ -1,186 +1,156 @@
-import { type AxiosRequestConfig } from 'axios'
-import {
-  ACK_RESPONSE_MAP,
-  API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_CANCEL_ALL_ORDERS_REQUEST_MAP,
-  API_CANCEL_ALL_ORDERS_RESPONSE_MAP,
-  API_CANCEL_ORDER_REQUEST_MAP,
-  API_CANCEL_ORDER_RESPONSE_MAP,
-  API_CREATE_BULK_ORDERS_REQUEST_MAP,
-  API_CREATE_BULK_ORDERS_RESPONSE_MAP,
-  API_CREATE_ORDER_REQUEST_MAP,
-  API_CREATE_ORDER_RESPONSE_MAP,
-  API_DEDUST_POSITION_REQUEST_MAP,
-  API_DEDUST_POSITION_RESPONSE_MAP,
-  API_DEPOSIT_HISTORY_REQUEST_MAP,
-  API_DEPOSIT_HISTORY_RESPONSE_MAP,
-  API_FILL_HISTORY_REQUEST_MAP,
-  API_FILL_HISTORY_RESPONSE_MAP,
-  API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP,
-  API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP,
-  API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP,
-  API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP,
-  API_GET_MARGIN_TIERS_RESPONSE_MAP,
-  API_GET_ORDER_GROUP_REQUEST_MAP,
-  API_GET_ORDER_GROUP_RESPONSE_MAP,
-  API_GET_ORDER_REQUEST_MAP,
-  API_GET_ORDER_RESPONSE_MAP,
-  API_OPEN_ORDERS_REQUEST_MAP,
-  API_OPEN_ORDERS_RESPONSE_MAP,
-  API_ORDER_HISTORY_REQUEST_MAP,
-  API_ORDER_HISTORY_RESPONSE_MAP,
-  API_POSITIONS_REQUEST_MAP,
-  API_POSITIONS_RESPONSE_MAP,
-  API_PRE_DEPOSIT_CHECK_REQUEST_MAP,
-  API_PRE_DEPOSIT_CHECK_RESPONSE_MAP,
-  API_PRE_ORDER_CHECK_REQUEST_MAP,
-  API_PRE_ORDER_CHECK_RESPONSE_MAP,
-  API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP,
-  API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
-  API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
-  API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP,
-  API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP,
-  API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP,
-  API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP,
-  API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP,
-  API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP,
-  API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP,
-  API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP,
-  API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP,
-  API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP,
-  API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP,
-  API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP,
-  API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP,
-  API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP,
-  API_QUERY_VAULT_RISK_METRIC_REQUEST_MAP,
-  API_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP,
-  API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP,
-  API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP,
-  API_REPLACE_ORDERS_REQUEST_MAP,
-  API_REPLACE_ORDERS_RESPONSE_MAP,
-  API_SET_INITIAL_LEVERAGE_REQUEST_MAP,
-  API_SET_INITIAL_LEVERAGE_RESPONSE_MAP,
-  API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP,
-  API_SUB_ACCOUNT_HISTORY_REQUEST_MAP,
-  API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP,
-  API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP,
-  API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP,
-  API_TIMED_ASSET_EXPOSURE_REQUEST_MAP,
-  API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP,
-  API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP,
-  API_TRANSFER_HISTORY_REQUEST_MAP,
-  API_TRANSFER_HISTORY_RESPONSE_MAP,
-  API_TRANSFER_REQUEST_MAP,
-  API_TRANSFER_RESPONSE_MAP,
-  API_VAULT_BURN_TOKENS_REQUEST_MAP,
-  API_VAULT_DETAIL_REQUEST_MAP,
-  API_VAULT_DETAIL_RESPONSE_MAP,
-  API_VAULT_INVEST_REQUEST_MAP,
-  API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP,
-  API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP,
-  API_VAULT_REDEEM_CANCEL_REQUEST_MAP,
-  API_VAULT_REDEEM_REQUEST_MAP,
-  API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP,
-  API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP,
-  API_WITHDRAWAL_HISTORY_REQUEST_MAP,
-  API_WITHDRAWAL_HISTORY_RESPONSE_MAP,
-  API_WITHDRAWAL_REQUEST_MAP,
-  validConfig,
-  type IAckResponse,
-  type IApiAggregatedAccountSummaryResponse,
-  type IApiCancelAllOrdersRequest,
-  type IApiCancelAllOrdersResponse,
-  type IApiCancelOrderRequest,
-  type IApiCancelOrderResponse,
-  type IApiCreateBulkOrdersRequest,
-  type IApiCreateBulkOrdersResponse,
-  type IApiCreateOrderRequest,
-  type IApiCreateOrderResponse,
-  type IApiDedustPositionRequest,
-  type IApiDedustPositionResponse,
-  type IApiDepositHistoryRequest,
-  type IApiDepositHistoryResponse,
-  type IApiFillHistoryRequest,
-  type IApiFillHistoryResponse,
-  type IApiFundingAccountSummaryResponse,
-  type IApiFundingPaymentHistoryRequest,
-  type IApiFundingPaymentHistoryResponse,
-  type IApiGetAllInitialLeverageRequest,
-  type IApiGetAllInitialLeverageResponse,
-  type IApiGetMarginTiersResponse,
-  type IApiGetOrderGroupRequest,
-  type IApiGetOrderGroupResponse,
-  type IApiGetOrderRequest,
-  type IApiGetOrderResponse,
-  type IApiOpenOrdersRequest,
-  type IApiOpenOrdersResponse,
-  type IApiOrderHistoryRequest,
-  type IApiOrderHistoryResponse,
-  type IApiPositionsRequest,
-  type IApiPositionsResponse,
-  type IApiPreDepositCheckRequest,
-  type IApiPreDepositCheckResponse,
-  type IApiPreOrderCheckRequest,
-  type IApiPreOrderCheckResponse,
-  type IApiQueryListFundingAccountSummaryRequest,
-  type IApiQueryListFundingAccountSummaryResponse,
-  type IApiQueryListSubAccountSummaryRequest,
-  type IApiQueryListSubAccountSummaryResponse,
-  type IApiQueryListVaultSubAccountSummaryRequest,
-  type IApiQueryListVaultSubAccountSummaryResponse,
-  type IApiQuerySnapVaultPositionRequest,
-  type IApiQuerySnapVaultPositionResponse,
-  type IApiQueryTradingPerformanceRequest,
-  type IApiQueryTradingPerformanceResponse,
-  type IApiQueryTradingPerformanceTrendRequest,
-  type IApiQueryTradingPerformanceTrendResponse,
-  type IApiQueryVaultInvestorHistoryRequest,
-  type IApiQueryVaultInvestorHistoryResponse,
-  type IApiQueryVaultManagerInvestorHistoryRequest,
-  type IApiQueryVaultManagerInvestorHistoryResponse,
-  type IApiQueryVaultPerformanceRequest,
-  type IApiQueryVaultPerformanceResponse,
-  type IApiQueryVaultPerformanceTrendRequest,
-  type IApiQueryVaultPerformanceTrendResponse,
-  type IApiQueryVaultRiskMetricRequest,
-  type IApiQueryVaultRiskMetricResponse,
-  type IApiQueryVaultSummaryHistoryRequest,
-  type IApiQueryVaultSummaryHistoryResponse,
-  type IApiReplaceOrdersRequest,
-  type IApiReplaceOrdersResponse,
-  type IApiSetInitialLeverageRequest,
-  type IApiSetInitialLeverageResponse,
-  type IApiSocializedLossStatusResponse,
-  type IApiSubAccountHistoryRequest,
-  type IApiSubAccountHistoryResponse,
-  type IApiSubAccountSummaryRequest,
-  type IApiSubAccountSummaryResponse,
-  type IApiTimedAssetExposureRequest,
-  type IApiTimedAssetExposureResponse,
-  type IApiTimedVaultAssetExposureRequest,
-  type IApiTransferHistoryRequest,
-  type IApiTransferHistoryResponse,
-  type IApiTransferRequest,
-  type IApiTransferResponse,
-  type IApiVaultBurnTokensRequest,
-  type IApiVaultDetailRequest,
-  type IApiVaultDetailResponse,
-  type IApiVaultInvestorSummaryRequest,
-  type IApiVaultInvestorSummaryResponse,
-  type IApiVaultInvestRequest,
-  type IApiVaultRedeemCancelRequest,
-  type IApiVaultRedeemRequest,
-  type IApiVaultViewRedemptionQueueRequest,
-  type IApiVaultViewRedemptionQueueResponse,
-  type IApiWithdrawalHistoryRequest,
-  type IApiWithdrawalHistoryResponse,
-  type IApiWithdrawalRequest,
-  type IConfig
+import type { AxiosRequestConfig } from 'axios'
+import type {
+  IAckResponse,
+  IApiAggregatedAccountSummaryResponse,
+  IApiCancelAllOrdersRequest,
+  IApiCancelAllOrdersResponse,
+  IApiCancelOrderRequest,
+  IApiCancelOrderResponse,
+  IApiCreateBulkOrdersRequest,
+  IApiCreateBulkOrdersResponse,
+  IApiCreateOrderRequest,
+  IApiCreateOrderResponse,
+  IApiDedustPositionRequest,
+  IApiDedustPositionResponse,
+  IApiDepositHistoryRequest,
+  IApiDepositHistoryResponse,
+  IApiFillHistoryRequest,
+  IApiFillHistoryResponse,
+  IApiFundingAccountSummaryResponse,
+  IApiFundingPaymentHistoryRequest,
+  IApiFundingPaymentHistoryResponse,
+  IApiGetAllInitialLeverageRequest,
+  IApiGetAllInitialLeverageResponse,
+  IApiGetMarginTiersResponse,
+  IApiGetOrderGroupRequest,
+  IApiGetOrderGroupResponse,
+  IApiGetOrderRequest,
+  IApiGetOrderResponse,
+  IApiOpenOrdersRequest,
+  IApiOpenOrdersResponse,
+  IApiOrderHistoryRequest,
+  IApiOrderHistoryResponse,
+  IApiPositionsRequest,
+  IApiPositionsResponse,
+  IApiPreDepositCheckRequest,
+  IApiPreDepositCheckResponse,
+  IApiPreOrderCheckRequest,
+  IApiPreOrderCheckResponse,
+  IApiQueryListFundingAccountSummaryRequest,
+  IApiQueryListFundingAccountSummaryResponse,
+  IApiQueryListSubAccountSummaryRequest,
+  IApiQueryListSubAccountSummaryResponse,
+  IApiQueryTradingPerformanceRequest,
+  IApiQueryTradingPerformanceResponse,
+  IApiQueryTradingPerformanceTrendRequest,
+  IApiQueryTradingPerformanceTrendResponse,
+  IApiQueryVaultInvestorHistoryRequest,
+  IApiQueryVaultInvestorHistoryResponse,
+  IApiQueryVaultManagerInvestorHistoryRequest,
+  IApiQueryVaultManagerInvestorHistoryResponse,
+  IApiReplaceOrdersRequest,
+  IApiReplaceOrdersResponse,
+  IApiSetInitialLeverageRequest,
+  IApiSetInitialLeverageResponse,
+  IApiSocializedLossStatusResponse,
+  IApiSubAccountHistoryRequest,
+  IApiSubAccountHistoryResponse,
+  IApiSubAccountSummaryRequest,
+  IApiSubAccountSummaryResponse,
+  IApiTimedAssetExposureRequest,
+  IApiTimedAssetExposureResponse,
+  IApiTransferHistoryRequest,
+  IApiTransferHistoryResponse,
+  IApiTransferRequest,
+  IApiTransferResponse,
+  IApiVaultBurnTokensRequest,
+  IApiVaultInvestorSummaryRequest,
+  IApiVaultInvestorSummaryResponse,
+  IApiVaultInvestRequest,
+  IApiVaultRedeemCancelRequest,
+  IApiVaultRedeemRequest,
+  IApiVaultViewRedemptionQueueRequest,
+  IApiVaultViewRedemptionQueueResponse,
+  IApiWithdrawalHistoryRequest,
+  IApiWithdrawalHistoryResponse,
+  IApiWithdrawalRequest,
+  IConfig
 } from '../interfaces'
+import { validConfig } from '../interfaces'
+import { ACK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/ack_response'
+import { API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_aggregated_account_summary_response'
+import { API_CANCEL_ALL_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_request'
+import { API_CANCEL_ALL_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_response'
+import { API_CANCEL_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_order_request'
+import { API_CANCEL_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cancel_order_response'
+import { API_CREATE_BULK_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_create_bulk_orders_request'
+import { API_CREATE_BULK_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_create_bulk_orders_response'
+import { API_CREATE_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_create_order_request'
+import { API_CREATE_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_create_order_response'
+import { API_DEDUST_POSITION_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_dedust_position_request'
+import { API_DEDUST_POSITION_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_dedust_position_response'
+import { API_DEPOSIT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_deposit_history_request'
+import { API_DEPOSIT_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_deposit_history_response'
+import { API_FILL_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_fill_history_request'
+import { API_FILL_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_fill_history_response'
+import { API_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_account_summary_response'
+import { API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_funding_payment_history_request'
+import { API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_payment_history_response'
+import { API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_all_initial_leverage_request'
+import { API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_all_initial_leverage_response'
+import { API_GET_MARGIN_TIERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_margin_tiers_response'
+import { API_GET_ORDER_GROUP_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_order_group_request'
+import { API_GET_ORDER_GROUP_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_order_group_response'
+import { API_GET_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_order_request'
+import { API_GET_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_order_response'
+import { API_OPEN_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_open_orders_request'
+import { API_OPEN_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_open_orders_response'
+import { API_ORDER_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_order_history_request'
+import { API_ORDER_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_order_history_response'
+import { API_POSITIONS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_positions_request'
+import { API_POSITIONS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_positions_response'
+import { API_PRE_DEPOSIT_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_pre_deposit_check_request'
+import { API_PRE_DEPOSIT_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_deposit_check_response'
+import { API_PRE_ORDER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_request'
+import { API_PRE_ORDER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_response'
+import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_request'
+import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_response'
+import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_request'
+import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_response'
+import { API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_request'
+import { API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_response'
+import { API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_trend_request'
+import { API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_trend_response'
+import { API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_request'
+import { API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_response'
+import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_request'
+import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_response'
+import { API_REPLACE_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_replace_orders_request'
+import { API_REPLACE_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_replace_orders_response'
+import { API_SET_INITIAL_LEVERAGE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_set_initial_leverage_request'
+import { API_SET_INITIAL_LEVERAGE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_set_initial_leverage_response'
+import { API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_socialized_loss_status_response'
+import { API_SUB_ACCOUNT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_history_request'
+import { API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_history_response'
+import { API_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_summary_request'
+import { API_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_summary_response'
+import { API_TIMED_ASSET_EXPOSURE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_timed_asset_exposure_request'
+import { API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_timed_asset_exposure_response'
+import { API_TRANSFER_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_transfer_history_request'
+import { API_TRANSFER_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_transfer_history_response'
+import { API_TRANSFER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_transfer_request'
+import { API_TRANSFER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_transfer_response'
+import { API_VAULT_BURN_TOKENS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_burn_tokens_request'
+import { API_VAULT_INVEST_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_invest_request'
+import { API_VAULT_INVESTOR_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_investor_summary_request'
+import { API_VAULT_INVESTOR_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_vault_investor_summary_response'
+import { API_VAULT_REDEEM_CANCEL_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_redeem_cancel_request'
+import { API_VAULT_REDEEM_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_redeem_request'
+import { API_VAULT_VIEW_REDEMPTION_QUEUE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_vault_view_redemption_queue_request'
+import { API_VAULT_VIEW_REDEMPTION_QUEUE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_vault_view_redemption_queue_response'
+import { API_WITHDRAWAL_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_withdrawal_history_request'
+import { API_WITHDRAWAL_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_withdrawal_history_response'
+import { API_WITHDRAWAL_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_withdrawal_request'
 import { createAxiosInstance } from '../services'
 import { Utils } from '../utils'
 
@@ -665,76 +635,6 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultPerformance (payload: IApiQueryVaultPerformanceRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_performance',
-      Utils.schemaMap(payload, API_QUERY_VAULT_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultPerformanceTrend (payload: IApiQueryVaultPerformanceTrendRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_performance_trend',
-      Utils.schemaMap(payload, API_QUERY_VAULT_PERFORMANCE_TREND_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_VAULT_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultPerformanceTrendResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultRiskMetric (payload: IApiQueryVaultRiskMetricRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_risk_metric',
-      Utils.schemaMap(payload, API_QUERY_VAULT_RISK_METRIC_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultRiskMetricResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultSummaryHistory (payload: IApiQueryVaultSummaryHistoryRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_summary_history',
-      Utils.schemaMap(payload, API_QUERY_VAULT_SUMMARY_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_VAULT_SUMMARY_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultSummaryHistoryResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultSubAccountSummaryHistory (payload: IApiQueryListVaultSubAccountSummaryRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_sub_account_summary_history',
-      Utils.schemaMap(payload, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_LIST_VAULT_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryListVaultSubAccountSummaryResponse
-    }).catch(Utils.coverApiError)
-  }
-
   vaultInvestorHistory (payload: IApiQueryVaultInvestorHistoryRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/vault_investor_history',
@@ -742,48 +642,6 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultInvestorHistoryResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultAssetExposure (payload: IApiTimedVaultAssetExposureRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_asset_exposure',
-      Utils.schemaMap(payload, API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_TIMED_ASSET_EXPOSURE_RESPONSE_MAP.LITE_TO_FULL) as IApiTimedAssetExposureResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  snapVaultPosition (payload: IApiQuerySnapVaultPositionRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/snap_vault_position',
-      Utils.schemaMap(payload, API_QUERY_SNAP_VAULT_POSITION_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_SNAP_VAULT_POSITION_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySnapVaultPositionResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  /**
-   * @deprecated
-   * Use MDG
-   */
-  vaultDetail (payload: IApiVaultDetailRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_detail',
-      Utils.schemaMap(payload, API_VAULT_DETAIL_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_VAULT_DETAIL_RESPONSE_MAP.LITE_TO_FULL) as IApiVaultDetailResponse
     }).catch(Utils.coverApiError)
   }
 

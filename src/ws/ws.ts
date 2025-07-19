@@ -1,57 +1,57 @@
-import {
-  WS_CANDLESTICK_FEED_DATA_V_1_MAP,
-  WS_DEPOSIT_FEED_DATA_V_1_MAP,
-  WS_FILL_FEED_DATA_V_1_MAP,
-  WS_MINI_TICKER_FEED_DATA_V_1_MAP,
-  WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP,
-  WS_ORDER_FEED_DATA_V_1_MAP,
-  WS_ORDER_GROUP_FEED_DATA_V_1_MAP,
-  WS_ORDER_STATE_FEED_DATA_V_1_MAP,
-  WS_POSITIONS_FEED_DATA_V_1_MAP,
-  WS_TICKER_FEED_DATA_V_1_MAP,
-  WS_TRADE_FEED_DATA_V_1_MAP,
-  WS_TRANSFER_FEED_DATA_V_1_MAP,
-  WS_WITHDRAWAL_FEED_DATA_V_1_MAP,
-  type IDeposit,
-  type IFill,
-  type IOrder,
-  type IOrderState,
-  type IPositions,
-  type ITransferHistory,
-  type IWSCandlestickFeedDataV1,
-  type IWSDepositFeedDataV1,
-  type IWSFillFeedDataV1,
-  type IWSMiniTickerFeedDataV1,
-  type IWSOrderFeedDataV1,
-  type IWSOrderGroupFeedDataV1,
-  type IWSOrderStateFeedDataV1,
-  type IWSPositionsFeedDataV1,
-  type IWSSubscribeRequestV1Legacy,
-  type IWSTickerFeedDataV1,
-  type IWSTradeFeedDataV1,
-  type IWSTransferFeedDataV1,
-  type IWSWithdrawalFeedDataV1,
-  type IWithdrawal
+import type {
+  IDeposit,
+  IFill,
+  IOrder,
+  IOrderState,
+  IPositions,
+  ITransferHistory,
+  IWithdrawal,
+  IWSCandlestickFeedDataV1,
+  IWSDepositFeedDataV1,
+  IWSFillFeedDataV1,
+  IWSMiniTickerFeedDataV1,
+  IWSOrderFeedDataV1,
+  IWSOrderGroupFeedDataV1,
+  IWSOrderStateFeedDataV1,
+  IWSPositionsFeedDataV1,
+  IWSSubscribeRequestV1Legacy,
+  IWSTickerFeedDataV1,
+  IWSTradeFeedDataV1,
+  IWSTransferFeedDataV1,
+  IWSWithdrawalFeedDataV1
 } from '../interfaces'
+import { WS_CANDLESTICK_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_candlestick_feed_data_v_1'
+import { WS_DEPOSIT_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_deposit_feed_data_v_1'
+import { WS_FILL_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_fill_feed_data_v_1'
+import { WS_MINI_TICKER_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_mini_ticker_feed_data_v_1'
+import { WS_ORDER_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_order_feed_data_v_1'
+import { WS_ORDER_GROUP_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_order_group_feed_data_v_1'
+import { WS_ORDER_STATE_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_order_state_feed_data_v_1'
+import { WS_ORDERBOOK_LEVELS_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_orderbook_levels_feed_data_v_1'
+import { WS_POSITIONS_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_positions_feed_data_v_1'
+import { WS_TICKER_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_ticker_feed_data_v_1'
+import { WS_TRADE_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_trade_feed_data_v_1'
+import { WS_TRANSFER_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_transfer_feed_data_v_1'
+import { WS_WITHDRAWAL_FEED_DATA_V_1_MAP } from '../interfaces/codegen/schema-maps/ws_withdrawal_feed_data_v_1'
 import { JsonUtils, StringUtils, Utils } from '../utils'
-import {
-  EStream,
-  type IWSBookRequest,
-  type IWSCandleRequest,
-  type IWSMiniRequest,
-  type IWSTdgDepositRequest,
-  type IWSTdgFillRequest,
-  type IWSTdgOrderGroupRequest,
-  type IWSTdgOrderRequest,
-  type IWSTdgOrderStateRequest,
-  type IWSTdgPositionRequest,
-  type IWSTdgTransferRequest,
-  type IWSTdgWithDrawalRequest,
-  type IWSTickerRequest,
-  type IWSTradeRequest,
-  type TMessageHandler,
-  type TWSRequest
+import type {
+  IWSBookRequest,
+  IWSCandleRequest,
+  IWSMiniRequest,
+  IWSTdgDepositRequest,
+  IWSTdgFillRequest,
+  IWSTdgOrderGroupRequest,
+  IWSTdgOrderRequest,
+  IWSTdgOrderStateRequest,
+  IWSTdgPositionRequest,
+  IWSTdgTransferRequest,
+  IWSTdgWithDrawalRequest,
+  IWSTickerRequest,
+  IWSTradeRequest,
+  TMessageHandler,
+  TWSRequest
 } from './interfaces'
+import { EStream } from './interfaces'
 
 const omitZeroStr = (str?: string) => str === '0' ? '' : str
 
