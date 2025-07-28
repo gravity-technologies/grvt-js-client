@@ -53,6 +53,22 @@ import type {
 } from './interfaces'
 import { EStream } from './interfaces'
 
+export class WSError extends Error {
+  code?: number
+  status?: number
+
+  constructor (response: {
+    status?: number
+    code?: number
+    message?: string
+  }) {
+    super(response.message)
+    this.name = 'WSError'
+    this.code = response.code
+    this.status = response.status
+  }
+}
+
 const omitZeroStr = (str?: string) => str === '0' ? '' : str
 
 interface IMessage {
@@ -186,12 +202,35 @@ export class WS {
       if (this._retries) {
         this._retries = 0
       }
-      const message = JsonUtils.parse<IMessage>(e.data)
+      const message = JsonUtils.parse<IMessage & {
+        c?: number
+        m?: string
+        message?: string
+      }>(e.data)
 
       /**
-       * Ignore 400 status response messages
+       * Handle error response
        */
-      if (message.status === 400) {
+      if (message.status ?? message.c ?? message.code) {
+        /**
+         * Ignore 1003 response "Request could not be processed due to malformed syntax"
+         * This happens when client send
+         */
+        const code = message.c ?? message.code
+        if (code !== 1003) {
+          const error = new WSError({
+            ...message,
+            code,
+            message: message.m ?? message.message
+          })
+          if (this._onErrors.length) {
+            for (const onError of this._onErrors) {
+              onError(error)
+            }
+          } else {
+            console.error(error)
+          }
+        }
         return
       }
 
@@ -716,8 +755,8 @@ export class WS {
     }
   }
 
-  private readonly _onErrors: Array<(e: Event) => void> = []
-  onError (callback: (e: Event) => void) {
+  private readonly _onErrors: Array<(e: Event | WSError) => void> = []
+  onError (callback: (e: Event | WSError) => void) {
     this._onErrors.push(callback)
     this._ws.addEventListener('error', callback)
     return () => {
@@ -728,12 +767,24 @@ export class WS {
 
   private _subscribeCurrentPairs () {
     const pairs = Object.keys(this._pairs)
-    for (const pair of pairs) {
+    const groupStreams: Record<string, string[]> = {}
+    // keep last primary stream
+    for (const pair of pairs.reverse()) {
       const { stream, feed } = this._parsePair(pair)
+      if (!groupStreams[stream]) {
+        groupStreams[stream] = []
+      }
+      const primaryFeed = feed.split('@')[0]
+      if (!groupStreams[stream].some((f) => f.startsWith(`${primaryFeed}@`))) {
+        groupStreams[stream].push(feed)
+      }
+    }
+    const streams = Object.keys(groupStreams)
+    for (const stream of streams) {
       this._sendMessage({
         method: 'subscribe',
         stream,
-        feed: [feed]
+        feed: groupStreams[stream]
       })
     }
   }
@@ -797,8 +848,98 @@ export class WS {
     return this._addConsumer(pair, onMessage as TMessageHandler<TEntities>)
   }
 
-  unsubscribe (pairedConsumerKey: string) {
-    this._removeConsumer(pairedConsumerKey)
+  subscribes (...subscriptions: TWSRequest[]): string[] {
+    if (!subscriptions.length) {
+      return []
+    }
+    const pairs: Array<{ pair: string, onData: TMessageHandler<TEntities>, onError: TWSRequest['onError'] }> = []
+    const payloads: IWSSubscribeRequestV1Legacy[] = []
+    const groupStreams: Record<string, string[]> = {}
+    for (const subscription of subscriptions) {
+      const { onData: onMessage, onError, ...options } = subscription
+      const subscribePayload = this._parseStream(options)
+      const stream = subscribePayload?.stream
+      const feed = subscribePayload?.feed?.[0] as string
+      if (!stream || !feed) {
+        throw new Error('Unknown stream or feed')
+      }
+      if (!groupStreams[stream]) {
+        groupStreams[stream] = []
+      }
+      const primaryFeed = feed.split('@')[0]
+      if (groupStreams[stream].some((f) => f.startsWith(`${primaryFeed}@`))) {
+        throw new Error(`Attempted to subscribe to same primary selector twice, in same request: ${primaryFeed}`)
+      }
+      groupStreams[stream].push(feed)
+      payloads.push(subscribePayload)
+      pairs.push({
+        pair: this._getPair({ stream, feed }),
+        onData: onMessage as TMessageHandler<TEntities>,
+        onError
+      })
+    }
+
+    /**
+     * Subscribe in parallel and listen for responses
+     */
+    setTimeout(async () => {
+      await this.ready()
+
+      for (const { pair, onError } of pairs) {
+        let _resolve: (value: void | PromiseLike<void>) => void
+        const onPaired = (e: MessageEvent<string>) => {
+          const message = JsonUtils.parse<IMessage>(e.data)
+          if (!message?.s || !message?.s1?.length) {
+            return
+          }
+          const responseStream = message.s?.replace?.(`${this._version}.`, '')
+          const { stream, feed } = this._parsePair(pair)
+          const asset = feed.split('@')[0]
+          const subs = message.s1
+          const isResolved = stream === responseStream && (
+            subs.includes(asset) ||
+            subs.includes(asset.toLowerCase()) ||
+            subs.includes(feed) ||
+            subs.includes(feed.toLowerCase())
+          )
+          if (isResolved) {
+            _resolve()
+          }
+        }
+        const promise = new Promise<void>((resolve) => {
+          _resolve = resolve
+          this._ws.addEventListener('message', onPaired)
+        })
+        Utils.timeout(
+          promise,
+          this._options.timeout ?? 30000,
+          new Error('Subscribe Timeout: ' + pair)
+        )
+          .catch((error) => onError?.(error))
+          .finally(() => {
+            this._ws.removeEventListener('message', onPaired)
+          })
+      }
+
+      const streams = Object.keys(groupStreams)
+      for (const stream of streams) {
+        this._sendMessage({
+          method: 'subscribe',
+          stream,
+          feed: groupStreams[stream]
+        })
+      }
+    })
+
+    return pairs.map(({ pair, onData }) => {
+      return this._addConsumer(pair, onData)
+    })
+  }
+
+  unsubscribe (...pairedConsumerKeys: string[]) {
+    for (const pairedConsumerKey of pairedConsumerKeys) {
+      this._removeConsumer(pairedConsumerKey)
+    }
     return this
   }
 
