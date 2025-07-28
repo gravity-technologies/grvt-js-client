@@ -691,32 +691,49 @@ export class WS {
     return `${pair}__${consumerKey}`
   }
 
-  private _removeConsumer (pairedConsumerKey: string) {
-    const [stream, feed, consumerKey] = pairedConsumerKey.split('__')
-    const pairKey = this._getPair({ stream, feed })
-    if (!this._pairs[pairKey]) {
-      return
+  private _removeConsumer (...pairedConsumerKeys: string[]) {
+    const toUnsubscribe: Record<string, string[]> = {}
+
+    for (const pairedConsumerKey of pairedConsumerKeys) {
+      const [stream, feed, consumerKey] = pairedConsumerKey.split('__')
+      const pairKey = this._getPair({ stream, feed })
+      if (!this._pairs[pairKey]) {
+        return
+      }
+
+      let needUnsubscribe = true
+      const pairPrimary = pairKey.split('@')[0]
+      for (const key of Object.keys(this._pairs)) {
+        if (key.split('@')[0] !== pairPrimary) {
+          continue
+        }
+        const primaryGroup = this._pairs[key]
+        const { [consumerKey]: _, ...keep } = primaryGroup
+        this._pairs[key] = keep
+        if (Object.keys(keep).length) {
+          needUnsubscribe = false
+        }
+      }
+
+      if (needUnsubscribe) {
+        if (!toUnsubscribe[stream]) {
+          toUnsubscribe[stream] = []
+        }
+        const primaryFeed = feed.split('@')[0]
+        if (!toUnsubscribe[stream].some((f) => f.startsWith(`${primaryFeed}@`))) {
+          toUnsubscribe[stream].push(feed)
+        }
+      }
     }
 
-    let needUnsubscribe = true
-    const pairPrimary = pairKey.split('@')[0]
-    for (const key of Object.keys(this._pairs)) {
-      if (key.split('@')[0] !== pairPrimary) {
-        continue
-      }
-      const primaryGroup = this._pairs[key]
-      const { [consumerKey]: _, ...keep } = primaryGroup
-      this._pairs[key] = keep
-      if (Object.keys(keep).length) {
-        needUnsubscribe = false
-      }
-    }
-
-    if (needUnsubscribe) {
+    /**
+     * Send unsubscribes
+     */
+    for (const stream of Object.keys(toUnsubscribe)) {
       this._sendMessage({
         method: 'unsubscribe',
         stream,
-        feed: [feed]
+        feed: toUnsubscribe[stream]
       })
     }
   }
@@ -937,9 +954,7 @@ export class WS {
   }
 
   unsubscribe (...pairedConsumerKeys: string[]) {
-    for (const pairedConsumerKey of pairedConsumerKeys) {
-      this._removeConsumer(pairedConsumerKey)
-    }
+    this._removeConsumer(...pairedConsumerKeys)
     return this
   }
 
