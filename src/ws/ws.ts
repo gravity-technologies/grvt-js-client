@@ -1,9 +1,5 @@
 import type {
   IDeposit,
-  IFill,
-  IOrder,
-  IOrderState,
-  IPositions,
   ITransferHistory,
   IWithdrawal,
   IWSCandlestickFeedDataV1,
@@ -75,14 +71,12 @@ interface IMessage {
   s: string
   n: string
   f?: TEntities
-  s1?: string[]
+  s1?: string | string[]
   code?: number
   status?: number
 }
 
 type TEntities = Parameters<Required<TWSRequest>['onData']>[0]
-
-type TEntityHasInstrument = Exclude<TEntities, IOrder | IOrderState | IDeposit | ITransferHistory | IWithdrawal>
 
 interface IOptions {
   url: string | URL
@@ -235,12 +229,13 @@ export class WS {
       }
 
       const stream = message.s = message.s?.replace?.(`${this._version}.`, '') as `${EStream}`
+      const selector = typeof message.s1 === 'string' ? message.s1 : ''
       const result = this._messageLiteToFull(message)
       // no entity found
-      if (!result) {
+      if (!selector || !result) {
         // if no entity found and not a subscription message
-        if (!message.s1?.length) {
-          console.warn('Error: something went wrong with message', message)
+        if (typeof message.s1 === 'string') {
+          console.warn('Error: not found selector', message)
         }
         return
       }
@@ -249,14 +244,16 @@ export class WS {
         return
       }
 
-      const instrument = (result as IOrder)?.legs?.[0]?.instrument ?? (result as TEntityHasInstrument)?.instrument
-
-      /**
-       * Handle subscriptions with instrument
-       */
-      const consumers = instrument
-        ? this._getInstrumentConsumers({ stream, instrument, result })
-        : this._getNonInstrumentConsumers({ stream, result })
+      const consumers = (() => {
+        switch (stream) {
+          case EStream.DEPOSIT:
+          case EStream.TRANSFER:
+          case EStream.WITHDRAWAL:
+            return this._getHistoryConsumers({ stream, result })
+          default:
+            return this._getSelectorConsumers({ stream, selector })
+        }
+      })()
       if (!consumers?.length) {
         // There are delay in sending unsubscribe message so clients might receive messages after unsubscribing
         // console.log('TODO: send unsubscribe with by message:', message, result)
@@ -302,9 +299,9 @@ export class WS {
 
   /**
    * Only use for TDG
-   * Use for TEntities of GROUP | STATE | DEPOSIT | TRANSFER | WITHDRAWAL streams
+   * Use for TEntities of DEPOSIT | TRANSFER | WITHDRAWAL streams
    */
-  private _getNonInstrumentConsumers ({ result, stream }: {
+  private _getHistoryConsumers ({ result, stream }: {
     result: TEntities
     stream: `${EStream}`
   }) {
@@ -325,10 +322,6 @@ export class WS {
         ].filter(Boolean).join('-')
         const withdrawalFromAccountId = omitZeroStr((result as IWithdrawal).from_account_id)
         switch (stream) {
-          case EStream.GROUP:
-            return [...acc, ...Object.values(value)]
-          case EStream.STATE:
-            return [...acc, ...Object.values(value)]
           case EStream.DEPOSIT:
             if (depositDestinationAccountId && key.endsWith(depositDestinationAccountId)) {
               return [...acc, ...Object.values(value)]
@@ -353,53 +346,23 @@ export class WS {
 
   /**
    * Use for MDG/TDG
-   * Use for TEntityHasInstrument
    */
-  private _getInstrumentConsumers ({ result, stream, instrument }: {
-    result: TEntities
+  private _getSelectorConsumers ({ stream, selector }: {
     stream: `${EStream}`
-    instrument: string
+    selector: string
   }) {
+    const selectorPrimary = selector.split('@')[0]
     return Object.entries(this._pairs).reduce<Array<TMessageHandler<TEntities>>>(
       (acc, [key, value]) => {
-        if (!key.startsWith(`${stream}__`)) {
+        const pairPrefix = `${stream}__${selectorPrimary}`
+        const isKeyMatch = key.includes('@')
+          ? key.startsWith(pairPrefix)
+          : key === pairPrefix
+        if (!isKeyMatch) {
           return acc
         }
 
-        const hasSubAccountId = [
-          EStream.ORDER,
-          // EStream.STATE,
-          EStream.POSITION,
-          EStream.FILL
-          // EStream.DEPOSIT,
-          // EStream.TRANSFER,
-          // EStream.WITHDRAWAL
-        ].includes(stream as EStream)
-
-        // no sub account id handling
-        if (!hasSubAccountId) {
-          return key.startsWith(`${stream}__${instrument}`)
-            ? [...acc, ...Object.values(value)]
-            : acc
-        }
-
-        // has sub account id handling
-        const subAccountId = String((result as IOrder | IPositions | IFill).sub_account_id ?? '')
-        // const subAccountId = String((result as IPositions).sub_account_id)
-        // const subAccountId = String((result as IFill).sub_account_id)
-        const feed = this._parseStream({
-          stream: stream as EStream.ORDER | EStream.POSITION | EStream.FILL,
-          params: {
-            sub_account_id: omitZeroStr(subAccountId),
-            instrument
-          }
-        })?.feed
-        const tdgFeedPrefix = feed?.[0]?.split('@')?.[0]
-        if (tdgFeedPrefix && key.startsWith(`${stream}__${tdgFeedPrefix}`)) {
-          return [...acc, ...Object.values(value)]
-        }
-
-        return acc
+        return [...acc, ...Object.values(value)]
       }, []
     )
   }
@@ -815,7 +778,7 @@ export class WS {
     let _resolve: (value: void | PromiseLike<void>) => void
     const onPaired = (e: MessageEvent<string>) => {
       const message = JsonUtils.parse<IMessage>(e.data)
-      if (!message?.s || !message?.s1?.length) {
+      if (!message?.s || !message?.s1?.length || typeof message.s1 === 'string') {
         return
       }
       const responseStream = message.s?.replace?.(`${this._version}.`, '')
@@ -906,7 +869,7 @@ export class WS {
         let _resolve: (value: void | PromiseLike<void>) => void
         const onPaired = (e: MessageEvent<string>) => {
           const message = JsonUtils.parse<IMessage>(e.data)
-          if (!message?.s || !message?.s1?.length) {
+          if (!message?.s || !message?.s1?.length || typeof message.s1 === 'string') {
             return
           }
           const responseStream = message.s?.replace?.(`${this._version}.`, '')
