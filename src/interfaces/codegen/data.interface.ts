@@ -515,6 +515,61 @@ export interface IApiBatchQueryVaultRiskMetricResponse {
   result?: IVaultRiskMetric[]
 }
 
+// Usage Parameters
+//
+// * Rate Limits
+//   - If N orders are created, it will consume N create_order rate limit tokens
+//   - If M orders are cancelled, it will consume 1 cancel_order rate limit tokens
+//
+// • Usage Pattern
+//   - This can be used as BulkCreate if no cancellations are supplied
+//   - This can be used as BulkCancel if no creations are supplied
+//   - This can be used as BulkReplace if both creations and cancellations are supplied
+//
+// * Order Replacement
+//   - For a pair of create and cancel payloads at the same index:
+//     * If they belong to the same inst/side/price
+//     * And the created order has an order_size smaller than the book_size of the cancelled order
+//     * The created order will replace the cancelled order, and retain its priority in the orderbook
+//   - For instance, to replace 2 orders, place 1 order, and cancel 2 orders:
+//     * orders = <replace_1, replace_2, create_1>
+//     * order_ids = <replace_1, replace_2, cancel_1, cancel_2>
+//
+// * Speed Bump
+//   - The highest speed_bump level applies across all sub-payloads and will be applied on the BulkOrder
+//   - To ensure that creations/cancellations are not speed bumped, ensure that all orders have post_only = true
+//
+// * Restrictions
+//   - This is only available to API users
+//   - All create orders must use the same instrument
+//   - TPSL (Take Profit / Stop Loss) orders are not supported
+export interface IApiBulkOrdersRequest {
+  // The subaccount ID of the user creating the request
+  sub_account_id?: string
+  // Orders to create or replace, supply up to 20 orders
+  orders?: IOrder[]
+  // The order IDs of the orders to cancel or replace, supply up to 20 orderIDs (if both orderIDs and clientOrderIDs are provided, we will reject the payload)
+  order_i_ds?: string[]
+  // The client order IDs of the orders to cancel or replace, supply up to 20 clientOrderIDs (if both orderIDs and clientOrderIDs are provided, we will reject the payload)
+  client_order_i_ds?: string[]
+  // Specifies the time-to-live (in milliseconds) for this cancellation.
+  // During this period, any order creation with a matching `client_order_id` will be cancelled and not be added to the GRVT matching engine.
+  // This mechanism helps mitigate time-of-flight issues where cancellations might arrive before the corresponding orders.
+  // Hence, cancellation by `order_id` ignores this field as the exchange can only assign `order_id`s to already-processed order creations.
+  // The duration cannot be negative, is rounded down to the nearest 100ms (e.g., `'670'` -> `'600'`, `'30'` -> `'0'`) and capped at 5 seconds (i.e., `'5000'`).
+  // Value of `'0'` or omission results in the default time-to-live value being applied.
+  // If the caller requests multiple successive cancellations for a given order, such that the time-to-live windows overlap, only the first request will be considered.
+  //
+  time_to_live_ms?: string
+}
+
+export interface IApiBulkOrdersResponse {
+  // The orders in same order as requested
+  orders?: IOrder[]
+  // A list of acks for the cancelled orders
+  cancel_acks?: IAck[]
+}
+
 // Cancel all orders on the orderbook for this trading account. This may not match new orders in flight.
 export interface IApiCancelAllOrdersRequest {
   // The subaccount ID cancelling all orders
@@ -684,6 +739,12 @@ export interface IApiDepositHistoryResponse {
   result?: IDepositHistory[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+// The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
+export interface IApiDetailedAggregatedAccountSummaryResponse {
+  // The aggregated account summary
+  result?: IDetailedAggregatedAccountSummary
 }
 
 export interface IApiDropClientWsRequest {
@@ -1092,6 +1153,15 @@ export interface IApiGetUserEcosystemPointResponse {
   points?: IEcosystemPoint[]
 }
 
+export interface IApiGetUserVaultRewardPointResponse {
+  // The ecosystem point
+  ecosystem_point?: string
+  // The trading point
+  trader_point?: string
+  // The lp point
+  lp_point?: string
+}
+
 export interface IApiGetVerifiedEcosystemLeaderboardRequest {
   // Start time of the epoch
   calculate_from?: string
@@ -1118,7 +1188,12 @@ export interface IApiListAggregatedAccountSummaryRequest {
 
 export interface IApiListAggregatedAccountSummaryResponse {
   // The list of aggregated account summaries of requested main accounts
-  account_summaries?: IApiAggregatedAccountSummaryResponse[]
+  account_summaries?: IApiDetailedAggregatedAccountSummaryResponse[]
+}
+
+export interface IApiListEpochUserVaultRewardPointResponse {
+  // The list of user vault reward point history
+  result?: IEpochUserVaultRewardPoint[]
 }
 
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
@@ -2262,6 +2337,19 @@ export interface IDepositHistory {
   from_address?: string
 }
 
+export interface IDetailedAggregatedAccountSummary {
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: string
+  // Total equity of the main (+ sub) account, denominated in USD
+  total_equity?: string
+  // The list of spot assets owned by this main (+ sub) account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of vault investments held by this main account
+  vault_investments?: IVaultInvestment[]
+  // Total balance of the main account, denominated in USD
+  funding_account_balance?: string
+}
+
 export interface IECNToBrokerFeed {
   // A unique 128-bit identifier for the order, deterministically generated within the GRVT backend
   order_id?: string
@@ -2418,6 +2506,17 @@ export interface IEpochLPPoint {
   liquidity_score?: string
   // Vault liquidity score
   vault_liquidity_score?: string
+}
+
+export interface IEpochUserVaultRewardPoint {
+  // The epoch number
+  epoch?: number
+  // The ecosystem point
+  ecosystem_point?: string
+  // The trading point
+  trader_point?: string
+  // The lp point
+  lp_point?: string
 }
 
 // An error response
@@ -3122,6 +3221,12 @@ export interface IQueryVaultInvestorHistoryRequest {
   main_account_id?: string
   // Optional. The unique identifier of the vault.
   vault_id?: string
+  // Optional. The types of transactions to filter by. List of types: vaultInvest, vaultBurnLpToken, vaultRedeem
+  types?: EVaultInvestorAction[]
+  // Optional. The start time of the transaction.
+  start_time?: string
+  // Optional. The end time of the transaction.
+  end_time?: string
 }
 
 // Response to retrieve the vault summary for a given vault
@@ -3251,6 +3356,8 @@ export interface ISnapVaultSummary {
   total_lp_token_supply?: string
   // The share price of the vault LP token at point of vault investment
   share_price?: string
+  // Reward sharing ratio for the vault. GRVT points earned by the vault would be redistributed to investors in the ratio of this field. 0% indicates that vault manager get all rewards. Range: 0-10000 centibeeps (0%-100%). 10000 centibeeps = 100%
+  reward_sharing_ratio_centi_beeps?: number
 }
 
 export interface ISpotBalance {
