@@ -9,7 +9,8 @@ export const SNAP_VAULT_SUMMARY_MAP: SchemaPairMap = Object.freeze({
     vault_id: 'vi',
     lp_infos: ['li', [LP_INFO_ENTRY_MAP.FULL_TO_LITE]],
     total_lp_token_supply: 'tl',
-    share_price: 'sp'
+    share_price: 'sp',
+    reward_sharing_ratio_centi_beeps: 'rs'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -17,6 +18,7 @@ export const SNAP_VAULT_SUMMARY_MAP: SchemaPairMap = Object.freeze({
     vi: 'vault_id',
     li: ['lp_infos', [LP_INFO_ENTRY_MAP.LITE_TO_FULL]],
     tl: 'total_lp_token_supply',
-    sp: 'share_price'
+    sp: 'share_price',
+    rs: 'reward_sharing_ratio_centi_beeps'
   }
 })
