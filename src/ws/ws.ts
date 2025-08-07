@@ -222,7 +222,7 @@ export class WS {
               onError(error)
             }
           } else {
-            console.error(error)
+            console.warn(error)
           }
         }
         return
@@ -824,7 +824,9 @@ export class WS {
       throw new Error('Unknown stream or feed')
     }
     const pair = this._getPair({ stream, feed })
-    void this._subscribe(pair, subscribePayload).catch(onError)
+    void this._subscribe(pair, subscribePayload).catch((error) => {
+      onError?.(error)
+    })
     return this._addConsumer(pair, onMessage as TMessageHandler<TEntities>)
   }
 
