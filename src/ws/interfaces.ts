@@ -1,6 +1,4 @@
 import type {
-  ECandlestickInterval,
-  ECandlestickType,
   IWSCandlestickFeedDataV1,
   IWSCandlestickFeedSelectorV1,
   IWSDepositFeedDataV1,
@@ -27,6 +25,8 @@ import type {
   IWSWithdrawalFeedDataV1,
   IWSWithdrawalFeedSelectorV1
 } from '../interfaces'
+import type { ECandlestickInterval } from '../interfaces/codegen/enums/candlestick-interval'
+import type { ECandlestickType } from '../interfaces/codegen/enums/candlestick-type'
 
 export enum EStream {
   CANDLE = 'candle',
