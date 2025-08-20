@@ -169,7 +169,10 @@ export class WS {
         this._close(currentWs)
         return
       }
-      this._resume()
+      // auto subscribe to all current subscriptions if not paused
+      if (!this._paused) {
+        this._resume()
+      }
     })
     currentWs.addEventListener('close', () => {
       // only keep the latest ws
