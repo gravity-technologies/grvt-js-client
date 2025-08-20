@@ -88,6 +88,7 @@ interface IOptions {
 
 export class WS {
   private _retries = 0
+  private _paused = false
   private _connecting = true
   private readonly _version = 'v1'
   private readonly _options: IOptions
@@ -168,7 +169,7 @@ export class WS {
         this._close(currentWs)
         return
       }
-      this._subscribeCurrentPairs()
+      this._resume()
     })
     currentWs.addEventListener('close', () => {
       // only keep the latest ws
@@ -245,6 +246,12 @@ export class WS {
       }
 
       const consumers = (() => {
+        /**
+         * If paused, do not send any message to consumers
+         */
+        if (this._paused) {
+          return []
+        }
         switch (stream) {
           case EStream.DEPOSIT:
           case EStream.TRANSFER:
@@ -254,11 +261,7 @@ export class WS {
             return this._getSelectorConsumers({ stream, selector })
         }
       })()
-      if (!consumers?.length) {
-        // There are delay in sending unsubscribe message so clients might receive messages after unsubscribing
-        // console.log('TODO: send unsubscribe with by message:', message, result)
-        return
-      }
+
       if (result && consumers?.length) {
         for (const consumer of consumers) {
           typeof consumer === 'function' && consumer(result)
@@ -672,9 +675,12 @@ export class WS {
         }
         const primaryGroup = this._pairs[key]
         const { [consumerKey]: _, ...keep } = primaryGroup
-        this._pairs[key] = keep
         if (Object.keys(keep).length) {
+          this._pairs[key] = keep
           needUnsubscribe = false
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete this._pairs[key]
         }
       }
 
@@ -745,7 +751,39 @@ export class WS {
     }
   }
 
-  private _subscribeCurrentPairs () {
+  private _pause () {
+    this._paused = true
+    const pairs = Object.keys(this._pairs)
+    const groupStreams: Record<string, string[]> = {}
+    // keep last primary stream
+    for (const pair of pairs.reverse()) {
+      const { stream, feed } = this._parsePair(pair)
+      if (!groupStreams[stream]) {
+        groupStreams[stream] = []
+      }
+      const primaryFeed = feed.split('@')[0]
+      if (!groupStreams[stream].some((f) => f.startsWith(`${primaryFeed}@`))) {
+        groupStreams[stream].push(feed)
+      }
+    }
+    const streams = Object.keys(groupStreams)
+    for (const stream of streams) {
+      this._sendMessage({
+        method: 'unsubscribe',
+        stream,
+        feed: groupStreams[stream]
+      })
+    }
+  }
+
+  private _resume () {
+    /**
+     * If not paused, do nothing
+     */
+    if (!this._paused) {
+      return
+    }
+    this._paused = false
     const pairs = Object.keys(this._pairs)
     const groupStreams: Record<string, string[]> = {}
     // keep last primary stream
@@ -949,5 +987,15 @@ export class WS {
         resolve(this.ready())
       }, delay)
     })
+  }
+
+  pause () {
+    this._pause()
+    return this
+  }
+
+  resume () {
+    this._resume()
+    return this
   }
 }
