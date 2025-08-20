@@ -675,9 +675,12 @@ export class WS {
         }
         const primaryGroup = this._pairs[key]
         const { [consumerKey]: _, ...keep } = primaryGroup
-        this._pairs[key] = keep
         if (Object.keys(keep).length) {
+          this._pairs[key] = keep
           needUnsubscribe = false
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete this._pairs[key]
         }
       }
 
