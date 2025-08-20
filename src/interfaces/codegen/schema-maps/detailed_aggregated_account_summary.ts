@@ -9,13 +9,17 @@ export const DETAILED_AGGREGATED_ACCOUNT_SUMMARY_MAP: SchemaPairMap = Object.fre
     total_equity: 'te',
     spot_balances: ['sb', [SPOT_BALANCE_MAP.FULL_TO_LITE]],
     vault_investments: ['vi', [VAULT_INVESTMENT_MAP.FULL_TO_LITE]],
-    funding_account_balance: 'fa'
+    funding_account_balance: 'fa',
+    total_sub_account_balance: 'ts',
+    total_vault_investments_balance: 'tv'
   },
   LITE_TO_FULL: {
     ma: 'main_account_id',
     te: 'total_equity',
     sb: ['spot_balances', [SPOT_BALANCE_MAP.LITE_TO_FULL]],
     vi: ['vault_investments', [VAULT_INVESTMENT_MAP.LITE_TO_FULL]],
-    fa: 'funding_account_balance'
+    fa: 'funding_account_balance',
+    ts: 'total_sub_account_balance',
+    tv: 'total_vault_investments_balance'
   }
 })

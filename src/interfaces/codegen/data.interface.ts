@@ -1,441 +1,30 @@
-export enum EBridgeType {
-  // XY Bridge type
-  XY = 'XY',
-  // Rhino Bridge type
-  RHINO = 'RHINO',
-}
-
-// BrokerTag is a tag for the broker that the order is sent from.
-export enum EBrokerTag {
-  UNSPECIFIED = 'UNSPECIFIED',
-  // CoinRoutes
-  COIN_ROUTES = 'COIN_ROUTES',
-  // Alertatron
-  ALERTATRON = 'ALERTATRON',
-  // Origami
-  ORIGAMI = 'ORIGAMI',
-}
-
-export enum ECancelStatus {
-  // Cancellation has expired because corresponding order had not arrived within the defined time-to-live window.
-  EXPIRED = 'EXPIRED',
-  // This cancellation request was dropped because its TTL window overlaps with another cancellation request for the same order.
-  DROPPED_DUPLICATE = 'DROPPED_DUPLICATE',
-}
-
-export enum ECandlestickInterval {
-  // 1 minute
-  CI_1_M = 'CI_1_M',
-  // 3 minutes
-  CI_3_M = 'CI_3_M',
-  // 5 minutes
-  CI_5_M = 'CI_5_M',
-  // 15 minutes
-  CI_15_M = 'CI_15_M',
-  // 30 minutes
-  CI_30_M = 'CI_30_M',
-  // 1 hour
-  CI_1_H = 'CI_1_H',
-  // 2 hour
-  CI_2_H = 'CI_2_H',
-  // 4 hour
-  CI_4_H = 'CI_4_H',
-  // 6 hour
-  CI_6_H = 'CI_6_H',
-  // 8 hour
-  CI_8_H = 'CI_8_H',
-  // 12 hour
-  CI_12_H = 'CI_12_H',
-  // 1 day
-  CI_1_D = 'CI_1_D',
-  // 3 days
-  CI_3_D = 'CI_3_D',
-  // 5 days
-  CI_5_D = 'CI_5_D',
-  // 1 week
-  CI_1_W = 'CI_1_W',
-  // 2 weeks
-  CI_2_W = 'CI_2_W',
-  // 3 weeks
-  CI_3_W = 'CI_3_W',
-  // 4 weeks
-  CI_4_W = 'CI_4_W',
-}
-
-export enum ECandlestickType {
-  // Tracks traded prices
-  TRADE = 'TRADE',
-  // Tracks mark prices
-  MARK = 'MARK',
-  // Tracks index prices
-  INDEX = 'INDEX',
-  // Tracks book mid prices
-  MID = 'MID',
-}
-
-export enum EEpochBadgeType {
-  // Champion
-  CHAMPION = 'CHAMPION',
-  // Legend
-  LEGEND = 'LEGEND',
-  // Veteran
-  VETERAN = 'VETERAN',
-  // Elite
-  ELITE = 'ELITE',
-  // Master
-  MASTER = 'MASTER',
-  // Expert
-  EXPERT = 'EXPERT',
-  // Warrior
-  WARRIOR = 'WARRIOR',
-  // Sergeant
-  SERGEANT = 'SERGEANT',
-  // Ranger
-  RANGER = 'RANGER',
-  // Challenger
-  CHALLENGER = 'CHALLENGER',
-  // Apprentice
-  APPRENTICE = 'APPRENTICE',
-  // Rookie
-  ROOKIE = 'ROOKIE',
-}
-
-export enum EInstrumentSettlementPeriod {
-  // Instrument settles through perpetual funding cycles
-  PERPETUAL = 'PERPETUAL',
-  // Instrument settles at an expiry date, marked as a daily instrument
-  DAILY = 'DAILY',
-  // Instrument settles at an expiry date, marked as a weekly instrument
-  WEEKLY = 'WEEKLY',
-  // Instrument settles at an expiry date, marked as a monthly instrument
-  MONTHLY = 'MONTHLY',
-  // Instrument settles at an expiry date, marked as a quarterly instrument
-  QUARTERLY = 'QUARTERLY',
-}
-
-// The list of asset kinds that are supported on the GRVT exchange
-export enum EKind {
-  // the perpetual asset kind
-  PERPETUAL = 'PERPETUAL',
-  // the future asset kind
-  FUTURE = 'FUTURE',
-  // the call option asset kind
-  CALL = 'CALL',
-  // the put option asset kind
-  PUT = 'PUT',
-}
-
-export enum EMarginType {
-  // Simple Cross Margin Mode: all assets have a predictable margin impact, the whole subaccount shares a single margin
-  SIMPLE_CROSS_MARGIN = 'SIMPLE_CROSS_MARGIN',
-  // Portfolio Cross Margin Mode: asset margin impact is analysed on portfolio level, the whole subaccount shares a single margin
-  PORTFOLIO_CROSS_MARGIN = 'PORTFOLIO_CROSS_MARGIN',
-}
-
-export enum EOrderRejectReason {
-  // order is not cancelled or rejected
-  UNSPECIFIED = 'UNSPECIFIED',
-  // client called a Cancel API
-  CLIENT_CANCEL = 'CLIENT_CANCEL',
-  // client called a Bulk Cancel API
-  CLIENT_BULK_CANCEL = 'CLIENT_BULK_CANCEL',
-  // client called a Session Cancel API, or set the WebSocket connection to 'cancelOrdersOnTerminate'
-  CLIENT_SESSION_END = 'CLIENT_SESSION_END',
-  // the market order was cancelled after no/partial fill. Lower precedence than other TimeInForce cancel reasons
-  MARKET_CANCEL = 'MARKET_CANCEL',
-  // the IOC order was cancelled after no/partial fill
-  IOC_CANCEL = 'IOC_CANCEL',
-  // the AON order was cancelled as it could not be fully matched
-  AON_CANCEL = 'AON_CANCEL',
-  // the FOK order was cancelled as it could not be fully matched
-  FOK_CANCEL = 'FOK_CANCEL',
-  // the order was cancelled as it has expired
-  EXPIRED = 'EXPIRED',
-  // the post-only order could not be posted into the orderbook
-  FAIL_POST_ONLY = 'FAIL_POST_ONLY',
-  // the reduce-only order would have caused position size to increase
-  FAIL_REDUCE_ONLY = 'FAIL_REDUCE_ONLY',
-  // the order was cancelled due to market maker protection trigger
-  MM_PROTECTION = 'MM_PROTECTION',
-  // the order was cancelled due to self-trade protection trigger
-  SELF_TRADE_PROTECTION = 'SELF_TRADE_PROTECTION',
-  // the order matched with another order from the same sub account
-  SELF_MATCHED_SUBACCOUNT = 'SELF_MATCHED_SUBACCOUNT',
-  // an active order on your sub account shares the same clientOrderId
-  OVERLAPPING_CLIENT_ORDER_ID = 'OVERLAPPING_CLIENT_ORDER_ID',
-  // the order will bring the sub account below initial margin requirement
-  BELOW_MARGIN = 'BELOW_MARGIN',
-  // the sub account is liquidated (and all open orders are cancelled by Gravity)
-  LIQUIDATION = 'LIQUIDATION',
-  // instrument is invalid or not found on Gravity
-  INSTRUMENT_INVALID = 'INSTRUMENT_INVALID',
-  // instrument is no longer tradable on Gravity. (typically due to a market halt, or instrument expiry)
-  INSTRUMENT_DEACTIVATED = 'INSTRUMENT_DEACTIVATED',
-  // system failover resulting in loss of order state
-  SYSTEM_FAILOVER = 'SYSTEM_FAILOVER',
-  // the credentials used (userSession/apiKeySession/walletSignature) is not authorised to perform the action
-  UNAUTHORISED = 'UNAUTHORISED',
-  // the session key used to sign the order expired
-  SESSION_KEY_EXPIRED = 'SESSION_KEY_EXPIRED',
-  // the subaccount does not exist
-  SUB_ACCOUNT_NOT_FOUND = 'SUB_ACCOUNT_NOT_FOUND',
-  // the signature used to sign the order has no trade permission
-  NO_TRADE_PERMISSION = 'NO_TRADE_PERMISSION',
-  // the order payload does not contain a supported TimeInForce value
-  UNSUPPORTED_TIME_IN_FORCE = 'UNSUPPORTED_TIME_IN_FORCE',
-  // the order has multiple legs, but multiple legs are not supported by this venue
-  MULTI_LEGGED_ORDER = 'MULTI_LEGGED_ORDER',
-  // the order would have caused the subaccount to exceed the max position size
-  EXCEED_MAX_POSITION_SIZE = 'EXCEED_MAX_POSITION_SIZE',
-  // the signature supplied is more than 30 days in the future
-  EXCEED_MAX_SIGNATURE_EXPIRATION = 'EXCEED_MAX_SIGNATURE_EXPIRATION',
-  // the market order has a limit price set
-  MARKET_ORDER_WITH_LIMIT_PRICE = 'MARKET_ORDER_WITH_LIMIT_PRICE',
-  // client cancel on disconnect triggered
-  CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED = 'CLIENT_CANCEL_ON_DISCONNECT_TRIGGERED',
-  // the OCO counter part order was triggered
-  OCO_COUNTER_PART_TRIGGERED = 'OCO_COUNTER_PART_TRIGGERED',
-  // the remaining order size was cancelled because it exceeded current position size
-  REDUCE_ONLY_LIMIT = 'REDUCE_ONLY_LIMIT',
-  // the order was replaced by a client replace request
-  CLIENT_REPLACE = 'CLIENT_REPLACE',
-  // the derisk order must be an IOC order
-  DERISK_MUST_BE_IOC = 'DERISK_MUST_BE_IOC',
-  // the derisk order must be a reduce-only order
-  DERISK_MUST_BE_REDUCE_ONLY = 'DERISK_MUST_BE_REDUCE_ONLY',
-  // derisk is not supported
-  DERISK_NOT_SUPPORTED = 'DERISK_NOT_SUPPORTED',
-  // the order type is invalid
-  INVALID_ORDER_TYPE = 'INVALID_ORDER_TYPE',
-  // the currency is not defined
-  CURRENCY_NOT_DEFINED = 'CURRENCY_NOT_DEFINED',
-}
-
-export enum EOrderStatus {
-  // Order has been sent to the matching engine and is pending a transition to open/filled/rejected.
-  PENDING = 'PENDING',
-  // Order is actively matching on the matching engine, could be unfilled or partially filled.
-  OPEN = 'OPEN',
-  // Order is fully filled and hence closed. Taker Orders can transition directly from pending to filled, without going through open.
-  FILLED = 'FILLED',
-  // Order is rejected by matching engine since if fails a particular check (See OrderRejectReason). Once an order is open, it cannot be rejected.
-  REJECTED = 'REJECTED',
-  // Order is cancelled by the user using one of the supported APIs (See OrderRejectReason). Before an order is open, it cannot be cancelled.
-  CANCELLED = 'CANCELLED',
-}
-
-export enum EQueryMainAccountLeaderboardOrderBy {
-  // Sort by realized PnL
-  PNL = 'PNL',
-  // Sort by trading volume
-  TRADING_VOLUME = 'TRADING_VOLUME',
-}
-
-export enum ERewardEpochStatus {
-  // Past
-  PAST = 'PAST',
-  // Current
-  CURRENT = 'CURRENT',
-  // Future
-  FUTURE = 'FUTURE',
-}
-
-export enum ERewardProgramType {
-  ECOSYSTEM = 'ECOSYSTEM',
-  TRADER = 'TRADER',
-  LP = 'LP',
-}
-
-// Defines the source of the order or trade, such as a UI, API, or a bot.
-// This is used to track the source of the order, and is not signed by the client
-export enum ESource {
-  // The order/trade was created by a web client
-  WEB = 'WEB',
-  // The order/trade was created by a mobile client
-  MOBILE = 'MOBILE',
-  // The order/trade was created by an API client
-  API = 'API',
-  // The order/trade was created by the liquidator service
-  LIQUIDATOR = 'LIQUIDATOR',
-}
-
-export enum ESubAccountTradeInterval {
-  // 1 month
-  SAT_1_MO = 'SAT_1_MO',
-  // 1 day
-  SAT_1_D = 'SAT_1_D',
-  // 1 hour
-  SAT_1_H = 'SAT_1_H',
-  // 4 hour
-  SAT_4_H = 'SAT_4_H',
-}
-
-// |                       | Must Fill All | Can Fill Partial |
-// | -                     | -             | -                |
-// | Must Fill Immediately | FOK           | IOC              |
-// | Can Fill Till Time    | AON           | GTC              |
-//
-export enum ETimeInForce {
-  // GTT - Remains open until it is cancelled, or expired
-  GOOD_TILL_TIME = 'GOOD_TILL_TIME',
-  // AON - Either fill the whole order or none of it (Block Trades Only)
-  ALL_OR_NONE = 'ALL_OR_NONE',
-  // IOC - Fill the order as much as possible, when hitting the orderbook. Then cancel it
-  IMMEDIATE_OR_CANCEL = 'IMMEDIATE_OR_CANCEL',
-  // FOK - Both AoN and IoC. Either fill the full order when hitting the orderbook, or cancel it
-  FILL_OR_KILL = 'FILL_OR_KILL',
-  // RPI - A GTT + PostOnly maker order, that can only be taken by non-algorithmic UI users.
-  RETAIL_PRICE_IMPROVEMENT = 'RETAIL_PRICE_IMPROVEMENT',
-}
-
-// Time interval can be used as a filter in metric/portfolio management APIs
-export enum ETimeInterval {
-  // 1 day
-  INTERVAL_1_D = 'INTERVAL_1_D',
-  // 7 days
-  INTERVAL_7_D = 'INTERVAL_7_D',
-  // 30 days
-  INTERVAL_30_D = 'INTERVAL_30_D',
-  // 90 days
-  INTERVAL_90_D = 'INTERVAL_90_D',
-  // Lifetime
-  INTERVAL_LIFETIME = 'INTERVAL_LIFETIME',
-}
-
-export enum ETransactionType {
-  UNSPECIFIED_1 = 'UNSPECIFIED_1',
-  UNSPECIFIED_2 = 'UNSPECIFIED_2',
-  UNSPECIFIED_3 = 'UNSPECIFIED_3',
-  CREATE_ACCOUNT = 'CREATE_ACCOUNT',
-  CREATE_SUB_ACCOUNT = 'CREATE_SUB_ACCOUNT',
-  SET_ACCOUNT_MULTI_SIG_THRESHOLD = 'SET_ACCOUNT_MULTI_SIG_THRESHOLD',
-  ADD_ACCOUNT_SIGNER = 'ADD_ACCOUNT_SIGNER',
-  REMOVE_ACCOUNT_SIGNER = 'REMOVE_ACCOUNT_SIGNER',
-  ADD_WITHDRAWAL_ADDRESS = 'ADD_WITHDRAWAL_ADDRESS',
-  REMOVE_WITHDRAWAL_ADDRESS = 'REMOVE_WITHDRAWAL_ADDRESS',
-  ADD_TRANSFER_ACCOUNT = 'ADD_TRANSFER_ACCOUNT',
-  REMOVE_TRANSFER_ACCOUNT = 'REMOVE_TRANSFER_ACCOUNT',
-  SET_SUB_ACCOUNT_MARGIN_TYPE = 'SET_SUB_ACCOUNT_MARGIN_TYPE',
-  ADD_SUB_ACCOUNT_SIGNER = 'ADD_SUB_ACCOUNT_SIGNER',
-  REMOVE_SUB_ACCOUNT_SIGNER = 'REMOVE_SUB_ACCOUNT_SIGNER',
-  ADD_SESSION_KEY = 'ADD_SESSION_KEY',
-  REMOVE_SESSION_KEY = 'REMOVE_SESSION_KEY',
-  DEPOSIT = 'DEPOSIT',
-  WITHDRAWAL = 'WITHDRAWAL',
-  TRANSFER = 'TRANSFER',
-  MARK_PRICE_TICK = 'MARK_PRICE_TICK',
-  SETTLEMENT_PRICE_TICK = 'SETTLEMENT_PRICE_TICK',
-  FUNDING_TICK = 'FUNDING_TICK',
-  INTEREST_RATE_TICK = 'INTEREST_RATE_TICK',
-  SCHEDULE_CONFIG = 'SCHEDULE_CONFIG',
-  SET_CONFIG = 'SET_CONFIG',
-  TRADE = 'TRADE',
-  ADD_RECOVERY_ADDRESS = 'ADD_RECOVERY_ADDRESS',
-  REMOVE_RECOVERY_ADDRESS = 'REMOVE_RECOVERY_ADDRESS',
-  RECOVER_ADDRESS = 'RECOVER_ADDRESS',
-  SETTLE_START = 'SETTLE_START',
-  SETTLE_INSTRUMENTS = 'SETTLE_INSTRUMENTS',
-  SETTLE_SOCIALISED_LOSS = 'SETTLE_SOCIALISED_LOSS',
-  SETTLE_END = 'SETTLE_END',
-  SCHEDULE_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS = 'SCHEDULE_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS',
-  SET_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS = 'SET_SIMPLE_CROSS_MAINTENANCE_MARGIN_TIERS',
-  INITIALIZE_CONFIG = 'INITIALIZE_CONFIG',
-  CREATE_ACCOUNT_WITH_SUB_ACCOUNT = 'CREATE_ACCOUNT_WITH_SUB_ACCOUNT',
-  VAULT_CREATE = 'VAULT_CREATE',
-  VAULT_UPDATE = 'VAULT_UPDATE',
-  VAULT_DELIST = 'VAULT_DELIST',
-  VAULT_CLOSE = 'VAULT_CLOSE',
-  VAULT_INVEST = 'VAULT_INVEST',
-  VAULT_BURN_LP_TOKEN = 'VAULT_BURN_LP_TOKEN',
-  VAULT_REDEEM = 'VAULT_REDEEM',
-  VAULT_MANAGEMENT_FEE_TICK = 'VAULT_MANAGEMENT_FEE_TICK',
-  ADD_CURRENCY = 'ADD_CURRENCY',
-  SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO = 'SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO',
-}
-
-export enum ETransferType {
-  // Default transfer that has nothing to do with bridging
-  UNSPECIFIED = 'UNSPECIFIED',
-  // Standard transfer that has nothing to do with bridging
-  STANDARD = 'STANDARD',
-  // Fast Arb Deposit Metadata type
-  FAST_ARB_DEPOSIT = 'FAST_ARB_DEPOSIT',
-  // Fast Arb Withdrawal Metadata type
-  FAST_ARB_WITHDRAWAL = 'FAST_ARB_WITHDRAWAL',
-  // Transfer type for non native bridging deposit
-  NON_NATIVE_BRIDGE_DEPOSIT = 'NON_NATIVE_BRIDGE_DEPOSIT',
-  // Transfer type for non native bridging withdrawal
-  NON_NATIVE_BRIDGE_WITHDRAWAL = 'NON_NATIVE_BRIDGE_WITHDRAWAL',
-}
-
-// Defines the price type that activates a Take Profit (TP) or Stop Loss (SL) order.
-//
-// Trigger orders are executed when the selected price type reaches the specified trigger price.Different price types ensure flexibility in executing strategies based on market conditions.
-//
-//
-export enum ETriggerBy {
-  // no trigger condition
-  UNSPECIFIED = 'UNSPECIFIED',
-  // INDEX - Order is activated when the index price reaches the trigger price
-  INDEX = 'INDEX',
-  // LAST - Order is activated when the last trade price reaches the trigger price
-  LAST = 'LAST',
-  // MID - Order is activated when the mid price reaches the trigger price
-  MID = 'MID',
-  // MARK - Order is activated when the mark price reaches the trigger price
-  MARK = 'MARK',
-}
-
-// Defines the type of trigger order used in trading, such as Take Profit or Stop Loss.
-//
-// Trigger orders allow execution based on pre-defined price conditions rather than immediate market conditions.
-//
-//
-export enum ETriggerType {
-  // Not a trigger order. The order executes normally without any trigger conditions.
-  UNSPECIFIED = 'UNSPECIFIED',
-  // Take Profit Order - Executes when the price reaches a specified level to secure profits.
-  TAKE_PROFIT = 'TAKE_PROFIT',
-  // Stop Loss Order - Executes when the price reaches a specified level to limit losses.
-  STOP_LOSS = 'STOP_LOSS',
-}
-
-export enum EVaultInvestorAction {
-  UNSPECIFIED = 'UNSPECIFIED',
-  VAULT_INVEST = 'VAULT_INVEST',
-  VAULT_BURN_LP_TOKEN = 'VAULT_BURN_LP_TOKEN',
-  VAULT_REDEEM = 'VAULT_REDEEM',
-}
-
-// Denotes the age category of a given redemption request.
-//
-//
-export enum EVaultRedemptionReqAgeCategory {
-  // This request is at least as old as the minimum redemption period, and is eligible for automated redemption.
-  NORMAL = 'NORMAL',
-  // This request is nearing the maxmimum redemption period and will be factored into pre-order check margin requirements.
-  URGENT = 'URGENT',
-  // This request has exceeded the maximum redemption period and will be considered for forced redemptions.
-  OVERDUE = 'OVERDUE',
-  // This request has yet to exceed the minimum redemption period, and is not yet eligible for automated redemption.
-  PRE_MIN = 'PRE_MIN',
-}
-
-export enum EVaultType {
-  // Prime vault
-  PRIME = 'PRIME',
-  // Launchpad vault
-  LAUNCH_PAD = 'LAUNCH_PAD',
-}
-
-// The list of Trading Venues that are supported on the GRVT exchange
-export enum EVenue {
-  // the trade is cleared on the orderbook venue
-  ORDERBOOK = 'ORDERBOOK',
-  // the trade is cleared on the RFQ venue
-  RFQ = 'RFQ',
-}
-
+import type { EBridgeType } from './enums/bridge-type.ts'
+import type { EBrokerTag } from './enums/broker-tag.ts'
+import type { ECancelStatus } from './enums/cancel-status.ts'
+import type { ECandlestickInterval } from './enums/candlestick-interval.ts'
+import type { ECandlestickType } from './enums/candlestick-type.ts'
+import type { EClusterConfigType } from './enums/cluster-config-type.ts'
+import type { EEpochBadgeType } from './enums/epoch-badge-type.ts'
+import type { EInstrumentSettlementPeriod } from './enums/instrument-settlement-period.ts'
+import type { EKind } from './enums/kind.ts'
+import type { EMarginType } from './enums/margin-type.ts'
+import type { EOrderRejectReason } from './enums/order-reject-reason.ts'
+import type { EOrderStatus } from './enums/order-status.ts'
+import type { EQueryMainAccountLeaderboardOrderBy } from './enums/query-main-account-leaderboard-order-by.ts'
+import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
+import type { ERewardProgramType } from './enums/reward-program-type.ts'
+import type { ESource } from './enums/source.ts'
+import type { ESubAccountTradeInterval } from './enums/sub-account-trade-interval.ts'
+import type { ETimeInForce } from './enums/time-in-force.ts'
+import type { ETimeInterval } from './enums/time-interval.ts'
+import type { ETransactionType } from './enums/transaction-type.ts'
+import type { ETransferType } from './enums/transfer-type.ts'
+import type { ETriggerBy } from './enums/trigger-by.ts'
+import type { ETriggerType } from './enums/trigger-type.ts'
+import type { EVaultInvestorAction } from './enums/vault-investor-action.ts'
+import type { EVaultRedemptionReqAgeCategory } from './enums/vault-redemption-req-age-category.ts'
+import type { EVaultType } from './enums/vault-type.ts'
+import type { EVenue } from './enums/venue.ts'
 export interface IAPISettlementPrice {
   // The base currency of the settlement price
   base?: string
@@ -672,6 +261,12 @@ export interface IApiCategoryAffinityScoreRequest {
 export interface IApiCategoryAffinityScoreResponse {
   // The list of categoryAffinities score
   result?: IUserCategoryAffinityScore[]
+}
+
+export interface IApiClusterConfig {
+  config_type?: EClusterConfigType
+  config_name?: string
+  config_json_value?: string
 }
 
 // Create multiple orders simultaneously for this trading account.
@@ -938,6 +533,10 @@ export interface IApiGetClientTiersResponse {
   tiers?: IClientTier[]
 }
 
+export interface IApiGetClusterConfigsResponse {
+  results?: IApiClusterConfig[]
+}
+
 // Fetch all currencies
 export interface IApiGetCurrencyRequest {
 }
@@ -1132,6 +731,15 @@ export interface IApiGetOrderRequest {
 export interface IApiGetOrderResponse {
   // The order object for the requested filter
   result?: IOrder
+}
+
+// Price protection bands response
+export interface IApiGetPriceProtectionBandsResponse {
+  enabled?: boolean
+  // Default price protection band applied, unless an asset-specific override exists.
+  default_band?: IPriceProtectionBand
+  // Asset-specific price protection bands.
+  asset_specific?: IAssetSpecificPriceProtectionBand[]
 }
 
 export interface IApiGetTraderStatResponse {
@@ -1447,6 +1055,10 @@ export interface IApiQueryTradingPerformanceTrendResponse {
 export interface IApiQueryVaultInvestorHistoryRequest {
   // Optional. The unique identifier of the vault.
   vault_id?: string
+  // Optional. The start time of the transaction in nanosecond.
+  start_time?: string
+  // Optional. The end time of the transaction in nanosecond.
+  end_time?: string
 }
 
 // Response to retrieve the vault summary for a given vault
@@ -1461,6 +1073,10 @@ export interface IApiQueryVaultManagerInvestorHistoryRequest {
   vault_id?: string
   // Whether to only return investments made by the manager
   only_own_investments?: boolean
+  // Optional. Start time in unix nanoseconds
+  start_time?: string
+  // Optional. End time in unix nanoseconds
+  end_time?: string
 }
 
 // Response to retrieve the vault summary for a given vault
@@ -1601,6 +1217,12 @@ export interface IApiSetInitialLeverageRequest {
 export interface IApiSetInitialLeverageResponse {
   // Whether the leverage was set successfully
   success?: boolean
+}
+
+export interface IApiSetPriceProtectionBandsRequest {
+  enabled?: boolean
+  default_band?: IPriceProtectionBand
+  asset_specific?: IAssetSpecificPriceProtectionBand[]
 }
 
 // Lookup the historical settlement price of various pairs.
@@ -2126,7 +1748,7 @@ export interface IApiVaultViewRedemptionQueueRequest {
 //
 //
 export interface IApiVaultViewRedemptionQueueResponse {
-  // Outstanding vault redemption requests, ordered by descending priority. Excludes requests that have not yet aged past the minmimum redemption period.
+  // Outstanding vault redemption requests, ordered by descending priority. Excludes requests that have not yet aged past the minimum redemption period.
   redemption_queue?: IVaultRedemptionRequest[]
   // Number of shares eligible for automated redemption (held in queue for at least the minimum redemption period).
   pending_redemption_token_count?: string
@@ -2231,6 +1853,12 @@ export interface IAssetMaxQty {
   max_buy_qty?: string
   // The maximum sell quantity
   max_sell_qty?: string
+}
+
+// PP band for a specific asset
+export interface IAssetSpecificPriceProtectionBand {
+  asset?: string
+  band?: IPriceProtectionBand
 }
 
 export interface ICancelStatusFeed {
@@ -2348,6 +1976,10 @@ export interface IDetailedAggregatedAccountSummary {
   vault_investments?: IVaultInvestment[]
   // Total balance of the main account, denominated in USD
   funding_account_balance?: string
+  // Total balance of the sub accounts, denominated in USD
+  total_sub_account_balance?: string
+  // Total balance of the vault investments, denominated in USD
+  total_vault_investments_balance?: string
 }
 
 export interface IECNToBrokerFeed {
@@ -3093,6 +2725,12 @@ export interface IPreOrderCheckResult {
   settle_currency?: string
 }
 
+// Upper and lower bound of a price protection band
+export interface IPriceProtectionBand {
+  high_centi_beeps?: string
+  low_centi_beeps?: string
+}
+
 // Request to retrieve the account summary for a given account
 export interface IQueryAccountSummaryRequest {
   // The time interval to filter
@@ -3210,7 +2848,7 @@ export interface IQueryTradingPerformanceTrendRequest {
 // Response to retrieve the trading performance trend
 export interface IQueryTradingPerformanceTrendResponse {
   // The list of trading performance trends
-  result?: ITradingPerformancePoint[]
+  result?: ITradingPerformanceTrendPoint[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -3305,7 +2943,7 @@ export interface ISnapAccountSummary {
   total_equity?: string
 }
 
-// The funding account summary, that reports the total equity and spot balances of a funding (main) account
+// The aggregated account summary, that reports the total equity and spot balances of an account
 export interface ISnapFundingAccountSummary {
   // Time at which the event was emitted in unix nanoseconds
   event_time?: string
@@ -3317,6 +2955,14 @@ export interface ISnapFundingAccountSummary {
   total_equity?: string
   // The list of spot assets owned by this main account, and their balances
   spot_balances?: ISpotBalance[]
+  // The list of vault investments held by this main account
+  vault_investments?: IVaultInvestment[]
+  // Total balance of the main account, denominated in USD
+  funding_account_balance?: string
+  // Total balance of the sub accounts, denominated in USD
+  total_sub_account_balance?: string
+  // Total balance of the vault investments, denominated in USD
+  total_vault_investments_balance?: string
 }
 
 export interface ISnapSubAccountSummary {
@@ -3579,6 +3225,30 @@ export interface ITraderMetric {
   total_point?: number
 }
 
+// Trading performance returned by the service
+export interface ITradingPerformance {
+  // The sub account id
+  sub_account_id?: string
+  // Total fee paid
+  total_fee?: string
+  // Total volume traded
+  total_trade_volume?: string
+  // Number of trades
+  num_traded?: string
+  // Total positive fee paid by user
+  positive_fee?: string
+  // Realized PnL
+  realized_pnl?: string
+  // Realized PnL
+  unrealized_pnl?: string
+  // Whether the unrealized pnl is snapshotted in the last interval
+  is_unrealized_pnl_snapshotted?: boolean
+  // The start time of the last interval
+  last_start_interval?: string
+  // Funding payment amount, in USD
+  funding_payment_amount?: string
+}
+
 // Trading performance trend returned by clickhouse
 export interface ITradingPerformancePoint {
   // The start time of the interval
@@ -3589,6 +3259,28 @@ export interface ITradingPerformancePoint {
   realized_pnl?: string
   // Unrealized PnL in USDT
   unrealized_pnl?: string
+}
+
+// Trading performance trend returned by clickhouse
+export interface ITradingPerformanceTrendPoint {
+  // The start time of the interval
+  start_interval?: string
+  // Total fee paid
+  total_fee?: string
+  // Total volume traded
+  total_trade_volume?: string
+  // Number of trades
+  num_traded?: string
+  // Total positive fee paid by user
+  positive_fee?: string
+  // Realized PnL
+  realized_pnl?: string
+  // Realized PnL
+  unrealized_pnl?: string
+  // Whether the unrealized pnl is snapshotted in the last interval
+  is_unrealized_pnl_snapshotted?: boolean
+  // Funding payment amount, in USD
+  funding_payment_amount?: string
 }
 
 export interface ITransferHistory {
