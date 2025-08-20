@@ -780,12 +780,6 @@ export class WS {
   }
 
   private _resume () {
-    /**
-     * If not paused, do nothing
-     */
-    if (!this._paused) {
-      return
-    }
     this._paused = false
     const pairs = Object.keys(this._pairs)
     const groupStreams: Record<string, string[]> = {}
