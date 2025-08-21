@@ -169,7 +169,10 @@ export class WS {
         this._close(currentWs)
         return
       }
-      this._resume()
+      // auto subscribe to all current subscriptions if not paused
+      if (!this._paused) {
+        this._resume()
+      }
     })
     currentWs.addEventListener('close', () => {
       // only keep the latest ws
@@ -777,12 +780,6 @@ export class WS {
   }
 
   private _resume () {
-    /**
-     * If not paused, do nothing
-     */
-    if (!this._paused) {
-      return
-    }
     this._paused = false
     const pairs = Object.keys(this._pairs)
     const groupStreams: Record<string, string[]> = {}
