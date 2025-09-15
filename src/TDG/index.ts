@@ -10,6 +10,13 @@ import type {
   IApiCreateBulkOrdersResponse,
   IApiCreateOrderRequest,
   IApiCreateOrderResponse,
+  IApiCrossExchVaultAttestEquityRequest,
+  IApiCrossExchVaultInvestCancelRequest,
+  IApiCrossExchVaultTriggerRedemptionRequest,
+  IApiCrossExchVaultViewInvestmentQueueRequest,
+  IApiCrossExchVaultViewInvestmentQueueResponse,
+  IApiCrossExchVaultViewPendingInvestmentRequest,
+  IApiCrossExchVaultViewPendingInvestmentResponse,
   IApiDedustPositionRequest,
   IApiDedustPositionResponse,
   IApiDepositHistoryRequest,
@@ -87,6 +94,13 @@ import { API_CREATE_BULK_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema
 import { API_CREATE_BULK_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_create_bulk_orders_response'
 import { API_CREATE_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_create_order_request'
 import { API_CREATE_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_create_order_response'
+import { API_CROSS_EXCH_VAULT_ATTEST_EQUITY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_attest_equity_request'
+import { API_CROSS_EXCH_VAULT_INVEST_CANCEL_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_invest_cancel_request'
+import { API_CROSS_EXCH_VAULT_TRIGGER_REDEMPTION_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_trigger_redemption_request'
+import { API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_investment_queue_request'
+import { API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_investment_queue_response'
+import { API_CROSS_EXCH_VAULT_VIEW_PENDING_INVESTMENT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_pending_investment_request'
+import { API_CROSS_EXCH_VAULT_VIEW_PENDING_INVESTMENT_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_pending_investment_response'
 import { API_DEDUST_POSITION_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_dedust_position_request'
 import { API_DEDUST_POSITION_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_dedust_position_response'
 import { API_DEPOSIT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_deposit_history_request'
@@ -657,5 +671,73 @@ export class TDG {
 
   /**
    * END: Vault
+   */
+
+  /**
+   * START: Cross-Exchange Vault
+   */
+
+  cevAttestEquity (payload: IApiCrossExchVaultAttestEquityRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_attest_equity',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_ATTEST_EQUITY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevTriggerRedemption (payload: IApiCrossExchVaultTriggerRedemptionRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_trigger_redemption',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_TRIGGER_REDEMPTION_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevViewInvestmentQueue (payload: IApiCrossExchVaultViewInvestmentQueueRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_view_investment_queue',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_RESPONSE_MAP.LITE_TO_FULL) as IApiCrossExchVaultViewInvestmentQueueResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevInvest (payload: IApiVaultInvestRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_invest',
+      Utils.schemaMap(payload, API_VAULT_INVEST_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevInvestCancel (payload: IApiCrossExchVaultInvestCancelRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_invest_cancel',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_INVEST_CANCEL_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevViewPendingInvestment (payload: IApiCrossExchVaultViewPendingInvestmentRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_view_pending_investment',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_VIEW_PENDING_INVESTMENT_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_CROSS_EXCH_VAULT_VIEW_PENDING_INVESTMENT_RESPONSE_MAP.LITE_TO_FULL) as IApiCrossExchVaultViewPendingInvestmentResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Cross-Exchange Vault
    */
 }

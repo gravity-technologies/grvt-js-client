@@ -10,7 +10,9 @@ export const WITHDRAWAL_HISTORY_MAP: SchemaPairMap = Object.freeze({
     currency: 'c',
     num_tokens: 'nt',
     signature: ['s', SIGNATURE_MAP.FULL_TO_LITE],
-    event_time: 'et'
+    event_time: 'et',
+    l_1_hash: 'l1',
+    l_2_hash: 'l2'
   },
   LITE_TO_FULL: {
     ti: 'tx_id',
@@ -19,6 +21,8 @@ export const WITHDRAWAL_HISTORY_MAP: SchemaPairMap = Object.freeze({
     c: 'currency',
     nt: 'num_tokens',
     s: ['signature', SIGNATURE_MAP.LITE_TO_FULL],
-    et: 'event_time'
+    et: 'event_time',
+    l1: 'l_1_hash',
+    l2: 'l_2_hash'
   }
 })
