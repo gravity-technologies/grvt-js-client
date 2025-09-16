@@ -5,11 +5,13 @@ export const EPOCH_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     epoch: 'e',
     start_time: 'st',
-    end_time: 'et'
+    end_time: 'et',
+    session: 's'
   },
   LITE_TO_FULL: {
     e: 'epoch',
     st: 'start_time',
-    et: 'end_time'
+    et: 'end_time',
+    s: 'session'
   }
 })

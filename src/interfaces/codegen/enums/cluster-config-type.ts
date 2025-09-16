@@ -61,6 +61,20 @@ export enum EClusterConfigType {
   FLAG_REJECT_AHEAD_OF_SEQUENCE_ECN_FROM_BROKER = 'FLAG_REJECT_AHEAD_OF_SEQUENCE_ECN_FROM_BROKER',
   // Flag to allow total equity after trade loss to be below IM
   FLAG_ALLOW_TOTAL_EQUITY_AFTER_TRADE_LOSS_BELOW_IM = 'FLAG_ALLOW_TOTAL_EQUITY_AFTER_TRADE_LOSS_BELOW_IM',
+  // Flag to enable position cumulative data
+  FLAG_ENABLE_POSITION_CUMULATIVE_DATA = 'FLAG_ENABLE_POSITION_CUMULATIVE_DATA',
+  // Flag to disable vault creation
+  FLAG_DISABLE_VAULT_CREATE = 'FLAG_DISABLE_VAULT_CREATE',
+  // Flag to enable investment queue
+  FLAG_ENABLE_INVESTMENT_QUEUE = 'FLAG_ENABLE_INVESTMENT_QUEUE',
+  // Flag to enable calculating taker trade level realized PnL
+  FLAG_CALCULATE_TAKER_TRADE_LEVEL_REALIZED_PNL = 'FLAG_CALCULATE_TAKER_TRADE_LEVEL_REALIZED_PNL',
+  // Payload to configure cross-exchange vault access tiers by lifetime trading volume.
+  CONFIGURE_CEV_ACCESS_TIERS = 'CONFIGURE_CEV_ACCESS_TIERS',
+  // Flag to enable vault lock
+  FLAG_ENABLE_VAULT_LOCK = 'FLAG_ENABLE_VAULT_LOCK',
+  // Flag to enable MsgTimer in all services
+  FLAG_ENABLE_MSG_TIMER = 'FLAG_ENABLE_MSG_TIMER',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -94,5 +108,12 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_BULK_ORDER]: 28,
   [EClusterConfigType.FLAG_ALLOW_DECREASE_FEE_IMMEDIATELY]: 29,
   [EClusterConfigType.FLAG_REJECT_AHEAD_OF_SEQUENCE_ECN_FROM_BROKER]: 30,
-  [EClusterConfigType.FLAG_ALLOW_TOTAL_EQUITY_AFTER_TRADE_LOSS_BELOW_IM]: 31
+  [EClusterConfigType.FLAG_ALLOW_TOTAL_EQUITY_AFTER_TRADE_LOSS_BELOW_IM]: 31,
+  [EClusterConfigType.FLAG_ENABLE_POSITION_CUMULATIVE_DATA]: 32,
+  [EClusterConfigType.FLAG_DISABLE_VAULT_CREATE]: 33,
+  [EClusterConfigType.FLAG_ENABLE_INVESTMENT_QUEUE]: 34,
+  [EClusterConfigType.FLAG_CALCULATE_TAKER_TRADE_LEVEL_REALIZED_PNL]: 35,
+  [EClusterConfigType.CONFIGURE_CEV_ACCESS_TIERS]: 36,
+  [EClusterConfigType.FLAG_ENABLE_VAULT_LOCK]: 37,
+  [EClusterConfigType.FLAG_ENABLE_MSG_TIMER]: 38
 })

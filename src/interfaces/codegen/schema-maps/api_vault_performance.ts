@@ -7,13 +7,15 @@ export const API_VAULT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     trading_volume: 'tv',
     apr: 'a',
     realized_pnl: 'rp',
-    pnl: 'p'
+    pnl: 'p',
+    cumulative_pnl: 'cp'
   },
   LITE_TO_FULL: {
     vi: 'vault_id',
     tv: 'trading_volume',
     a: 'apr',
     rp: 'realized_pnl',
-    p: 'pnl'
+    p: 'pnl',
+    cp: 'cumulative_pnl'
   }
 })

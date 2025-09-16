@@ -47,6 +47,7 @@ export enum ETransactionType {
   VAULT_MANAGEMENT_FEE_TICK = 'VAULT_MANAGEMENT_FEE_TICK',
   ADD_CURRENCY = 'ADD_CURRENCY',
   SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO = 'SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO',
+  VAULT_CROSS_EXCHANGE_UPDATE = 'VAULT_CROSS_EXCHANGE_UPDATE',
 }
 
 export const ETransactionTypeInt: Record<ETransactionType, number> = Object.freeze({
@@ -97,5 +98,6 @@ export const ETransactionTypeInt: Record<ETransactionType, number> = Object.free
   [ETransactionType.VAULT_REDEEM]: 45,
   [ETransactionType.VAULT_MANAGEMENT_FEE_TICK]: 46,
   [ETransactionType.ADD_CURRENCY]: 47,
-  [ETransactionType.SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO]: 48
+  [ETransactionType.SET_DERISK_TO_MAINTENANCE_MARGIN_RATIO]: 48,
+  [ETransactionType.VAULT_CROSS_EXCHANGE_UPDATE]: 49
 })

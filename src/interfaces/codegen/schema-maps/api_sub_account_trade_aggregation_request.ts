@@ -13,7 +13,8 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     is_taker: 'it',
     cursor: 'c',
     group_by_signer: 'gb',
-    sources: 's'
+    sources: 's',
+    is_liquidation: 'il'
   },
   LITE_TO_FULL: {
     l: 'limit',
@@ -26,6 +27,7 @@ export const API_SUB_ACCOUNT_TRADE_AGGREGATION_REQUEST_MAP: SchemaPairMap = Obje
     it: 'is_taker',
     c: 'cursor',
     gb: 'group_by_signer',
-    s: 'sources'
+    s: 'sources',
+    il: 'is_liquidation'
   }
 })

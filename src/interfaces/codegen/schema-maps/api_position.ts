@@ -17,7 +17,9 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     roi: 'r',
     quote_index_price: 'qi',
     est_liquidation_price: 'el',
-    leverage: 'l'
+    leverage: 'l',
+    cumulative_fee: 'cf',
+    cumulative_realized_funding_payment: 'cr'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -34,6 +36,8 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     r: 'roi',
     qi: 'quote_index_price',
     el: 'est_liquidation_price',
-    l: 'leverage'
+    l: 'leverage',
+    cf: 'cumulative_fee',
+    cr: 'cumulative_realized_funding_payment'
   }
 })
