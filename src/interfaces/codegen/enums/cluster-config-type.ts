@@ -75,6 +75,12 @@ export enum EClusterConfigType {
   FLAG_ENABLE_VAULT_LOCK = 'FLAG_ENABLE_VAULT_LOCK',
   // Flag to enable MsgTimer in all services
   FLAG_ENABLE_MSG_TIMER = 'FLAG_ENABLE_MSG_TIMER',
+  // Flag to enable position transfer
+  FLAG_ENABLE_POSITION_TRANSFER = 'FLAG_ENABLE_POSITION_TRANSFER',
+  // Flag to enable total equity with unrealized funding payment on snap sub account
+  FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT = 'FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT',
+  // Flag to let scribe write to local file storage
+  FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE = 'FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -115,5 +121,8 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_CALCULATE_TAKER_TRADE_LEVEL_REALIZED_PNL]: 35,
   [EClusterConfigType.CONFIGURE_CEV_ACCESS_TIERS]: 36,
   [EClusterConfigType.FLAG_ENABLE_VAULT_LOCK]: 37,
-  [EClusterConfigType.FLAG_ENABLE_MSG_TIMER]: 38
+  [EClusterConfigType.FLAG_ENABLE_MSG_TIMER]: 38,
+  [EClusterConfigType.FLAG_ENABLE_POSITION_TRANSFER]: 39,
+  [EClusterConfigType.FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT]: 40,
+  [EClusterConfigType.FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE]: 41
 })

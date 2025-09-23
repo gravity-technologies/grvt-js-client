@@ -274,6 +274,31 @@ export interface IApiClusterConfig {
   config_json_value?: string
 }
 
+export interface IApiConflictEpochBandParameterResponse {
+  // The list of epoch band parameters
+  result?: IRewardEpochBandParameter[]
+}
+
+export interface IApiCreateAccountMultiplierRequest {
+  // The metric name. Can be empty if the multiplier is apply for all metrics
+  metric?: EMetricType
+  // The account ID. Can be empty if the multiplier apply for all accounts
+  off_chain_account_id?: string
+  // The account type. can be empty if offChainAccountID is specific or want to apply for all account type
+  account_type?: EAccountType
+  // The multiplier value
+  multiplier?: number
+  // The start epoch when multiplier takes effect
+  effective_epoch_start?: number
+  // The end epoch when multiplier stops taking effect
+  effective_epoch_end?: number
+}
+
+export interface IApiCreateAccountMultiplierResponse {
+  // The created account multiplier ID
+  id?: string
+}
+
 // Create multiple orders simultaneously for this trading account.
 //
 // This endpoint supports the following order scenarios:
@@ -291,6 +316,26 @@ export interface IApiCreateBulkOrdersRequest {
 export interface IApiCreateBulkOrdersResponse {
   // The created orders in same order as requested
   result?: IOrder[]
+}
+
+export interface IApiCreateEpochBandParameterRequest {
+  // The start epoch when parameter takes effect
+  effective_epoch_start?: number
+  // The end epoch when parameter stops taking effect
+  effective_epoch_end?: number
+  // The metric name
+  metric?: EMetricType
+  // The band range list
+  band_range?: string[]
+  // The band steepness list.
+  band_steepness?: number[]
+  // Whether to set the created parameter to highest priority
+  is_highest_priority?: boolean
+}
+
+export interface IApiCreateEpochBandParameterResponse {
+  // The created epoch band parameter ID
+  id?: string
 }
 
 // Create an order on the orderbook for this trading account.
@@ -359,6 +404,46 @@ export interface IApiCrossExchVaultInvestCancelRequest {
 export interface IApiCrossExchVaultLockRequest {
   // The unique identifier of the cross-exchange vault to lock.
   cross_exch_vault_id?: string
+}
+
+// Request payload for a cross-exchange vault (CEV) investor to check their internal transfer allowance for some currency, factoring in all pending CEV investment requests in that currency.
+//
+//
+export interface IApiCrossExchVaultPreInternalTransferCheckRequest {
+  // The address of the vault investor.
+  main_account_id?: string
+  // The currency that the vault investor is looking to withdraw.
+  currency?: string
+}
+
+// Request payload for a cross-exchange vault (CEV) investor to check their internal transfer allowance for some currency, factoring in all pending CEV investment requests in that currency.
+//
+//
+export interface IApiCrossExchVaultPreInternalTransferCheckResponse {
+  // Represented in terms of the requested token currency. This is the total spot balance the investor is allowed to withdraw.
+  internal_transfer_allowance_num_tokens?: string
+  // The currency that the vault investor is looking to withdraw.
+  currency?: string
+}
+
+// Request payload for a cross-exchange vault (CEV) investor to check their withdraw allowance for some currency, subject to their spot balance for that currency and their current CEV tier requirements.
+//
+//
+export interface IApiCrossExchVaultPreWithdrawCheckRequest {
+  // The address of the vault investor.
+  main_account_id?: string
+  // The currency that the vault investor is looking to withdraw.
+  currency?: string
+}
+
+// Response payload for a cross-exchange vault (CEV) investor to check their withdraw allowance for some currency, subject to their spot balance for that currency and their current CEV tier requirements.
+//
+//
+export interface IApiCrossExchVaultPreWithdrawCheckResponse {
+  // Represented in terms of the requested token currency. This is the total spot balance the investor is allowed to withdraw.
+  withdrawal_allowance_num_tokens?: string
+  // The currency that the vault investor is looking to withdraw.
+  currency?: string
 }
 
 // Request payload for a cross-exchange vault manager to trigger execution of the redemption request at the head of their cross-exchange vault's redemption queue.
@@ -562,6 +647,11 @@ export interface IApiFindAccountMultiplierRequest {
 }
 
 export interface IApiFindAccountMultiplierResponse {
+  // The list of account multipliers
+  result?: IRewardAccountMultiplier[]
+}
+
+export interface IApiFindConflictAccountMultiplerResponse {
   // The list of account multipliers
   result?: IRewardAccountMultiplier[]
 }
@@ -1049,6 +1139,22 @@ export interface IApiInactiveEpochBandParameterResponse {
   ids?: string[]
 }
 
+export interface IApiInternalBatchCreateAccountMultiplierRequest {
+  // The metric name. Can be empty if the multiplers is applied for all metrics
+  metric?: EMetricType
+  // The list of account multiplier elements to create
+  multiplers?: IBatchCreateAccountMultiplierElement[]
+  // The start epoch when multiplier takes effect
+  effective_epoch_start?: number
+  // The end epoch when multiplier stops taking effect
+  effective_epoch_end?: number
+}
+
+export interface IApiInternalBatchCreateAccountMultiplierResponse {
+  // The list of created account multiplier IDs
+  ids?: string[]
+}
+
 // The request to get the latest snapshot of list sub account
 //
 export interface IApiLatestSnapSubAccountsRequest {
@@ -1159,6 +1265,21 @@ export interface IApiOrderbookLevelsRequest {
 export interface IApiOrderbookLevelsResponse {
   // The orderbook levels objects matching the request asset
   result?: IOrderbookLevels
+}
+
+// Transfer position from one subaccount to another
+export interface IApiPositionTransferRequest {
+  // The maker order to transfer the position
+  maker_order?: IOrder
+  // The taker order to transfer the position
+  taker_order?: IOrder
+}
+
+export interface IApiPositionTransferResponse {
+  // The maker order created
+  maker_order?: IOrder
+  // The taker order created
+  taker_order?: IOrder
 }
 
 // Query the positions of a sub account
@@ -2166,29 +2287,44 @@ export interface IAssetSpecificPriceProtectionBand {
   band?: IPriceProtectionBand
 }
 
+export interface IBatchCreateAccountMultiplierElement {
+  // The account ID. Can be empty if the multiplier apply for all accounts
+  off_chain_account_id?: string
+  // The account type. can be empty if offChainAccountID is specific or want to apply for all account type
+  account_type?: EAccountType
+  // The multiplier value
+  multiplier?: number
+}
+
 // For some CEV investor mainAccID, provides a readout of that mainAccID's overall CEV allocation state on GRVT.
 export interface ICEVAllocStatsAccOverview {
-  // Represented in USDT. CEV allocation accrued to this mainAccID based on LTV (subject to max cap for tier).
+  // Represented in USD. CEV allocation accrued to this mainAccID based on LTV (subject to max cap for tier).
   total_allocation?: string
-  // Represented in USDT. Total invested by this mainAccID across all CEVs. Includes enqueued investments.
+  // Represented in USD. Total invested by this mainAccID across all CEVs.
   total_invested?: string
-  // Total Allocation - Total Invested
+  // Represented in USD. Total value of enqueued investments for this mainAccID across all CEVs.
+  total_pending_invest?: string
+  // Total Allocation - Total Invested - Total Pending Invest
   allowance?: string
-  // Represented in USDT. Sourced from history DB (where it is stored in USDT -- hence the USDT representation throughout).
+  // Represented in USD. Sourced from history DB (where it is stored in USDT).
   lifetime_trading_volume?: string
-  // Maximum percentage of a user's total equity allowed to be in a cross exchange vault, for this tier. 100% is represented as 1000000
-  allocation_percent_centi_beeps?: string
-  // Represented in USDT. Maximum allowed to be in a cross exchange vault, for this tier
+  // Maximum percentage of a user's total equity allowed to be in a cross exchange vault, for this tier.
+  allocation_percent?: string
+  // Represented in USD. Maximum allowed to be in a cross exchange vault, for this tier
   allocation_max_cap?: string
+  // Represented in USD. Total amount redemption for investment across all cross exchange vaults.
+  total_pending_redeem?: string
 }
 
 // For some CEV investor mainAccID, provides a readout of that mainAccID's investment state with this CEV.
 export interface ICEVAllocStatsVaultLevel {
   vault_id?: string
-  // Represented in USDT. Size confirmed invested for the investor-CEV pair.
+  // Represented in USD. Size confirmed invested for the investor-CEV pair.
   invested_size?: string
-  // Represented in USDT. Size in the CEV's investment queue for this investor
+  // Represented in USD. Size in the CEV's investment queue for this investor
   pending_invest_size?: string
+  // Represented in USD. Size pending redemption from the CEV for this investor.
+  pending_redeem_size?: string
 }
 
 export interface ICancelStatusFeed {
@@ -2984,6 +3120,8 @@ export interface IOrderMetadata {
   source?: ESource
   // Specifies if the order is an ECN order
   is_ecn?: boolean
+  // Specifies if the order is a position transfer order
+  is_position_transfer?: boolean
 }
 
 export interface IOrderState {
@@ -3944,6 +4082,8 @@ export interface IVaultInvestorSummary {
   pending_redemption?: IVaultRedemption
   // True if the requesting account is authorized to burn tokens on this vault, omitted otherwise.
   can_burn?: boolean
+  // Internal flag for controlling whether to hide CEV-only fields
+  is_vault_cross_exchange?: boolean
 }
 
 export interface IVaultLpInfo {
@@ -4016,6 +4156,8 @@ export interface IVaultRedemption {
   request_time?: string
   // [Filled by GRVT Backend] Time in unix nanoseconds, beyond which the request will be force-redeemed.
   max_redemption_period_timestamp?: string
+  // Omitted for redemption requests to non-cross exchange vaults. True if cancellation is blocked within the CEV allocation allowance for the user's current tier (e.g. because the user has already transferred out the spot balance underlying the redemption request).
+  cancel_blocked?: boolean
 }
 
 // Representation of a pending redemption request for a given vault.

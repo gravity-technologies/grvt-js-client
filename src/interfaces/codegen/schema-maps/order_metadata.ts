@@ -9,7 +9,8 @@ export const ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
     trigger: ['t', TRIGGER_ORDER_METADATA_MAP.FULL_TO_LITE],
     broker: 'b',
     source: 's',
-    is_ecn: 'ie'
+    is_ecn: 'ie',
+    is_position_transfer: 'ip'
   },
   LITE_TO_FULL: {
     co: 'client_order_id',
@@ -17,6 +18,7 @@ export const ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
     t: ['trigger', TRIGGER_ORDER_METADATA_MAP.LITE_TO_FULL],
     b: 'broker',
     s: 'source',
-    ie: 'is_ecn'
+    ie: 'is_ecn',
+    ip: 'is_position_transfer'
   }
 })

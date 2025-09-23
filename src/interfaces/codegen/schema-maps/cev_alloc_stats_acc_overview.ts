@@ -5,17 +5,21 @@ export const CEV_ALLOC_STATS_ACC_OVERVIEW_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     total_allocation: 'ta',
     total_invested: 'ti',
+    total_pending_invest: 'tp',
     allowance: 'a',
     lifetime_trading_volume: 'lt',
-    allocation_percent_centi_beeps: 'ap',
-    allocation_max_cap: 'am'
+    allocation_percent: 'ap',
+    allocation_max_cap: 'am',
+    total_pending_redeem: 'tp1'
   },
   LITE_TO_FULL: {
     ta: 'total_allocation',
     ti: 'total_invested',
+    tp: 'total_pending_invest',
     a: 'allowance',
     lt: 'lifetime_trading_volume',
-    ap: 'allocation_percent_centi_beeps',
-    am: 'allocation_max_cap'
+    ap: 'allocation_percent',
+    am: 'allocation_max_cap',
+    tp1: 'total_pending_redeem'
   }
 })
