@@ -13,11 +13,13 @@ import type {
   IApiCrossExchVaultAttestEquityRequest,
   IApiCrossExchVaultGetInvestorAllocationStatsResponse,
   IApiCrossExchVaultInvestCancelRequest,
+  IApiCrossExchVaultLockRequest,
   IApiCrossExchVaultPreInternalTransferCheckRequest,
   IApiCrossExchVaultPreInternalTransferCheckResponse,
   IApiCrossExchVaultPreWithdrawCheckRequest,
   IApiCrossExchVaultPreWithdrawCheckResponse,
   IApiCrossExchVaultTriggerRedemptionRequest,
+  IApiCrossExchVaultUnlockRequest,
   IApiCrossExchVaultViewInvestmentQueueRequest,
   IApiCrossExchVaultViewInvestmentQueueResponse,
   IApiCrossExchVaultViewPendingInvestmentRequest,
@@ -102,11 +104,13 @@ import { API_CREATE_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps
 import { API_CROSS_EXCH_VAULT_ATTEST_EQUITY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_attest_equity_request'
 import { API_CROSS_EXCH_VAULT_GET_INVESTOR_ALLOCATION_STATS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_get_investor_allocation_stats_response'
 import { API_CROSS_EXCH_VAULT_INVEST_CANCEL_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_invest_cancel_request'
+import { API_CROSS_EXCH_VAULT_LOCK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_lock_request'
 import { API_CROSS_EXCH_VAULT_PRE_INTERNAL_TRANSFER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_pre_internal_transfer_check_request'
 import { API_CROSS_EXCH_VAULT_PRE_INTERNAL_TRANSFER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_pre_internal_transfer_check_response'
 import { API_CROSS_EXCH_VAULT_PRE_WITHDRAW_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_pre_withdraw_check_request'
 import { API_CROSS_EXCH_VAULT_PRE_WITHDRAW_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_pre_withdraw_check_response'
 import { API_CROSS_EXCH_VAULT_TRIGGER_REDEMPTION_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_trigger_redemption_request'
+import { API_CROSS_EXCH_VAULT_UNLOCK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_unlock_request'
 import { API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_investment_queue_request'
 import { API_CROSS_EXCH_VAULT_VIEW_INVESTMENT_QUEUE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_investment_queue_response'
 import { API_CROSS_EXCH_VAULT_VIEW_PENDING_INVESTMENT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cross_exch_vault_view_pending_investment_request'
@@ -774,6 +778,26 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CROSS_EXCH_VAULT_PRE_WITHDRAW_CHECK_RESPONSE_MAP.LITE_TO_FULL) as IApiCrossExchVaultPreWithdrawCheckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevLock (payload: IApiCrossExchVaultLockRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_lock',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_LOCK_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  cevUnlock (payload: IApiCrossExchVaultUnlockRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/cev_unlock',
+      Utils.schemaMap(payload, API_CROSS_EXCH_VAULT_UNLOCK_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
     }).catch(Utils.coverApiError)
   }
 
