@@ -1,0 +1,12 @@
+import { REWARD_ACCOUNT_MULTIPLIER_MAP } from './reward_account_multiplier'
+import { type SchemaPairMap } from './types'
+
+// Schema map for the 'API_FIND_CONFLICT_ACCOUNT_MULTIPLER_RESPONSE' struct.
+export const API_FIND_CONFLICT_ACCOUNT_MULTIPLER_RESPONSE_MAP: SchemaPairMap = Object.freeze({
+  FULL_TO_LITE: {
+    result: ['r', [REWARD_ACCOUNT_MULTIPLIER_MAP.FULL_TO_LITE]]
+  },
+  LITE_TO_FULL: {
+    r: ['result', [REWARD_ACCOUNT_MULTIPLIER_MAP.LITE_TO_FULL]]
+  }
+})
