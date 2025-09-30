@@ -12,7 +12,8 @@ export const TRADING_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     unrealized_pnl: 'up',
     is_unrealized_pnl_snapshotted: 'iu',
     last_start_interval: 'ls',
-    funding_payment_amount: 'fp'
+    funding_payment_amount: 'fp',
+    filled_order_count: 'fo'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
@@ -24,6 +25,7 @@ export const TRADING_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     up: 'unrealized_pnl',
     iu: 'is_unrealized_pnl_snapshotted',
     ls: 'last_start_interval',
-    fp: 'funding_payment_amount'
+    fp: 'funding_payment_amount',
+    fo: 'filled_order_count'
   }
 })

@@ -61,6 +61,8 @@ export interface IAggregatedAccountSummary {
   spot_balances?: ISpotBalance[]
   // The list of vault investments held by this main account
   vault_investments?: IVaultInvestment[]
+  // Total balance of the sub accounts, denominated in USD
+  total_sub_account_balance?: string
 }
 
 // The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
@@ -837,6 +839,14 @@ export interface IApiGetAllInstrumentsResponse {
   result?: IInstrument[]
 }
 
+// The response to get all CEV access tiers
+export interface IApiGetCEVAccessTiersResponse {
+  // Will be returned false with empty list when the feature is disabled
+  enabled?: boolean
+  // Validated to start from tier 1 and be ordered in ascending tier without gaps, e.g. Tiers 1-6.
+  tiers?: ICEVAccessTier[]
+}
+
 // The response to get all client tiers
 export interface IApiGetClientTiersResponse {
   tiers?: IClientTier[]
@@ -1586,6 +1596,13 @@ export interface IApiRewardLeaderboardItem {
   point?: string
 }
 
+// The request to set CEV access tiers
+export interface IApiSetCEVAccessTiersRequest {
+  enabled?: boolean
+  // List must start from tier 1 and be ordered in ascending tier without gaps, e.g. Tiers 1-6. Empty if `enabled` field set to `false`.
+  tiers?: ICEVAccessTier[]
+}
+
 // The request to set client tiers
 export interface IApiSetClientTiersRequest {
   tiers?: IClientTier[]
@@ -1859,6 +1876,8 @@ export interface IApiTransferHistoryRequest {
   tx_id?: string
   // Main account ID being queried. By default, applies the requestor's main account ID.
   main_account_id?: string
+  // The transfer type to filters for. If the list is empty, return all transfer types.
+  transfer_types?: ETransferType[]
 }
 
 export interface IApiTransferHistoryResponse {
@@ -2296,6 +2315,19 @@ export interface IBatchCreateAccountMultiplierElement {
   multiplier?: number
 }
 
+export interface ICEVAccessTier {
+  // Explicit printout of the access tier number implied by the list-element position. Starts from Tier 1, counts upward.
+  idx?: number
+  // Represented in USD millions, 6 decimals. USD10,000 is USDT0.01mn, so represented as 10000. For Tier 1, has to be 0. For all subsequent tiers, has to be equal to the range-end of previous tier. Comparison INCLUDES start.
+  lifetime_trading_volume_range_start?: string
+  // Represented in USD millions, 6 decimals. USD10,000 is USDT0.01mn, so represented as 10000. For the final catch-all tier, this value is ignored. Comparison EXCLUDES end.
+  lifetime_trading_volume_range_end?: string
+  // Maximum percentage of a user's total equity allowed to be in a cross exchange vault, for this tier. 100% is represented as 1000000
+  allocation_total_equity_percentage_centi_beeps?: number
+  // Represented in USD, 6 decimals. Maximum USD allowed to be in a cross exchange vault, for this tier
+  allocation_max_cap?: string
+}
+
 // For some CEV investor mainAccID, provides a readout of that mainAccID's overall CEV allocation state on GRVT.
 export interface ICEVAllocStatsAccOverview {
   // Represented in USD. CEV allocation accrued to this mainAccID based on LTV (subject to max cap for tier).
@@ -2631,9 +2663,9 @@ export interface IEpochMetricPoint {
   raw_point?: string
   // The adjusted point, with multiplier 1e9
   adjusted_point?: string
-  // The allocated point for this metric
+  // The allocated point for this metric, with multiplier 1e9
   point?: string
-  // The metadata
+  // The metadata, contain the band index and account multiplier
   metadata?: IRewardMetricPointMetadata
 }
 
@@ -2642,9 +2674,9 @@ export interface IEpochMetricPointCalculatorMetadata {
   metric?: EMetricType
   // The epoch number
   epoch?: number
-  // The allocated point for this metric
+  // The allocated point for this metric, with multiplier 1e9
   allocated_point?: string
-  // The total adjusted point for this metric
+  // The total adjusted point for this metric, with multiplier 1e9
   total_adjusted_point?: string
   // The band range list
   band_range?: string[]
@@ -2661,6 +2693,8 @@ export interface IEpochPoint {
   off_chain_account_id?: string
   // The raw point, with multiplier 1e9
   point?: string
+  // The reserve point, with multiplier 1e9
+  reserve_point?: string
 }
 
 export interface IEpochPointStats {
@@ -3734,6 +3768,8 @@ export interface ISubAccountTradingPerformance {
   is_unrealized_pnl_snapshotted?: boolean
   // Funding payment amount, in USD
   funding_payment_amount?: string
+  // Number of filled orders, including partially matched orders. Only first matched order is counted
+  filled_order_count?: string
 }
 
 // Contains metadata for Take Profit (TP) and Stop Loss (SL) trigger orders.
@@ -3897,6 +3933,8 @@ export interface ITradingPerformance {
   last_start_interval?: string
   // Funding payment amount, in USD
   funding_payment_amount?: string
+  // Number of filled orders, including partially matched orders. Only first matched order is counted
+  filled_order_count?: string
 }
 
 // Trading performance trend returned by clickhouse
@@ -3919,6 +3957,8 @@ export interface ITradingPerformanceTrendPoint {
   is_unrealized_pnl_snapshotted?: boolean
   // Funding payment amount, in USD
   funding_payment_amount?: string
+  // Number of filled orders, including partially matched orders. Only first matched order is counted
+  filled_order_count?: string
 }
 
 export interface ITransferHistory {

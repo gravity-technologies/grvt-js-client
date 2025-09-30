@@ -81,6 +81,8 @@ export enum EClusterConfigType {
   FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT = 'FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT',
   // Flag to let scribe write to local file storage
   FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE = 'FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE',
+  // Flag to exclude liquidation from public trades
+  FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES = 'FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -124,5 +126,6 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_MSG_TIMER]: 38,
   [EClusterConfigType.FLAG_ENABLE_POSITION_TRANSFER]: 39,
   [EClusterConfigType.FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT]: 40,
-  [EClusterConfigType.FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE]: 41
+  [EClusterConfigType.FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE]: 41,
+  [EClusterConfigType.FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES]: 42
 })

@@ -1,5 +1,5 @@
-import { REWARD_ACCOUNT_MULTIPLIER_MAP } from './reward_account_multiplier'
 import { type SchemaPairMap } from './types'
+import { REWARD_ACCOUNT_MULTIPLIER_MAP } from './reward_account_multiplier'
 
 // Schema map for the 'API_FIND_CONFLICT_ACCOUNT_MULTIPLER_RESPONSE' struct.
 export const API_FIND_CONFLICT_ACCOUNT_MULTIPLER_RESPONSE_MAP: SchemaPairMap = Object.freeze({

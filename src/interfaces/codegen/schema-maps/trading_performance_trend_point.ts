@@ -11,7 +11,8 @@ export const TRADING_PERFORMANCE_TREND_POINT_MAP: SchemaPairMap = Object.freeze(
     realized_pnl: 'rp',
     unrealized_pnl: 'up',
     is_unrealized_pnl_snapshotted: 'iu',
-    funding_payment_amount: 'fp'
+    funding_payment_amount: 'fp',
+    filled_order_count: 'fo'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
@@ -22,6 +23,7 @@ export const TRADING_PERFORMANCE_TREND_POINT_MAP: SchemaPairMap = Object.freeze(
     rp: 'realized_pnl',
     up: 'unrealized_pnl',
     iu: 'is_unrealized_pnl_snapshotted',
-    fp: 'funding_payment_amount'
+    fp: 'funding_payment_amount',
+    fo: 'filled_order_count'
   }
 })
