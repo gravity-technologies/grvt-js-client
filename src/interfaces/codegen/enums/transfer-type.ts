@@ -11,6 +11,12 @@ export enum ETransferType {
   NON_NATIVE_BRIDGE_DEPOSIT = 'NON_NATIVE_BRIDGE_DEPOSIT',
   // Transfer type for non native bridging withdrawal
   NON_NATIVE_BRIDGE_WITHDRAWAL = 'NON_NATIVE_BRIDGE_WITHDRAWAL',
+  // Transfer type for adhoc incentive
+  ADHOC_INCENTIVE = 'ADHOC_INCENTIVE',
+  // Transfer type for referral incentive
+  REFERRAL_INCENTIVE = 'REFERRAL_INCENTIVE',
+  // Transfer type for trading deposit yield incentive
+  TRADING_DEPOSIT_YIELD_INCENTIVE = 'TRADING_DEPOSIT_YIELD_INCENTIVE',
 }
 
 export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
@@ -19,5 +25,8 @@ export const ETransferTypeInt: Record<ETransferType, number> = Object.freeze({
   [ETransferType.FAST_ARB_DEPOSIT]: 2,
   [ETransferType.FAST_ARB_WITHDRAWAL]: 3,
   [ETransferType.NON_NATIVE_BRIDGE_DEPOSIT]: 4,
-  [ETransferType.NON_NATIVE_BRIDGE_WITHDRAWAL]: 5
+  [ETransferType.NON_NATIVE_BRIDGE_WITHDRAWAL]: 5,
+  [ETransferType.ADHOC_INCENTIVE]: 6,
+  [ETransferType.REFERRAL_INCENTIVE]: 7,
+  [ETransferType.TRADING_DEPOSIT_YIELD_INCENTIVE]: 8
 })

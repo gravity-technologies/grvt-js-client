@@ -1,5 +1,5 @@
-import { BATCH_CREATE_ACCOUNT_MULTIPLIER_ELEMENT_MAP } from './batch_create_account_multiplier_element'
 import { type SchemaPairMap } from './types'
+import { BATCH_CREATE_ACCOUNT_MULTIPLIER_ELEMENT_MAP } from './batch_create_account_multiplier_element'
 
 // Schema map for the 'API_INTERNAL_BATCH_CREATE_ACCOUNT_MULTIPLIER_REQUEST' struct.
 export const API_INTERNAL_BATCH_CREATE_ACCOUNT_MULTIPLIER_REQUEST_MAP: SchemaPairMap = Object.freeze({

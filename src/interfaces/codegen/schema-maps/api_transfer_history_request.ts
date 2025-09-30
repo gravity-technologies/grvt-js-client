@@ -9,7 +9,8 @@ export const API_TRANSFER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     limit: 'l',
     cursor: 'c1',
     tx_id: 'ti',
-    main_account_id: 'ma'
+    main_account_id: 'ma',
+    transfer_types: 'tt'
   },
   LITE_TO_FULL: {
     c: 'currency',
@@ -18,6 +19,7 @@ export const API_TRANSFER_HISTORY_REQUEST_MAP: SchemaPairMap = Object.freeze({
     l: 'limit',
     c1: 'cursor',
     ti: 'tx_id',
-    ma: 'main_account_id'
+    ma: 'main_account_id',
+    tt: 'transfer_types'
   }
 })
