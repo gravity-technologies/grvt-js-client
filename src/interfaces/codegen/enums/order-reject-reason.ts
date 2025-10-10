@@ -75,6 +75,8 @@ export enum EOrderRejectReason {
   INVALID_ORDER_TYPE = 'INVALID_ORDER_TYPE',
   // the currency is not defined
   CURRENCY_NOT_DEFINED = 'CURRENCY_NOT_DEFINED',
+  // the chain ID is invalid
+  INVALID_CHAIN_ID = 'INVALID_CHAIN_ID',
 }
 
 export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.freeze({
@@ -115,5 +117,6 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.DERISK_MUST_BE_REDUCE_ONLY]: 34,
   [EOrderRejectReason.DERISK_NOT_SUPPORTED]: 35,
   [EOrderRejectReason.INVALID_ORDER_TYPE]: 36,
-  [EOrderRejectReason.CURRENCY_NOT_DEFINED]: 37
+  [EOrderRejectReason.CURRENCY_NOT_DEFINED]: 37,
+  [EOrderRejectReason.INVALID_CHAIN_ID]: 38
 })

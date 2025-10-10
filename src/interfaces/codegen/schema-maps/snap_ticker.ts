@@ -26,7 +26,10 @@ export const TICKER_MAP: SchemaPairMap = Object.freeze({
     low_price: 'lp1',
     open_price: 'op',
     open_interest: 'oi',
-    long_short_ratio: 'ls1'
+    long_short_ratio: 'ls1',
+    funding_rate: 'fr2',
+    funding_interval_hours: 'fi',
+    next_funding_time: 'nf'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -52,6 +55,9 @@ export const TICKER_MAP: SchemaPairMap = Object.freeze({
     lp1: 'low_price',
     op: 'open_price',
     oi: 'open_interest',
-    ls1: 'long_short_ratio'
+    ls1: 'long_short_ratio',
+    fr2: 'funding_rate',
+    fi: 'funding_interval_hours',
+    nf: 'next_funding_time'
   }
 })

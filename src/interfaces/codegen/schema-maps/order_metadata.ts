@@ -10,7 +10,8 @@ export const ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
     broker: 'b',
     source: 's',
     is_ecn: 'ie',
-    is_position_transfer: 'ip'
+    is_position_transfer: 'ip',
+    allow_crossing: 'ac'
   },
   LITE_TO_FULL: {
     co: 'client_order_id',
@@ -19,6 +20,7 @@ export const ORDER_METADATA_MAP: SchemaPairMap = Object.freeze({
     b: 'broker',
     s: 'source',
     ie: 'is_ecn',
-    ip: 'is_position_transfer'
+    ip: 'is_position_transfer',
+    ac: 'allow_crossing'
   }
 })

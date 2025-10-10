@@ -83,6 +83,14 @@ export enum EClusterConfigType {
   FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE = 'FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE',
   // Flag to exclude liquidation from public trades
   FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES = 'FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES',
+  // Flag to enable session key permission extension for internal transfer, vault redeem and invest
+  FLAG_ENABLE_SESSION_KEY_PERMISSION_EXTENSION = 'FLAG_ENABLE_SESSION_KEY_PERMISSION_EXTENSION',
+  // Configs for migrating GRVT funding rate v2 methodology
+  FUNDING_V_2 = 'FUNDING_V_2',
+  // Flag to enable post-only to cross orderbook
+  FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK = 'FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK',
+  // Flag to enable update funding info fix
+  FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX = 'FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -127,5 +135,9 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_POSITION_TRANSFER]: 39,
   [EClusterConfigType.FLAG_ENABLE_TOTAL_EQUITY_WITH_UNREALIZED_FUNDING_PAYMENT_ON_SNAP_SUB_ACCOUNT]: 40,
   [EClusterConfigType.FLAG_ENABLE_SCRIBE_LOCAL_FILE_STORAGE]: 41,
-  [EClusterConfigType.FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES]: 42
+  [EClusterConfigType.FLAG_EXCLUDE_LIQUIDATION_FROM_PUBLIC_TRADES]: 42,
+  [EClusterConfigType.FLAG_ENABLE_SESSION_KEY_PERMISSION_EXTENSION]: 43,
+  [EClusterConfigType.FUNDING_V_2]: 44,
+  [EClusterConfigType.FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK]: 45,
+  [EClusterConfigType.FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX]: 46
 })
