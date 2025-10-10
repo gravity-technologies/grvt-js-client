@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'INSTRUMENT' struct.
-export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'INSTRUMENT_DISPLAY' struct.
+export const INSTRUMENT_DISPLAY_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     instrument: 'i',
     instrument_hash: 'ih',
@@ -18,7 +18,11 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     min_size: 'ms',
     min_block_trade_size: 'mb',
     create_time: 'ct',
-    max_position_size: 'mp'
+    max_position_size: 'mp',
+    funding_methodology_version: 'fm',
+    funding_interval_hours: 'fi',
+    adjusted_funding_rate_cap: 'af',
+    adjusted_funding_rate_floor: 'af1'
   },
   LITE_TO_FULL: {
     i: 'instrument',
@@ -36,6 +40,10 @@ export const INSTRUMENT_MAP: SchemaPairMap = Object.freeze({
     ms: 'min_size',
     mb: 'min_block_trade_size',
     ct: 'create_time',
-    mp: 'max_position_size'
+    mp: 'max_position_size',
+    fm: 'funding_methodology_version',
+    fi: 'funding_interval_hours',
+    af: 'adjusted_funding_rate_cap',
+    af1: 'adjusted_funding_rate_floor'
   }
 })

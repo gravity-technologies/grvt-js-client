@@ -836,7 +836,7 @@ export interface IApiGetAllInstrumentsRequest {
 
 export interface IApiGetAllInstrumentsResponse {
   // List of instruments
-  result?: IInstrument[]
+  result?: IInstrumentDisplay[]
 }
 
 // The response to get all CEV access tiers
@@ -916,7 +916,7 @@ export interface IApiGetFilteredInstrumentsRequest {
 
 export interface IApiGetFilteredInstrumentsResponse {
   // The instruments matching the request filter
-  result?: IInstrument[]
+  result?: IInstrumentDisplay[]
 }
 
 // Fetch a single instrument by supplying the asset or instrument name
@@ -927,7 +927,7 @@ export interface IApiGetInstrumentRequest {
 
 export interface IApiGetInstrumentResponse {
   // The instrument matching the request asset
-  result?: IInstrument
+  result?: IInstrumentDisplay
 }
 
 export interface IApiGetLPInfoRequest {
@@ -1601,6 +1601,8 @@ export interface IApiSetCEVAccessTiersRequest {
   enabled?: boolean
   // List must start from tier 1 and be ordered in ascending tier without gaps, e.g. Tiers 1-6. Empty if `enabled` field set to `false`.
   tiers?: ICEVAccessTier[]
+  // Access tier overwrites to be used ONLY BY THE TRADING ENGINEERING TEAM
+  overwrites?: ICEVAccessTierOverwrite[]
 }
 
 // The request to set client tiers
@@ -2328,6 +2330,14 @@ export interface ICEVAccessTier {
   allocation_max_cap?: string
 }
 
+export interface ICEVAccessTierOverwrite {
+  main_account_id?: string
+  // Tier index that the whitelisted user will belong to
+  access_tier_level?: number
+  // Overwrites the default max_cap to allow the user to invest more than the tier limit
+  allocation_max_cap?: string
+}
+
 // For some CEV investor mainAccID, provides a readout of that mainAccID's overall CEV allocation state on GRVT.
 export interface ICEVAllocStatsAccOverview {
   // Represented in USD. CEV allocation accrued to this mainAccID based on LTV (subject to max cap for tier).
@@ -2784,6 +2794,19 @@ export interface IFill {
   source?: ESource
 }
 
+export interface IFirstSessionAirdropInfo {
+  // The off chain account id
+  off_chain_account_id?: string
+  // The airdrop ratio, with multiplier 1e9
+  airdrop_ratio?: string
+  // The total ecosystem point, without multiplier
+  total_ecosystem_point?: string
+  // The total trader point, without multiplier
+  total_trader_point?: string
+  // The total LP point, without multiplier
+  total_lp_point?: string
+}
+
 export interface IFlatReferral {
   // The off chain account id
   account_id?: string
@@ -2819,6 +2842,17 @@ export interface IFundingAccountSummary {
   spot_balances?: ISpotBalance[]
   // The list of vault investments held by this main account
   vault_investments?: IVaultInvestment[]
+}
+
+export interface IFundingInfo {
+  // Defines the funding interval to be applied.
+  interval_hours?: number
+  // Funding rate cap over the defined `intervalHours`.
+  funding_rate_high_pct?: string
+  // Funding rate floor over the defined `intervalHours`.
+  funding_rate_low_pct?: string
+  // [Filled by GRVT Backend] The cluster timestamp from which this funding info became effective, in unix nanoseconds.
+  update_time?: string
 }
 
 export interface IFundingPayment {
@@ -2871,7 +2905,7 @@ export interface IInitialLeverageResult {
   max_leverage?: string
 }
 
-export interface IInstrument {
+export interface IInstrumentDisplay {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
   instrument?: string
   // The asset ID used for instrument signing.
@@ -2904,6 +2938,14 @@ export interface IInstrument {
   create_time?: string
   // The maximum position size, expressed in base asset decimal units
   max_position_size?: string
+  // Used as a tag for applying presentation logic, hidden from public API. Funding methodology version: 1 for legacy, 2 for Funding V2.
+  funding_methodology_version?: number
+  // Defines the funding interval to be applied.
+  funding_interval_hours?: number
+  // Funding rate cap over the defined `intervalHours`.
+  adjusted_funding_rate_cap?: string
+  // Funding rate floor over the defined `intervalHours`.
+  adjusted_funding_rate_floor?: string
 }
 
 // All Websocket JSON RPC Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
@@ -3156,6 +3198,8 @@ export interface IOrderMetadata {
   is_ecn?: boolean
   // Specifies if the order is a position transfer order
   is_position_transfer?: boolean
+  // Specifies if post only order is allowed to cross the orderbook
+  allow_crossing?: boolean
 }
 
 export interface IOrderState {
@@ -3368,6 +3412,16 @@ export interface IQueryFindEpochResponse {
   epoch?: IEpoch
 }
 
+export interface IQueryFirstSessionAirdropInfoRequest {
+  // The off chain account id to query
+  off_chain_account_id?: string
+}
+
+export interface IQueryFirstSessionAirdropInfoResponse {
+  // The first session airdrop info
+  info?: IFirstSessionAirdropInfo
+}
+
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
@@ -3553,6 +3607,8 @@ export interface IRewardMetricPointMetadata {
   band_index?: number
   // The account multiplier
   account_multiplier?: string
+  // The note
+  note?: string
 }
 
 export interface IRewardReferralPoint {
@@ -3593,6 +3649,8 @@ export interface ISignature {
   // When the same nonce is used, the same payload will generate the same signature.
   // Our system will consider the payload a duplicate, and ignore it.
   nonce?: number
+  // Chain ID used in EIP-712 domain. Zero value fallbacks to GRVT Chain ID.
+  chain_id?: string
 }
 
 // All account summary returned by clickhouse
@@ -3849,6 +3907,12 @@ export interface ITicker {
   open_interest?: string
   // The ratio of accounts that are net long vs net short on this instrument
   long_short_ratio?: string
+  // The current indicative funding rate for the active interval, expressed in centibeeps
+  funding_rate?: string
+  // Hidden from public API, relevant to internal cluster state only. The funding interval in hours (e.g. 1/2/4/8/etc)
+  funding_interval_hours?: number
+  // Timestamp in nanoseconds when the current funding interval ends
+  next_funding_time?: string
 }
 
 // The gross/net exposure of a asset.
