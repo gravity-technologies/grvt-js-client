@@ -91,6 +91,12 @@ export enum EClusterConfigType {
   FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK = 'FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK',
   // Flag to enable update funding info fix
   FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX = 'FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX',
+  // Flag to disable funding-tick publications from marketdata
+  FLAG_DISABLE_MARKET_DATA_FUNDING_TICK_PUBS = 'FLAG_DISABLE_MARKET_DATA_FUNDING_TICK_PUBS',
+  // Flag to fix the reported funding payment
+  FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT = 'FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT',
+  // Flag to fix the total volume calculation
+  FLAG_FIX_TOTAL_VOLUME_CALCULATION = 'FLAG_FIX_TOTAL_VOLUME_CALCULATION',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -139,5 +145,8 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_SESSION_KEY_PERMISSION_EXTENSION]: 43,
   [EClusterConfigType.FUNDING_V_2]: 44,
   [EClusterConfigType.FLAG_ALLOW_POST_ONLY_TO_CROSS_ORDERBOOK]: 45,
-  [EClusterConfigType.FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX]: 46
+  [EClusterConfigType.FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX]: 46,
+  [EClusterConfigType.FLAG_DISABLE_MARKET_DATA_FUNDING_TICK_PUBS]: 47,
+  [EClusterConfigType.FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT]: 48,
+  [EClusterConfigType.FLAG_FIX_TOTAL_VOLUME_CALCULATION]: 49
 })
