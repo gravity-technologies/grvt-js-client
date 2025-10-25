@@ -40,6 +40,7 @@ import type {
   IApiGetOrderGroupResponse,
   IApiGetOrderRequest,
   IApiGetOrderResponse,
+  IApiGetPriceProtectionBandsResponse,
   IApiOpenOrdersRequest,
   IApiOpenOrdersResponse,
   IApiOrderHistoryRequest,
@@ -131,6 +132,7 @@ import { API_GET_ORDER_GROUP_REQUEST_MAP } from '../interfaces/codegen/schema-ma
 import { API_GET_ORDER_GROUP_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_order_group_response'
 import { API_GET_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_order_request'
 import { API_GET_ORDER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_order_response'
+import { API_GET_PRICE_PROTECTION_BANDS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_price_protection_bands_response'
 import { API_OPEN_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_open_orders_request'
 import { API_OPEN_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_open_orders_response'
 import { API_ORDER_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_order_history_request'
@@ -373,6 +375,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_BULK_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateBulkOrdersResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  getPriceProtectionBands (config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/get_price_protection_bands',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_PRICE_PROTECTION_BANDS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetPriceProtectionBandsResponse
     }).catch(Utils.coverApiError)
   }
 
