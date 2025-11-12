@@ -97,6 +97,22 @@ export enum EClusterConfigType {
   FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT = 'FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT',
   // Flag to fix the total volume calculation
   FLAG_FIX_TOTAL_VOLUME_CALCULATION = 'FLAG_FIX_TOTAL_VOLUME_CALCULATION',
+  // Flag to skip pre-trade check
+  FLAG_SKIP_PRE_TRADE_CHECK = 'FLAG_SKIP_PRE_TRADE_CHECK',
+  // Version of the risk snapshot
+  RISK_SNAPSHOT_VERSION = 'RISK_SNAPSHOT_VERSION',
+  // Flag to check IM multiplier
+  FLAG_IM_CHECK_MULTIPLIER = 'FLAG_IM_CHECK_MULTIPLIER',
+  // Payload to configure non-liquidatable sub-accounts list.
+  CONFIGURE_NON_LIQUIDATABLE_SUB_ACCOUNTS = 'CONFIGURE_NON_LIQUIDATABLE_SUB_ACCOUNTS',
+  // Flag to enable risk-reducing trades when negative TE.
+  FLAG_ALLOW_RISK_REDUCING_TRADES_WHEN_NEGATIVE_TE = 'FLAG_ALLOW_RISK_REDUCING_TRADES_WHEN_NEGATIVE_TE',
+  // Config payload for setting ungated CEVs.
+  CONFIGURE_UNGATED_CROSS_EXCH_VAULTS = 'CONFIGURE_UNGATED_CROSS_EXCH_VAULTS',
+  // Flag to adjust WCPS for flipping position
+  FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION = 'FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION',
+  // Flag to swap risk attest and unlock pub order
+  FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK = 'FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -148,5 +164,13 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_UPDATE_FUNDING_INFO_FIX]: 46,
   [EClusterConfigType.FLAG_DISABLE_MARKET_DATA_FUNDING_TICK_PUBS]: 47,
   [EClusterConfigType.FLAG_FIX_V_2_REPORTED_FUNDING_PAYMENT]: 48,
-  [EClusterConfigType.FLAG_FIX_TOTAL_VOLUME_CALCULATION]: 49
+  [EClusterConfigType.FLAG_FIX_TOTAL_VOLUME_CALCULATION]: 49,
+  [EClusterConfigType.FLAG_SKIP_PRE_TRADE_CHECK]: 50,
+  [EClusterConfigType.RISK_SNAPSHOT_VERSION]: 51,
+  [EClusterConfigType.FLAG_IM_CHECK_MULTIPLIER]: 52,
+  [EClusterConfigType.CONFIGURE_NON_LIQUIDATABLE_SUB_ACCOUNTS]: 53,
+  [EClusterConfigType.FLAG_ALLOW_RISK_REDUCING_TRADES_WHEN_NEGATIVE_TE]: 54,
+  [EClusterConfigType.CONFIGURE_UNGATED_CROSS_EXCH_VAULTS]: 55,
+  [EClusterConfigType.FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION]: 56,
+  [EClusterConfigType.FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK]: 57
 })

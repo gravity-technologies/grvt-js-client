@@ -11,7 +11,8 @@ export const API_VAULT_DETAIL_MAP: SchemaPairMap = Object.freeze({
     total_supply_lp_tokens: 'ts',
     last_cross_exchange_equity_attest_timestamp: 'lc',
     is_vault_locked: 'iv',
-    is_cross_exchange: 'ic'
+    is_cross_exchange: 'ic',
+    is_ungated: 'iu'
   },
   LITE_TO_FULL: {
     vi: 'vault_id',
@@ -22,6 +23,7 @@ export const API_VAULT_DETAIL_MAP: SchemaPairMap = Object.freeze({
     ts: 'total_supply_lp_tokens',
     lc: 'last_cross_exchange_equity_attest_timestamp',
     iv: 'is_vault_locked',
-    ic: 'is_cross_exchange'
+    ic: 'is_cross_exchange',
+    iu: 'is_ungated'
   }
 })

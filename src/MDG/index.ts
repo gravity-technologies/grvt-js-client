@@ -8,6 +8,8 @@ import type {
   IApiBatchQueryVaultRiskMetricResponse,
   IApiCandlestickRequest,
   IApiCandlestickResponse,
+  IApiFundingHistoryComparisonRequest,
+  IApiFundingHistoryComparisonResponse,
   IApiFundingRateRequest,
   IApiFundingRateResponse,
   IApiGetAllInstrumentsRequest,
@@ -16,6 +18,8 @@ import type {
   IApiGetFilteredInstrumentsResponse,
   IApiGetInstrumentRequest,
   IApiGetInstrumentResponse,
+  IApiLiveFundingRateComparisonRequest,
+  IApiLiveFundingRateComparisonResponse,
   IApiMiniTickerRequest,
   IApiMiniTickerResponse,
   IApiOrderbookLevelsRequest,
@@ -49,6 +53,8 @@ import { API_BATCH_QUERY_VAULT_RISK_METRIC_REQUEST_MAP } from '../interfaces/cod
 import { API_BATCH_QUERY_VAULT_RISK_METRIC_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_batch_query_vault_risk_metric_response'
 import { API_CANDLESTICK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_candlestick_request'
 import { API_CANDLESTICK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_candlestick_response'
+import { API_FUNDING_HISTORY_COMPARISON_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_funding_history_comparison_request'
+import { API_FUNDING_HISTORY_COMPARISON_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_history_comparison_response'
 import { API_FUNDING_RATE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_funding_rate_request'
 import { API_FUNDING_RATE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_rate_response'
 import { API_GET_ALL_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_all_instruments_request'
@@ -57,6 +63,8 @@ import { API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/
 import { API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_filtered_instruments_response'
 import { API_GET_INSTRUMENT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_request'
 import { API_GET_INSTRUMENT_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_response'
+import { API_LIVE_FUNDING_RATE_COMPARISON_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_live_funding_rate_comparison_request'
+import { API_LIVE_FUNDING_RATE_COMPARISON_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_live_funding_rate_comparison_response'
 import { API_MINI_TICKER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_mini_ticker_request'
 import { API_MINI_TICKER_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_mini_ticker_response'
 import { API_ORDERBOOK_LEVELS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_orderbook_levels_request'
@@ -359,5 +367,39 @@ export class MDG {
 
   /**
    * END: Vault
+   */
+
+  /**
+   * SECTION: Funding V2
+   */
+
+  liveFundingRateComparison (payload: IApiLiveFundingRateComparisonRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/live_funding_rate_comparison',
+      Utils.schemaMap(payload, API_LIVE_FUNDING_RATE_COMPARISON_REQUEST_MAP.FULL_TO_LITE, true),
+      {
+        ...config,
+        withCredentials: false
+      }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_LIVE_FUNDING_RATE_COMPARISON_RESPONSE_MAP.LITE_TO_FULL) as IApiLiveFundingRateComparisonResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  fundingHistoryComparison (payload: IApiFundingHistoryComparisonRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/funding_history_comparison',
+      Utils.schemaMap(payload, API_FUNDING_HISTORY_COMPARISON_REQUEST_MAP.FULL_TO_LITE, true),
+      {
+        ...config,
+        withCredentials: false
+      }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_FUNDING_HISTORY_COMPARISON_RESPONSE_MAP.LITE_TO_FULL) as IApiFundingHistoryComparisonResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Funding V2
    */
 }
