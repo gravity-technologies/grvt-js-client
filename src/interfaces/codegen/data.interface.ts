@@ -1,3 +1,4 @@
+import type { EAccountMultiplierMetadataType } from './enums/account-multiplier-metadata-type.ts'
 import type { EAccountMultiplierStatus } from './enums/account-multiplier-status.ts'
 import type { EAccountType } from './enums/account-type.ts'
 import type { EBridgeType } from './enums/bridge-type.ts'
@@ -6,14 +7,19 @@ import type { ECancelStatus } from './enums/cancel-status.ts'
 import type { ECandlestickInterval } from './enums/candlestick-interval.ts'
 import type { ECandlestickType } from './enums/candlestick-type.ts'
 import type { EClusterConfigType } from './enums/cluster-config-type.ts'
+import type { EDistributionType } from './enums/distribution-type.ts'
 import type { EEpochBadgeType } from './enums/epoch-badge-type.ts'
 import type { EEpochBandStatus } from './enums/epoch-band-status.ts'
+import type { EEpochPointBoostConfigurationStatus } from './enums/epoch-point-boost-configuration-status.ts'
+import type { EEpochPointDistributionConfigurationStatus } from './enums/epoch-point-distribution-configuration-status.ts'
+import type { EFundingRateAggregationType } from './enums/funding-rate-aggregation-type.ts'
 import type { EInstrumentSettlementPeriod } from './enums/instrument-settlement-period.ts'
 import type { EKind } from './enums/kind.ts'
 import type { EMarginType } from './enums/margin-type.ts'
 import type { EMetricType } from './enums/metric-type.ts'
 import type { EOrderRejectReason } from './enums/order-reject-reason.ts'
 import type { EOrderStatus } from './enums/order-status.ts'
+import type { EPointType } from './enums/point-type.ts'
 import type { EQueryMainAccountLeaderboardOrderBy } from './enums/query-main-account-leaderboard-order-by.ts'
 import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
 import type { ERewardProgramType } from './enums/reward-program-type.ts'
@@ -50,6 +56,32 @@ export interface IAck {
 export interface IAckResponse {
   // The Ack Object
   result?: IAck
+}
+
+export interface IAdminRewardEpoch {
+  // The epoch ID
+  id?: string
+  // The epoch number
+  epoch?: number
+  // The start time of the epoch
+  start_time?: string
+  // The end time of the epoch
+  end_time?: string
+  // The emitted points of the epoch
+  emitted_points?: string
+  // Whether the epoch is released
+  is_released?: boolean
+  // The metadata of the epoch
+  metadata?: IAdminRewardEpochMetadata
+  // The reserve points of the epoch
+  reserve_points?: string
+}
+
+export interface IAdminRewardEpochMetadata {
+  // The total trading volume of the epoch
+  total_trading_volume?: string
+  // The visible emitted points of the epoch
+  visible_emitted_points?: string
 }
 
 export interface IAggregatedAccountSummary {
@@ -340,6 +372,30 @@ export interface IApiCreateEpochBandParameterResponse {
   id?: string
 }
 
+export interface IApiCreateEpochPointBoostConfigurationRequest {
+  // the epoch number
+  epoch?: number
+  // The point distribution ratio
+  boost_percentage?: IPointDistributionRatio
+}
+
+export interface IApiCreateEpochPointBoostConfigurationResponse {
+  // The created epoch point distribution configuration ID
+  id?: string
+}
+
+export interface IApiCreateEpochPointDistributionConfigurationRequest {
+  // the start epoch number
+  start_epoch?: number
+  // The point distribution ratio
+  point_distribution_percentage?: IPointDistributionRatio
+}
+
+export interface IApiCreateEpochPointDistributionConfigurationResponse {
+  // The created epoch point distribution configuration ID
+  id?: string
+}
+
 // Create an order on the orderbook for this trading account.
 export interface IApiCreateOrderRequest {
   // The order to create
@@ -508,6 +564,26 @@ export interface IApiCrossExchVaultViewPendingInvestmentResponse {
   vault_id?: string
   // Response payload describing a pending cross-exchange vault investment.
   pending_investment?: ICrossExchVaultPendingInvestment
+}
+
+export interface IApiDeactivateEpochPointBoostConfigurationRequest {
+  // The epoch point distribution configuration ID
+  id?: string
+}
+
+export interface IApiDeactivateEpochPointBoostConfigurationResponse {
+  // The deactivated epoch point distribution configuration ID
+  id?: string
+}
+
+export interface IApiDeactivateEpochPointDistributionConfigurationRequest {
+  // The epoch point distribution configuration ID
+  id?: string
+}
+
+export interface IApiDeactivateEpochPointDistributionConfigurationResponse {
+  // The deactivated epoch point distribution configuration ID
+  id?: string
 }
 
 // Remove dust position (i.e., order quantity smaller than minimum required increment) on an account, by matching the specified order against GRVT directly. Limit price should always be better than mark price.
@@ -738,6 +814,25 @@ export interface IApiFundingAccountSummaryResponse {
   tier?: IClientTier
 }
 
+export interface IApiFundingHistoryComparisonRequest {
+  instrument?: string
+  // Aggregation method. Defaults to instrument-specific funding interval.
+  agg_type?: EFundingRateAggregationType
+  // Number of intervals to query (10/20/40).
+  //
+  // Examples:
+  // - `aggType` of `FUNDING_INTERVAL` and `numIntervals` of `40` for an asset with a 4h-funding inteval returns results relevant for the past 160 hours.
+  // - `aggType` of `ONE_HOURLY` and `numIntervals` of `10` returns results relevant for the past 10 hours.
+  //
+  num_intervals?: number
+}
+
+export interface IApiFundingHistoryComparisonResponse {
+  instrument?: string
+  // Historical funding rate comparison for the selected instrument
+  entries?: IFundingHistoryComparisonEntry[]
+}
+
 // Query for all historical funding payments made by a single account.
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
@@ -763,6 +858,21 @@ export interface IApiFundingPaymentHistoryResponse {
   next?: string
 }
 
+export interface IApiFundingRate {
+  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
+  instrument?: string
+  // The funding rate of the instrument, expressed in percentage points
+  funding_rate?: string
+  // The funding timestamp of the funding rate, expressed in unix nanoseconds
+  funding_time?: string
+  // The mark price of the instrument at funding timestamp, expressed in `9` decimals
+  mark_price?: string
+  // Deprecated: Refer to `funding_rate` instead. Will be removed in a future release.
+  funding_rate_8_h_avg?: string
+  // Funding interval in hours (e.g. 1/4/8/etc).
+  funding_interval_hours?: number
+}
+
 // Lookup the historical funding rate of a perpetual future.
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
@@ -777,11 +887,13 @@ export interface IApiFundingRateRequest {
   limit?: number
   // The cursor to indicate when to start the query from
   cursor?: string
+  // Aggregation method for historical funding rate observations. Defaults to using the instrument-specific funding interval.
+  agg_type?: EFundingRateAggregationType
 }
 
 export interface IApiFundingRateResponse {
   // The funding rate result set for given interval
-  result?: IFundingRate[]
+  result?: IApiFundingRate[]
   // The cursor to indicate when to start the next query from
   next?: string
 }
@@ -887,6 +999,26 @@ export interface IApiGetEcosystemReferralStatResponse {
   direct_invite_trading_volume?: string
   // Total volume traded by indirect invites multiple by 1e9
   indirect_invite_trading_volume?: string
+}
+
+export interface IApiGetEpochPointBoostConfigurationRequest {
+  // The epoch number. default will return current epoch
+  epoch?: number
+}
+
+export interface IApiGetEpochPointBoostConfigurationResponse {
+  // The epoch point distribution configuration
+  result?: IEpochPointBoostConfiguration
+}
+
+export interface IApiGetEpochPointDistributionConfigurationRequest {
+  // The epoch number. default will return current epoch
+  epoch?: number
+}
+
+export interface IApiGetEpochPointDistributionConfigurationResponse {
+  // The epoch point distribution configuration
+  result?: IEpochPointDistributionConfiguration
 }
 
 export interface IApiGetEpochPointStatsResponse {
@@ -1149,6 +1281,18 @@ export interface IApiInactiveEpochBandParameterResponse {
   ids?: string[]
 }
 
+export interface IApiInjectPointsRequest {
+  // The list of injected points
+  injections?: IInjectedPointRequestElement[]
+  // The reason for injecting points
+  reason?: string
+}
+
+export interface IApiInjectPointsResponse {
+  // Whether the injection is successful
+  success?: boolean
+}
+
 export interface IApiInternalBatchCreateAccountMultiplierRequest {
   // The metric name. Can be empty if the multiplers is applied for all metrics
   metric?: EMetricType
@@ -1187,9 +1331,59 @@ export interface IApiListAggregatedAccountSummaryResponse {
   account_summaries?: IApiDetailedAggregatedAccountSummaryResponse[]
 }
 
+export interface IApiListEpochPointBoostConfigurationRequest {
+  // the epoch number
+  epoch?: number
+  // Filter by status
+  status?: EEpochPointBoostConfigurationStatus
+}
+
+export interface IApiListEpochPointBoostConfigurationResponse {
+  // The list of epoch point distribution configurations
+  result?: IEpochPointBoostConfiguration[]
+}
+
+export interface IApiListEpochPointDistributionConfigurationRequest {
+  // the start epoch number
+  start_epoch?: number
+  // Filter by status
+  status?: EEpochPointDistributionConfigurationStatus
+}
+
+export interface IApiListEpochPointDistributionConfigurationResponse {
+  // The list of epoch point distribution configurations
+  result?: IEpochPointDistributionConfiguration[]
+}
+
 export interface IApiListEpochUserVaultRewardPointResponse {
   // The list of user vault reward point history
   result?: IEpochUserVaultRewardPoint[]
+}
+
+export interface IApiLiveFundingRateComparisonRequest {
+  // Aggregation method. Defaults to instrument-specific funding interval.
+  agg_type?: EFundingRateAggregationType
+}
+
+export interface IApiLiveFundingRateComparisonResponse {
+  // Live funding rate comparison for all GRVT instruments
+  entries?: ILiveFundingRateComparisonEntry[]
+}
+
+export interface IApiManualInjectedPointHistoryRequest {
+  // The epoch number
+  epoch?: number
+  // The account ID
+  off_chain_account_id?: string
+  // The page number
+  page?: number
+  // The number of records per page
+  limit?: number
+}
+
+export interface IApiManualInjectedPointHistoryResponse {
+  // The list of manual injected point records
+  result?: IManualPointDistribution[]
 }
 
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
@@ -1995,6 +2189,8 @@ export interface IApiVaultDetail {
   is_vault_locked?: boolean
   // Indicates whether this vault is cross-exchange. Omitted for non-cross-exchange vaults.
   is_cross_exchange?: boolean
+  // Indicates whether this cross-exchange vault is ungated (i.e., exempt from access-tier based limits). Omitted for non-cross-exchange vaults.
+  is_ungated?: boolean
 }
 
 // Request payload for fetching the detail of a vault.
@@ -2315,6 +2511,8 @@ export interface IBatchCreateAccountMultiplierElement {
   account_type?: EAccountType
   // The multiplier value
   multiplier?: number
+  // The metadata/note for this account multiplier
+  metadata?: IRewardAccountMultiplierMetadata
 }
 
 export interface ICEVAccessTier {
@@ -2483,6 +2681,24 @@ export interface IDepositHistory {
   confirmed_time?: string
   // The address of the sender
   from_address?: string
+}
+
+export interface IDetailAdminRewardEpoch {
+  // The epoch detail information
+  epoch_info?: IAdminRewardEpoch
+  // The point distribution ratio for this epoch
+  distribution_percentage?: IPointDistributionRatio
+  // The raw point distribution ratio for this epoch before applying boost
+  raw_distribution_percentage?: IPointDistributionRatio
+  // The point boost ratio for this epoch
+  boost_percentage?: IPointDistributionRatio
+  // The visibility percentage for this epoch
+  visibility_percentage?: number
+}
+
+export interface IDetailAdminRewardEpochResponse {
+  // The detailed epoch information
+  result?: IDetailAdminRewardEpoch
 }
 
 export interface IDetailedAggregatedAccountSummary {
@@ -2707,6 +2923,44 @@ export interface IEpochPoint {
   reserve_point?: string
 }
 
+export interface IEpochPointBoostConfiguration {
+  // The epoch point distribution configuration ID
+  id?: string
+  // The epoch number
+  epoch?: number
+  // The point boost ratio
+  boost_percentage?: IPointDistributionRatio
+  // The configuration status
+  status?: EEpochPointBoostConfigurationStatus
+  // The creator of the configuration
+  created_by_id?: string
+  // The last updater of the configuration
+  update_by_id?: string
+  // The creation timestamp
+  create_time?: string
+  // The last update timestamp
+  update_time?: string
+}
+
+export interface IEpochPointDistributionConfiguration {
+  // The epoch point distribution configuration ID
+  id?: string
+  // The epoch number
+  start_epoch?: number
+  // The point distribution ratio
+  point_distribution_percentage?: IPointDistributionRatio
+  // The configuration status
+  status?: EEpochPointDistributionConfigurationStatus
+  // The creator of the configuration
+  created_by_id?: string
+  // The last updater of the configuration
+  update_by_id?: string
+  // The creation timestamp
+  create_time?: string
+  // The last update timestamp
+  update_time?: string
+}
+
 export interface IEpochPointStats {
   // The epoch number
   epoch?: number
@@ -2731,6 +2985,13 @@ export interface IError {
   code?: number
   // The error message for the request
   message?: string
+}
+
+export interface IExchangeFundingRate {
+  // Exchange name.
+  exchange?: string
+  // Funding rate as percentage (e.g., `0.005` denotes 0.005%).
+  funding_rate?: number
 }
 
 export interface IFill {
@@ -2844,6 +3105,15 @@ export interface IFundingAccountSummary {
   vault_investments?: IVaultInvestment[]
 }
 
+export interface IFundingHistoryComparisonEntry {
+  // The funding timestamp of the funding rate, expressed in unix nanoseconds
+  funding_time?: string
+  // The GRVT mark price of the instrument, expressed in `9` decimals
+  mark_price?: string
+  // Funding rates by exchange (GRVT always first)
+  funding_rates?: IExchangeFundingRate[]
+}
+
 export interface IFundingInfo {
   // Defines the funding interval to be applied.
   interval_hours?: number
@@ -2872,19 +3142,6 @@ export interface IFundingPayment {
   tx_id?: string
 }
 
-export interface IFundingRate {
-  // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
-  instrument?: string
-  // The funding rate of the instrument, expressed in percentage points
-  funding_rate?: string
-  // The funding timestamp of the funding rate, expressed in unix nanoseconds
-  funding_time?: string
-  // The mark price of the instrument at funding timestamp, expressed in `9` decimals
-  mark_price?: string
-  // The 8h average funding rate of the instrument, expressed in percentage points
-  funding_rate_8_h_avg?: string
-}
-
 export interface IGetClaimableEcosystemBadgeResponse {
   // The epoch badge
   badge?: IEpochBadge
@@ -2903,6 +3160,13 @@ export interface IInitialLeverageResult {
   min_leverage?: string
   // The max leverage this sub account can set
   max_leverage?: string
+}
+
+export interface IInjectedPointRequestElement {
+  // The account ID
+  off_chain_account_id?: string
+  // The number of points to inject
+  points?: number
 }
 
 export interface IInstrumentDisplay {
@@ -3046,6 +3310,23 @@ export interface ILPSubAccountSnapshot {
   calculate_at?: string
 }
 
+export interface IListRewardEpochResponse {
+  // The list of epochs
+  result?: IAdminRewardEpoch[]
+}
+
+export interface ILiveFundingRateComparisonEntry {
+  instrument?: string
+  // Next funding time in unix nanoseconds (from GRVT ticker)
+  next_funding_time?: string
+  // GRVT funding interval in hours
+  funding_interval_hours?: number
+  // Funding rates by exchange (GRVT always first)
+  funding_rates?: IExchangeFundingRate[]
+  // GRVT's open interest in the instrument, expressed in base asset decimal units
+  open_interest?: string
+}
+
 export interface ILpInfoEntry {
   // LP address
   lp_address?: string
@@ -3073,6 +3354,38 @@ export interface IMainAccountLeaderboardEntry {
   positive_fee?: string
   // Realized PnL
   realized_pnl?: string
+}
+
+export interface IManualPointDistribution {
+  // The manual point distribution ID
+  id?: string
+  // The account ID
+  off_chain_account_id?: string
+  // The number of points distributed
+  points?: number
+  // The epoch number
+  epoch?: number
+  // The metadata for manual point distribution
+  metadata?: IManualPointDistributionMetadata
+  // The distribution type
+  distribution_type?: EDistributionType
+  // The point type
+  point_type?: EPointType
+  // The creator of the distribution
+  created_by_id?: string
+  // The creation timestamp
+  create_time?: string
+  // The last update timestamp
+  update_time?: string
+}
+
+export interface IManualPointDistributionMetadata {
+  // The reason for manual point distribution
+  reason?: string
+  // The raffle task ID associated with this distribution
+  raffle_task_id?: string
+  // The account creation time associated with the task
+  task_account_create_time?: string
 }
 
 export interface IMarginTierResponse {
@@ -3246,6 +3559,23 @@ export interface IOrderbookLevels {
   asks?: IOrderbookLevel[]
 }
 
+export interface IPointDistributionRatio {
+  // The trading volume ratio.
+  trading_volume?: number
+  // The trading lp point ratio
+  trading_lp_point?: number
+  // The trading open interest ratio
+  trading_open_interest?: number
+  // The trading liquidation ratio
+  trading_liquidation?: number
+  // The total value locked ratio
+  tvl?: number
+  // The community referral ratio
+  community_referral?: number
+  // The reserve pool ratio. it will auto filled by 100 - sum(another_ratio)
+  reserve_pool?: number
+}
+
 export interface IPositionSummary {
   // The instrument being represented
   instrument?: string
@@ -3314,7 +3644,7 @@ export interface IPositions {
   leverage?: string
   // The cumulative fee paid on the position, expressed in quote asset decimal units
   cumulative_fee?: string
-  // The cumulative realized funding payment of the position, expressed in quote asset decimal units
+  // The cumulative realized funding payment of the position, expressed in quote asset decimal units. Positive if paid, negative if received
   cumulative_realized_funding_payment?: string
 }
 
@@ -3543,6 +3873,13 @@ export interface IQueryVaultSummaryHistoryResponse {
   result?: ISnapVaultSummary[]
 }
 
+export interface IReservePointInformation {
+  // The cumulative reserved points up to latest epoch. It is the sum of all previous released epochs' reserve points.
+  cumulative_reserved_points?: string
+  // The available reserve points that can be used for manual point distribution up to latest epoch
+  available_reserve_points?: string
+}
+
 export interface IRewardAccountMultiplier {
   // The account multiplier ID
   id?: string
@@ -3566,6 +3903,19 @@ export interface IRewardAccountMultiplier {
   create_time?: string
   // The last update timestamp
   update_time?: string
+  // The metadata/note for this account multiplier
+  metadata?: IRewardAccountMultiplierMetadata
+}
+
+export interface IRewardAccountMultiplierMetadata {
+  // The tier of the account
+  ambassador_tier?: number
+  // The ambassador account ID
+  referrer_account_id?: string
+  // The note for this account multiplier
+  note?: string
+  // The type of the account multiplier metadata
+  metadata_type?: EAccountMultiplierMetadataType
 }
 
 export interface IRewardEpochBandParameter {
@@ -4062,6 +4412,18 @@ export interface ITriggerOrderMetadata {
   //
   //
   tpsl?: ITPSLOrderMetadata
+}
+
+export interface IUpdateRewardEpochRequest {
+  // The epoch number
+  epoch?: number
+  // Whether the epoch is released
+  is_released?: boolean
+}
+
+export interface IUpdateRewardEpochResponse {
+  // The updated epoch
+  result?: IAdminRewardEpoch
 }
 
 export interface IUserCategoryAffinityScore {
