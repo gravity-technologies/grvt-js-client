@@ -1,6 +1,5 @@
 // HexStringMap contains all bigints the should be encoded/decoded to/from hex strings
 export const HexStringMap = [
-  'adjusted_point',
   'ask_depth_scores',
   'bid_depth_scores',
   'brokered_trading_volume',
@@ -19,7 +18,6 @@ export const HexStringMap = [
   'order_i_ds',
   'order_id',
   'r',
-  'raw_point',
   'referrer_main_account_id',
   's',
   'signer',
