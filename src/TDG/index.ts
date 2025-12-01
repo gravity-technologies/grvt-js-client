@@ -51,16 +51,26 @@ import type {
   IApiPreDepositCheckResponse,
   IApiPreOrderCheckRequest,
   IApiPreOrderCheckResponse,
+  IApiQueryAccountPerformanceTrendRequest,
+  IApiQueryAccountPerformanceTrendResponse,
+  IApiQueryAccountTodayPerformanceRequest,
+  IApiQueryAccountTodayPerformanceResponse,
   IApiQueryListFundingAccountSummaryRequest,
   IApiQueryListFundingAccountSummaryResponse,
   IApiQueryListSubAccountSummaryRequest,
   IApiQueryListSubAccountSummaryResponse,
+  IApiQueryTradingAccountRiskMetricRequest,
+  IApiQueryTradingAccountRiskMetricResponse,
   IApiQueryTradingPerformanceRequest,
   IApiQueryTradingPerformanceResponse,
+  IApiQueryTradingPerformanceSummaryRequest,
+  IApiQueryTradingPerformanceSummaryResponse,
   IApiQueryTradingPerformanceTrendRequest,
   IApiQueryTradingPerformanceTrendResponse,
   IApiQueryVaultInvestorHistoryRequest,
   IApiQueryVaultInvestorHistoryResponse,
+  IApiQueryVaultInvestorHistoryStatsRequest,
+  IApiQueryVaultInvestorHistoryStatsResponse,
   IApiQueryVaultManagerInvestorHistoryRequest,
   IApiQueryVaultManagerInvestorHistoryResponse,
   IApiReplaceOrdersRequest,
@@ -143,16 +153,26 @@ import { API_PRE_DEPOSIT_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-
 import { API_PRE_DEPOSIT_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_deposit_check_response'
 import { API_PRE_ORDER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_request'
 import { API_PRE_ORDER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_response'
+import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_request'
+import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_response'
+import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_request'
+import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_response'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_request'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_response'
 import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_request'
 import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_response'
+import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_request'
+import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_response'
 import { API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_request'
 import { API_QUERY_TRADING_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_response'
+import { API_QUERY_TRADING_PERFORMANCE_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_summary_request'
+import { API_QUERY_TRADING_PERFORMANCE_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_summary_response'
 import { API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_trend_request'
 import { API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_trend_response'
 import { API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_request'
 import { API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_response'
+import { API_QUERY_VAULT_INVESTOR_HISTORY_STATS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_stats_request'
+import { API_QUERY_VAULT_INVESTOR_HISTORY_STATS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_stats_response'
 import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_request'
 import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_response'
 import { API_REPLACE_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_replace_orders_request'
@@ -815,5 +835,63 @@ export class TDG {
 
   /**
    * END: Cross-Exchange Vault
+   */
+
+  /**
+   * START: Portfolio
+   */
+
+  accountTodayPerformance (payload: IApiQueryAccountTodayPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/account_today_performance',
+      Utils.schemaMap(payload, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountTodayPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  accountPerformanceTrend (payload: IApiQueryAccountPerformanceTrendRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/account_performance_trend',
+      Utils.schemaMap(payload, API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountPerformanceTrendResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  tradingPerformanceSummary (payload: IApiQueryTradingPerformanceSummaryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/trading_performance_summary',
+      Utils.schemaMap(payload, API_QUERY_TRADING_PERFORMANCE_SUMMARY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_TRADING_PERFORMANCE_SUMMARY_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingPerformanceSummaryResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  subAccountRiskMetric (payload: IApiQueryTradingAccountRiskMetricRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/sub_account_risk_metric',
+      Utils.schemaMap(payload, API_QUERY_TRADING_ACCOUNT_RISK_METRIC_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_TRADING_ACCOUNT_RISK_METRIC_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingAccountRiskMetricResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  vaultInvestorHistoryStats (payload: IApiQueryVaultInvestorHistoryStatsRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/vault_investor_history_stats',
+      Utils.schemaMap(payload, API_QUERY_VAULT_INVESTOR_HISTORY_STATS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_VAULT_INVESTOR_HISTORY_STATS_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultInvestorHistoryStatsResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Portfolio
    */
 }
