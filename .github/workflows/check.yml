@@ -18,7 +18,7 @@ jobs:
       cancel-in-progress: true
     runs-on: ubuntu-latest
     env:
-      node: ">=22"
+      node: "22.x"
     steps:
       - name: Checkout Commit
         uses: actions/checkout@v3

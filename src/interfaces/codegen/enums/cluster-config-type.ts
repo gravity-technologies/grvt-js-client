@@ -113,6 +113,16 @@ export enum EClusterConfigType {
   FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION = 'FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION',
   // Flag to swap risk attest and unlock pub order
   FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK = 'FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK',
+  // Flag to enable margin matrix v2
+  FLAG_ENABLE_MARGIN_MATRIX_V_2 = 'FLAG_ENABLE_MARGIN_MATRIX_V_2',
+  // Flag to check MM multiplier
+  FLAG_MM_CHECK_MULTIPLIER = 'FLAG_MM_CHECK_MULTIPLIER',
+  // Flag to enable isolated margin
+  FLAG_ISOLATED_MARGIN = 'FLAG_ISOLATED_MARGIN',
+  // Flag to enable set sub account position margin config
+  FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG = 'FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG',
+  // Flag to enable add isolated position margin
+  FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN = 'FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -172,5 +182,10 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ALLOW_RISK_REDUCING_TRADES_WHEN_NEGATIVE_TE]: 54,
   [EClusterConfigType.CONFIGURE_UNGATED_CROSS_EXCH_VAULTS]: 55,
   [EClusterConfigType.FLAG_ADJUST_WCPS_FOR_FLIPPING_POSITION]: 56,
-  [EClusterConfigType.FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK]: 57
+  [EClusterConfigType.FLAG_CEV_RISK_PUBS_ATTEST_THEN_UNLOCK]: 57,
+  [EClusterConfigType.FLAG_ENABLE_MARGIN_MATRIX_V_2]: 58,
+  [EClusterConfigType.FLAG_MM_CHECK_MULTIPLIER]: 59,
+  [EClusterConfigType.FLAG_ISOLATED_MARGIN]: 60,
+  [EClusterConfigType.FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG]: 61,
+  [EClusterConfigType.FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN]: 62
 })

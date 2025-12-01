@@ -20,7 +20,9 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     is_vault: 'iv',
     vault_im_additions: 'vi',
     derisk_margin: 'dm',
-    derisk_to_maintenance_margin_ratio: 'dt'
+    derisk_to_maintenance_margin_ratio: 'dt',
+    total_cross_equity: 'tc',
+    cross_unrealized_pnl: 'cu'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -38,6 +40,8 @@ export const SUB_ACCOUNT_MAP: SchemaPairMap = Object.freeze({
     iv: 'is_vault',
     vi: 'vault_im_additions',
     dm: 'derisk_margin',
-    dt: 'derisk_to_maintenance_margin_ratio'
+    dt: 'derisk_to_maintenance_margin_ratio',
+    tc: 'total_cross_equity',
+    cu: 'cross_unrealized_pnl'
   }
 })

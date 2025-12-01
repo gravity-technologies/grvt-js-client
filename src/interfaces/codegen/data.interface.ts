@@ -20,6 +20,7 @@ import type { EMetricType } from './enums/metric-type.ts'
 import type { EOrderRejectReason } from './enums/order-reject-reason.ts'
 import type { EOrderStatus } from './enums/order-status.ts'
 import type { EPointType } from './enums/point-type.ts'
+import type { EPositionMarginType } from './enums/position-margin-type.ts'
 import type { EQueryMainAccountLeaderboardOrderBy } from './enums/query-main-account-leaderboard-order-by.ts'
 import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
 import type { ERewardProgramType } from './enums/reward-program-type.ts'
@@ -77,11 +78,41 @@ export interface IAdminRewardEpoch {
   reserve_points?: string
 }
 
+export interface IAdminRewardEpochDetail {
+  // The epoch detail information
+  epoch_info?: IAdminRewardEpoch
+  // The point distribution percentage for this epoch
+  distribution_percentage?: IPointDistributionPercentage
+  // The raw point distribution percentage for this epoch before applying boost
+  raw_distribution_percentage?: IPointDistributionPercentage
+  // The point boost percentage for this epoch
+  boost_percentage?: IPointDistributionPercentage
+  // The visibility percentage for this epoch
+  visibility_percentage?: number
+}
+
+export interface IAdminRewardEpochDetailResponse {
+  // The detailed epoch information
+  result?: IAdminRewardEpochDetail
+}
+
 export interface IAdminRewardEpochMetadata {
   // The total trading volume of the epoch
   total_trading_volume?: string
   // The visible emitted points of the epoch
   visible_emitted_points?: string
+}
+
+// Aggregated account performance returned by clickhouse
+export interface IAggregatedAccountPerformance {
+  // The start time of the interval
+  start_interval?: string
+  // The main account ID of the account to which the performance belongs
+  main_account_id?: string
+  // Aggregated PnL of the funding account and sub accounts
+  aggregated_pnl?: string
+  // Investment PnL of the funding account
+  investment_pnl?: string
 }
 
 export interface IAggregatedAccountSummary {
@@ -93,8 +124,42 @@ export interface IAggregatedAccountSummary {
   spot_balances?: ISpotBalance[]
   // The list of vault investments held by this main account
   vault_investments?: IVaultInvestment[]
-  // Total balance of the sub accounts, denominated in USD
+  // Deprecated: Use totalSubAccountEquity instead
   total_sub_account_balance?: string
+  // Total equity of the sub accounts, denominated in USD
+  total_sub_account_equity?: string
+  // Total amount of the vault investments, denominated in USD
+  total_vault_investments_balance?: string
+  // Total available balance of the main account, denominated in USD
+  total_sub_account_available_balance?: string
+}
+
+// Trading performance trend returned by the service
+export interface IApiAccountPerformanceTrend {
+  // The start time of the interval
+  start_interval?: string
+  // The end time of the interval
+  end_interval?: string
+  // Aggregated PnL of the funding account and sub accounts
+  aggregated_pnl?: string
+}
+
+// The request to add margin to a isolated position
+export interface IApiAddIsolatedPositionMarginRequest {
+  // The sub account ID to add isolated margin in or remove margin from
+  sub_account_id?: string
+  // The instrument to add margin into, or remove margin from
+  instrument?: string
+  // The amount of margin to add to the position, positive to add, negative to remove, expressed in quote asset decimal units
+  amount?: string
+  // The signature of this operation
+  signature?: ISignature
+}
+
+// The response to add margin to a isolated position
+export interface IApiAddIsolatedPositionMarginResponse {
+  // Whether the margin mode and leverage was set successfully
+  success?: boolean
 }
 
 // The aggregated account summary, that reports the total equity and spot balances of a funding (main) account, and its constituent trading (sub) accounts
@@ -376,7 +441,7 @@ export interface IApiCreateEpochPointBoostConfigurationRequest {
   // the epoch number
   epoch?: number
   // The point distribution ratio
-  boost_percentage?: IPointDistributionRatio
+  boost_percentage?: IPointDistributionPercentage
 }
 
 export interface IApiCreateEpochPointBoostConfigurationResponse {
@@ -388,7 +453,7 @@ export interface IApiCreateEpochPointDistributionConfigurationRequest {
   // the start epoch number
   start_epoch?: number
   // The point distribution ratio
-  point_distribution_percentage?: IPointDistributionRatio
+  point_distribution_percentage?: IPointDistributionPercentage
 }
 
 export interface IApiCreateEpochPointDistributionConfigurationResponse {
@@ -729,7 +794,7 @@ export interface IApiFindAccountMultiplierResponse {
   result?: IRewardAccountMultiplier[]
 }
 
-export interface IApiFindConflictAccountMultiplerResponse {
+export interface IApiFindConflictAccountMultiplierResponse {
   // The list of account multipliers
   result?: IRewardAccountMultiplier[]
 }
@@ -1161,6 +1226,22 @@ export interface IApiGetListRewardEpochResponse {
   trading_epochs?: IRewardEpochInfo[]
 }
 
+// API request payload to get margin rules for a particular instrument
+export interface IApiGetMarginRulesRequest {
+  // The instrument to query margin rules for
+  instrument?: string
+}
+
+// API response payload for margin rules of a particular instrument
+export interface IApiGetMarginRulesResponse {
+  // The instrument name
+  instrument?: string
+  // The maximum position size, expressed in base asset decimal units
+  max_position_size?: string
+  // List of risk brackets defining margin requirements at different notional tiers
+  risk_brackets?: IRiskBracket[]
+}
+
 export interface IApiGetMarginTiersResponse {
   results?: IAssetMarginTierResponse[]
 }
@@ -1243,6 +1324,10 @@ export interface IApiGetUserEpochPointStatsResponse {
   cumulative_rank_change?: number
   // The time in unix nanoseconds when the points were last calculated
   last_calculated_time?: string
+  // The community referral point earned of the account
+  epoch_referral_point?: string
+  // The cumulative community referral point earned of the account
+  cumulative_referral_point?: string
 }
 
 export interface IApiGetUserVaultRewardPointResponse {
@@ -1370,22 +1455,6 @@ export interface IApiLiveFundingRateComparisonResponse {
   entries?: ILiveFundingRateComparisonEntry[]
 }
 
-export interface IApiManualInjectedPointHistoryRequest {
-  // The epoch number
-  epoch?: number
-  // The account ID
-  off_chain_account_id?: string
-  // The page number
-  page?: number
-  // The number of records per page
-  limit?: number
-}
-
-export interface IApiManualInjectedPointHistoryResponse {
-  // The list of manual injected point records
-  result?: IManualPointDistribution[]
-}
-
 // Retrieves a single mini ticker value for a single instrument. Please do not use this to repeatedly poll for data -- a websocket subscription is much more performant, and useful.
 export interface IApiMiniTickerRequest {
   // The readable instrument name:<ul><li>Perpetual: `ETH_USDT_Perp`</li><li>Future: `BTC_USDT_Fut_20Oct23`</li><li>Call: `ETH_USDT_Call_20Oct23_2800`</li><li>Put: `ETH_USDT_Put_20Oct23_2800`</li></ul>
@@ -1471,6 +1540,22 @@ export interface IApiOrderbookLevelsResponse {
   result?: IOrderbookLevels
 }
 
+export interface IApiPointInjectionHistoryRequest {
+  // The epoch number
+  epoch?: number
+  // The account ID
+  off_chain_account_id?: string
+  // The page number
+  page?: number
+  // The number of records per page
+  limit?: number
+}
+
+export interface IApiPointInjectionHistoryResponse {
+  // The list of manual injected point records
+  result?: IPointDistribution[]
+}
+
 // Transfer position from one subaccount to another
 export interface IApiPositionTransferRequest {
   // The maker order to transfer the position
@@ -1531,6 +1616,22 @@ export interface IApiPreOrderCheckResponse {
   results?: IPreOrderCheckResult[]
 }
 
+// Request to retrieve the trading performance trend
+export interface IApiQueryAccountPerformanceTrendRequest {
+  // The time interval to filter by
+  time_interval?: ETimeInterval
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
+}
+
+// Response to retrieve the trading performance trend
+export interface IApiQueryAccountPerformanceTrendResponse {
+  // The list of trading performance trends
+  result?: IApiAccountPerformanceTrend[]
+}
+
 // Request to retrieve the account summary for a given account
 export interface IApiQueryAccountSummaryRequest {
   // The time interval to filter
@@ -1543,6 +1644,18 @@ export interface IApiQueryAccountSummaryResponse {
   result?: ISnapAccountSummary[]
   // The next cursor to fetch the next page of results
   next?: string
+}
+
+// Request to retrieve the trading volume
+export interface IApiQueryAccountTodayPerformanceRequest {
+}
+
+// Response to retrieve today's performance
+export interface IApiQueryAccountTodayPerformanceResponse {
+  // Realtime aggregated PnL of the funding account and sub accounts
+  aggregated_pnl?: string
+  // Realtime investment PnL of the funding account in the given interval
+  investment_pnl?: string
 }
 
 // Query flat referral stats
@@ -1562,12 +1675,16 @@ export interface IApiQueryFlatReferralStatResponse {
 export interface IApiQueryListFundingAccountSummaryRequest {
   // The time interval to filter by
   time_interval?: ETimeInterval
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
 }
 
 // Response to retrieve the funding account summary for a given main account
 export interface IApiQueryListFundingAccountSummaryResponse {
   // The list of funding account summaries
-  result?: ISnapFundingAccountSummary[]
+  result?: IApiSnapAggregatedAccountSummary[]
   // The next cursor to fetch the next page of results
   next?: string
 }
@@ -1617,6 +1734,28 @@ export interface IApiQuerySnapVaultPositionResponse {
 }
 
 // Request to retrieve the trading volume
+export interface IApiQueryTradingAccountRiskMetricRequest {
+  // The sub account ID to filter by
+  sub_account_id?: string
+  // Optional: The time interval to filter by
+  time_interval?: ETimeInterval
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
+}
+
+// Response to retrieve the trading volume
+export interface IApiQueryTradingAccountRiskMetricResponse {
+  // The PnL volatility
+  pnl_volatility?: number
+  // The Sharpe ratio
+  sharpe_ratio?: number
+  // The max drawdown
+  max_drawdown?: number
+}
+
+// Request to retrieve the trading volume
 export interface IApiQueryTradingPerformanceRequest {
   // Optional: The subaccount ID to filter by
   sub_account_id?: string
@@ -1630,6 +1769,26 @@ export interface IApiQueryTradingPerformanceResponse {
   trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
+}
+
+// Accumulated trading performance returned by the service
+export interface IApiQueryTradingPerformanceSummaryRequest {
+  // The sub account ID to filter by
+  sub_account_id?: string
+  // The time interval to filter by
+  time_interval?: ETimeInterval
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
+}
+
+// Response to retrieve the accumulated trading performance
+export interface IApiQueryTradingPerformanceSummaryResponse {
+  // The total PnL ratio
+  total_pnl_ratio?: number
+  // The win rate
+  win_rate?: number
 }
 
 // Request to retrieve the trading performance trend
@@ -1662,6 +1821,16 @@ export interface IApiQueryVaultInvestorHistoryRequest {
 export interface IApiQueryVaultInvestorHistoryResponse {
   // The list of vault investor history
   result?: IApiVaultInvestorHistory[]
+}
+
+// Response to retrieve the vault summary for a given vault
+export interface IApiQueryVaultInvestorHistoryStatsRequest {
+}
+
+// The vault summary returned by the service to client
+export interface IApiQueryVaultInvestorHistoryStatsResponse {
+  // The total investment in the vault in USD.
+  total_investment_amount?: string
 }
 
 // Request for the manager to retrieve the vault investor history for their vault
@@ -1842,6 +2011,29 @@ export interface IApiSetPriceProtectionBandsRequest {
   asset_specific?: IAssetSpecificPriceProtectionBand[]
 }
 
+// Sets the margin type and leverage configuration for a specific position (instrument) within a sub account.
+//
+// This configuration is applied per-instrument, allowing different margin settings for different positions.
+//
+export interface IApiSetSubAccountPositionMarginConfigRequest {
+  // The sub account ID to set the margin type and leverage for
+  sub_account_id?: string
+  // The instrument of the position to set the margin type and leverage for
+  instrument?: string
+  // The margin type to set for the position
+  margin_type?: EPositionMarginType
+  // The leverage to set for the position
+  leverage?: string
+  // The signature of this operation
+  signature?: ISignature
+}
+
+// The response to set the margin type and leverage for a position
+export interface IApiSetSubAccountPositionMarginConfigResponse {
+  // Whether the margin type and leverage was acked
+  ack?: boolean
+}
+
 // Lookup the historical settlement price of various pairs.
 //
 // Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
@@ -1865,6 +2057,32 @@ export interface IApiSettlementPriceResponse {
   result?: IAPISettlementPrice[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+// The aggregated account summary, that reports the total equity and spot balances of an account
+export interface IApiSnapAggregatedAccountSummary {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: string
+  // The start of the interval in unix nanoseconds
+  start_interval?: string
+  // The main account ID of the account to which the summary belongs
+  main_account_id?: string
+  // Total equity of the main account, denominated in USD
+  total_equity?: string
+  // The list of spot assets owned by this main account, and their balances
+  spot_balances?: ISpotBalance[]
+  // The list of vault investments held by this main account
+  vault_investments?: IVaultInvestment[]
+  // Depreciated: Use fundingAccountEquity instead
+  funding_account_balance?: string
+  // Depreciated: Use totalSubAccountEquity instead
+  total_sub_account_balance?: string
+  // Depreciated: Use totalVaultInvestmentsEquity instead
+  total_vault_investments_balance?: string
+  // Total equity of the main account, denominated in USD
+  funding_account_equity?: string
+  // Total equity of the sub accounts, denominated in USD
+  total_sub_account_equity?: string
 }
 
 // The socialized loss status.
@@ -1945,6 +2163,33 @@ export interface IApiSubAccountTradeAggregationResponse {
   result?: ISubAccountTradeAggregation[]
   // The cursor to indicate when to start the next query from
   next?: string
+}
+
+// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
+export interface IApiSubAccountTradeIntervalAggregationRequest {
+  // The interval of each sub account trade
+  interval?: ESubAccountTradeInterval
+  // The list of sub account ids to query
+  sub_account_i_ds?: string[]
+  // Optional. The starting time in unix nanoseconds of a specific interval to query
+  start_interval?: string
+  // Optional. Start time in unix nanoseconds
+  start_time?: string
+  // Optional. End time in unix nanoseconds
+  end_time?: string
+  // Filter on the maker of the trade
+  is_maker?: boolean
+  // Filter on the taker of the trade
+  is_taker?: boolean
+  // source of order
+  sources?: ESource[]
+  // Filter on the liquidation of the trade
+  is_liquidation?: boolean
+}
+
+export interface IApiSubAccountTradeIntervalAggregationResponse {
+  // The sub account trade aggregation result set for given interval
+  result?: ISubAccountTradeIntervalAggregation[]
 }
 
 export interface IApiTickerFeedDataV1 {
@@ -2294,9 +2539,9 @@ export interface IApiVaultPerformance {
   trading_volume?: string
   // Returns ROI normalized to an annualized number.
   apr?: number
-  // Realized PnL in USDT
+  // Deprecated: Use cumulativePnl instead.
   realized_pnl?: string
-  // PnL in USDT
+  // Deprecated: Use cumulativePnl instead.
   pnl?: string
   // Cumulative PnL in USDT
   cumulative_pnl?: string
@@ -2683,24 +2928,6 @@ export interface IDepositHistory {
   from_address?: string
 }
 
-export interface IDetailAdminRewardEpoch {
-  // The epoch detail information
-  epoch_info?: IAdminRewardEpoch
-  // The point distribution ratio for this epoch
-  distribution_percentage?: IPointDistributionRatio
-  // The raw point distribution ratio for this epoch before applying boost
-  raw_distribution_percentage?: IPointDistributionRatio
-  // The point boost ratio for this epoch
-  boost_percentage?: IPointDistributionRatio
-  // The visibility percentage for this epoch
-  visibility_percentage?: number
-}
-
-export interface IDetailAdminRewardEpochResponse {
-  // The detailed epoch information
-  result?: IDetailAdminRewardEpoch
-}
-
 export interface IDetailedAggregatedAccountSummary {
   // The main account ID of the account to which the summary belongs
   main_account_id?: string
@@ -2710,12 +2937,18 @@ export interface IDetailedAggregatedAccountSummary {
   spot_balances?: ISpotBalance[]
   // The list of vault investments held by this main account
   vault_investments?: IVaultInvestment[]
-  // Total balance of the main account, denominated in USD
+  // Deprecated: Use fundingAccountEquity instead
   funding_account_balance?: string
-  // Total balance of the sub accounts, denominated in USD
+  // Deprecated: Use totalSubAccountEquity instead
   total_sub_account_balance?: string
-  // Total balance of the vault investments, denominated in USD
+  // Total amount of the vault investments, denominated in USD
   total_vault_investments_balance?: string
+  // Total equity of the main account, denominated in USD
+  funding_account_equity?: string
+  // Total equity of the sub accounts, denominated in USD
+  total_sub_account_equity?: string
+  // Total available balance of the main account, denominated in USD
+  total_sub_account_available_balance?: string
 }
 
 export interface IECNToBrokerFeed {
@@ -2878,58 +3111,13 @@ export interface IEpochLPPoint {
   vault_liquidity_score?: string
 }
 
-export interface IEpochMetricPoint {
-  // The metric name
-  metric?: EMetricType
-  // The epoch number
-  epoch?: number
-  // The off chain account id
-  off_chain_account_id?: string
-  // The raw point, with multiplier 1e9
-  raw_point?: string
-  // The adjusted point, with multiplier 1e9
-  adjusted_point?: string
-  // The allocated point for this metric, with multiplier 1e9
-  point?: string
-  // The metadata, contain the band index and account multiplier
-  metadata?: IRewardMetricPointMetadata
-}
-
-export interface IEpochMetricPointCalculatorMetadata {
-  // The metric name
-  metric?: EMetricType
-  // The epoch number
-  epoch?: number
-  // The allocated point for this metric, with multiplier 1e9
-  allocated_point?: string
-  // The total adjusted point for this metric, with multiplier 1e9
-  total_adjusted_point?: string
-  // The band range list
-  band_range?: string[]
-  // The band steepness list.
-  band_steepness?: number[]
-  // The time in unix nanoseconds when the points were calculated
-  calculated_at?: string
-}
-
-export interface IEpochPoint {
-  // The epoch number
-  epoch?: number
-  // The off chain account id
-  off_chain_account_id?: string
-  // The raw point, with multiplier 1e9
-  point?: string
-  // The reserve point, with multiplier 1e9
-  reserve_point?: string
-}
-
 export interface IEpochPointBoostConfiguration {
   // The epoch point distribution configuration ID
   id?: string
   // The epoch number
   epoch?: number
   // The point boost ratio
-  boost_percentage?: IPointDistributionRatio
+  boost_percentage?: IPointDistributionPercentage
   // The configuration status
   status?: EEpochPointBoostConfigurationStatus
   // The creator of the configuration
@@ -2948,7 +3136,7 @@ export interface IEpochPointDistributionConfiguration {
   // The epoch number
   start_epoch?: number
   // The point distribution ratio
-  point_distribution_percentage?: IPointDistributionRatio
+  point_distribution_percentage?: IPointDistributionPercentage
   // The configuration status
   status?: EEpochPointDistributionConfigurationStatus
   // The creator of the configuration
@@ -3053,19 +3241,6 @@ export interface IFill {
   is_rpi?: boolean
   // Specifies the source of the viewing party of the trade
   source?: ESource
-}
-
-export interface IFirstSessionAirdropInfo {
-  // The off chain account id
-  off_chain_account_id?: string
-  // The airdrop ratio, with multiplier 1e9
-  airdrop_ratio?: string
-  // The total ecosystem point, without multiplier
-  total_ecosystem_point?: string
-  // The total trader point, without multiplier
-  total_trader_point?: string
-  // The total LP point, without multiplier
-  total_lp_point?: string
 }
 
 export interface IFlatReferral {
@@ -3356,38 +3531,6 @@ export interface IMainAccountLeaderboardEntry {
   realized_pnl?: string
 }
 
-export interface IManualPointDistribution {
-  // The manual point distribution ID
-  id?: string
-  // The account ID
-  off_chain_account_id?: string
-  // The number of points distributed
-  points?: number
-  // The epoch number
-  epoch?: number
-  // The metadata for manual point distribution
-  metadata?: IManualPointDistributionMetadata
-  // The distribution type
-  distribution_type?: EDistributionType
-  // The point type
-  point_type?: EPointType
-  // The creator of the distribution
-  created_by_id?: string
-  // The creation timestamp
-  create_time?: string
-  // The last update timestamp
-  update_time?: string
-}
-
-export interface IManualPointDistributionMetadata {
-  // The reason for manual point distribution
-  reason?: string
-  // The raffle task ID associated with this distribution
-  raffle_task_id?: string
-  // The account creation time associated with the task
-  task_account_create_time?: string
-}
-
 export interface IMarginTierResponse {
   lower_bound?: string
   rate?: string
@@ -3559,7 +3702,39 @@ export interface IOrderbookLevels {
   asks?: IOrderbookLevel[]
 }
 
-export interface IPointDistributionRatio {
+export interface IPointDistribution {
+  // The manual point distribution ID
+  id?: string
+  // The account ID
+  off_chain_account_id?: string
+  // The number of points distributed
+  points?: number
+  // The epoch number
+  epoch?: number
+  // The metadata for manual point distribution
+  metadata?: IPointDistributionMetadata
+  // The distribution type
+  distribution_type?: EDistributionType
+  // The point type
+  point_type?: EPointType
+  // The creator of the distribution
+  created_by_id?: string
+  // The creation timestamp
+  create_time?: string
+  // The last update timestamp
+  update_time?: string
+}
+
+export interface IPointDistributionMetadata {
+  // The reason for manual point distribution
+  reason?: string
+  // The raffle task ID associated with this distribution
+  raffle_task_id?: string
+  // The account creation time associated with the task
+  task_account_create_time?: string
+}
+
+export interface IPointDistributionPercentage {
   // The trading volume ratio.
   trading_volume?: number
   // The trading lp point ratio
@@ -3742,16 +3917,6 @@ export interface IQueryFindEpochResponse {
   epoch?: IEpoch
 }
 
-export interface IQueryFirstSessionAirdropInfoRequest {
-  // The off chain account id to query
-  off_chain_account_id?: string
-}
-
-export interface IQueryFirstSessionAirdropInfoResponse {
-  // The first session airdrop info
-  info?: IFirstSessionAirdropInfo
-}
-
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
@@ -3777,6 +3942,22 @@ export interface IQueryLatestSubAccountSummaryRequest {
 export interface IQueryLatestSubAccountSummaryResponse {
   // The latest sub-account summary
   result?: ISnapSubAccountSummary
+}
+
+// Request to retrieve the sub-account summary for a given sub-account
+export interface IQueryListSubAccountHistoryRequest {
+  // The subaccount ID to filter by
+  sub_account_id?: string
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
+}
+
+// Response to retrieve the sub-account summary for a given sub-account
+export interface IQueryListSubAccountHistoryResponse {
+  // The list of sub-account summaries
+  result?: ISnapSubAccountSummary[]
 }
 
 // Request to retrieve the trading volume
@@ -3823,6 +4004,10 @@ export interface IQueryTradingPerformanceTrendRequest {
   sub_account_i_ds?: string[]
   // The time interval to filter by
   time_interval?: ETimeInterval
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
 }
 
 // Response to retrieve the trading performance trend
@@ -3865,19 +4050,16 @@ export interface IQueryVaultSummaryHistoryRequest {
   time_interval?: ETimeInterval
   // Optional. The start interval to query the vault summary from
   start_interval?: string
+  // Optional. The limit of the number of results to return
+  limit?: number
+  // Optional. If true, results are sorted by eventTime descending; if false or unset, results are sorted ascending.
+  sort_by_event_time_desc?: boolean
 }
 
 // Response to retrieve the vault summary for a given vault
 export interface IQueryVaultSummaryHistoryResponse {
   // The list of vault summaries
   result?: ISnapVaultSummary[]
-}
-
-export interface IReservePointInformation {
-  // The cumulative reserved points up to latest epoch. It is the sum of all previous released epochs' reserve points.
-  cumulative_reserved_points?: string
-  // The available reserve points that can be used for manual point distribution up to latest epoch
-  available_reserve_points?: string
 }
 
 export interface IRewardAccountMultiplier {
@@ -3952,15 +4134,6 @@ export interface IRewardEpochInfo {
   status?: ERewardEpochStatus
 }
 
-export interface IRewardMetricPointMetadata {
-  // The band index starting from 1 in the band range
-  band_index?: number
-  // The account multiplier
-  account_multiplier?: string
-  // The note
-  note?: string
-}
-
 export interface IRewardReferralPoint {
   // The off-chain account ID
   off_chain_account_id?: string
@@ -3968,6 +4141,23 @@ export interface IRewardReferralPoint {
   epoch?: number
   // The point
   point?: string
+}
+
+export interface IRiskBracket {
+  // 1-indexed tier number
+  tier?: number
+  // Lower bound of notional value (inclusive) in quote currency
+  notional_floor?: string
+  // Upper bound of notional value (exclusive) in quote currency, empty for last tier
+  notional_cap?: string
+  // Maintenance margin rate as a decimal (e.g., '0.01' for 1%)
+  maintenance_margin_rate?: string
+  // Initial margin rate as a decimal (e.g., '0.02' for 2%)
+  initial_margin_rate?: string
+  // Maximum leverage allowed at this tier (floor of 1 / initial_margin_rate)
+  max_leverage?: number
+  // Cumulative maintenance margin amount in quote currency
+  cumulative_maintenance_amount?: string
 }
 
 export interface ISessionInformation {
@@ -4009,28 +4199,6 @@ export interface ISnapAccountSummary {
   start_interval?: string
   // Total equity of the main account and all sub-accounts, denominated in USD
   total_equity?: string
-}
-
-// The aggregated account summary, that reports the total equity and spot balances of an account
-export interface ISnapFundingAccountSummary {
-  // Time at which the event was emitted in unix nanoseconds
-  event_time?: string
-  // The start of the interval in unix nanoseconds
-  start_interval?: string
-  // The main account ID of the account to which the summary belongs
-  main_account_id?: string
-  // Total equity of the main account, denominated in USD
-  total_equity?: string
-  // The list of spot assets owned by this main account, and their balances
-  spot_balances?: ISpotBalance[]
-  // The list of vault investments held by this main account
-  vault_investments?: IVaultInvestment[]
-  // Total balance of the main account, denominated in USD
-  funding_account_balance?: string
-  // Total balance of the sub accounts, denominated in USD
-  total_sub_account_balance?: string
-  // Total balance of the vault investments, denominated in USD
-  total_vault_investments_balance?: string
 }
 
 export interface ISnapSubAccountSummary {
@@ -4132,12 +4300,38 @@ export interface ISubAccount {
   derisk_margin?: string
   // The derisk margin to maintenance margin ratio of this sub account
   derisk_to_maintenance_margin_ratio?: string
+  // The total equity of this sub account for cross margin
+  total_cross_equity?: string
+  // The unrealized PnL of this sub account for cross margin
+  cross_unrealized_pnl?: string
 }
 
 // Similar to sub-account trade, but not divided by individual assets.
 export interface ISubAccountTradeAggregation {
   // The sub account id
   sub_account_id?: string
+  // Total fee paid
+  total_fee?: string
+  // Total volume traded
+  total_trade_volume?: string
+  // Number of trades
+  num_traded?: string
+  // Total positive fee paid by user
+  positive_fee?: string
+  // The signer of the trade
+  signer?: string
+  // Realized PnL
+  realized_pnl?: string
+  // source of order
+  source?: ESource
+}
+
+// aggregated sub-account trade at specific interval
+export interface ISubAccountTradeIntervalAggregation {
+  // The sub account id
+  sub_account_id?: string
+  // The starting time in unix nanoseconds of a specific interval
+  start_interval?: string
   // Total fee paid
   total_fee?: string
   // Total volume traded

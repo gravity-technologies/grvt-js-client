@@ -1,7 +1,7 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'POINT_DISTRIBUTION_RATIO' struct.
-export const POINT_DISTRIBUTION_RATIO_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'POINT_DISTRIBUTION_PERCENTAGE' struct.
+export const POINT_DISTRIBUTION_PERCENTAGE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     trading_volume: 'tv',
     trading_lp_point: 'tl',

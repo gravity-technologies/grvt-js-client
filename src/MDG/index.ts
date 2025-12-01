@@ -18,6 +18,8 @@ import type {
   IApiGetFilteredInstrumentsResponse,
   IApiGetInstrumentRequest,
   IApiGetInstrumentResponse,
+  IApiGetMarginRulesRequest,
+  IApiGetMarginRulesResponse,
   IApiLiveFundingRateComparisonRequest,
   IApiLiveFundingRateComparisonResponse,
   IApiMiniTickerRequest,
@@ -63,6 +65,8 @@ import { API_GET_FILTERED_INSTRUMENTS_REQUEST_MAP } from '../interfaces/codegen/
 import { API_GET_FILTERED_INSTRUMENTS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_filtered_instruments_response'
 import { API_GET_INSTRUMENT_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_request'
 import { API_GET_INSTRUMENT_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_instrument_response'
+import { API_GET_MARGIN_RULES_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_margin_rules_request'
+import { API_GET_MARGIN_RULES_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_margin_rules_response'
 import { API_LIVE_FUNDING_RATE_COMPARISON_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_live_funding_rate_comparison_request'
 import { API_LIVE_FUNDING_RATE_COMPARISON_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_live_funding_rate_comparison_response'
 import { API_MINI_TICKER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_mini_ticker_request'
@@ -401,5 +405,26 @@ export class MDG {
 
   /**
    * END: Funding V2
+   */
+
+  /**
+   * START: Isolated Margin
+   */
+
+  marginRules (payload: IApiGetMarginRulesRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/margin_rules',
+      Utils.schemaMap(payload, API_GET_MARGIN_RULES_REQUEST_MAP.FULL_TO_LITE, true),
+      {
+        ...config,
+        withCredentials: false
+      }
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_MARGIN_RULES_RESPONSE_MAP.LITE_TO_FULL) as IApiGetMarginRulesResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * END: Isolated Margin
    */
 }
