@@ -132,6 +132,8 @@ export interface IAggregatedAccountSummary {
   total_vault_investments_balance?: string
   // Total available balance of the main account, denominated in USD
   total_sub_account_available_balance?: string
+  // Total entry (initial investment) amount of the open investments, denominated in USD
+  total_usd_notional_invested?: string
 }
 
 // Trading performance trend returned by the service
@@ -2949,6 +2951,8 @@ export interface IDetailedAggregatedAccountSummary {
   total_sub_account_equity?: string
   // Total available balance of the main account, denominated in USD
   total_sub_account_available_balance?: string
+  // Total USD notional invested in the open vault investments, denominated in USD
+  total_usd_notional_invested?: string
 }
 
 export interface IECNToBrokerFeed {
@@ -4700,6 +4704,8 @@ export interface IVaultInvestment {
   num_lp_tokens?: string
   // The current share price (in USD) of this vault investment.
   share_price?: string
+  // The USD notional invested in this vault investment.
+  usd_notional_invested?: string
 }
 
 // The vault investor summary

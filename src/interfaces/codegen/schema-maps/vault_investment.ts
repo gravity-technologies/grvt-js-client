@@ -5,11 +5,13 @@ export const VAULT_INVESTMENT_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
     vault_id: 'vi',
     num_lp_tokens: 'nl',
-    share_price: 'sp'
+    share_price: 'sp',
+    usd_notional_invested: 'un'
   },
   LITE_TO_FULL: {
     vi: 'vault_id',
     nl: 'num_lp_tokens',
-    sp: 'share_price'
+    sp: 'share_price',
+    un: 'usd_notional_invested'
   }
 })

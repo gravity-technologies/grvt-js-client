@@ -14,7 +14,8 @@ export const DETAILED_AGGREGATED_ACCOUNT_SUMMARY_MAP: SchemaPairMap = Object.fre
     total_vault_investments_balance: 'tv',
     funding_account_equity: 'fa1',
     total_sub_account_equity: 'ts1',
-    total_sub_account_available_balance: 'ts2'
+    total_sub_account_available_balance: 'ts2',
+    total_usd_notional_invested: 'tu'
   },
   LITE_TO_FULL: {
     ma: 'main_account_id',
@@ -26,6 +27,7 @@ export const DETAILED_AGGREGATED_ACCOUNT_SUMMARY_MAP: SchemaPairMap = Object.fre
     tv: 'total_vault_investments_balance',
     fa1: 'funding_account_equity',
     ts1: 'total_sub_account_equity',
-    ts2: 'total_sub_account_available_balance'
+    ts2: 'total_sub_account_available_balance',
+    tu: 'total_usd_notional_invested'
   }
 })

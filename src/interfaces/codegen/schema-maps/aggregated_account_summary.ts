@@ -12,7 +12,8 @@ export const AGGREGATED_ACCOUNT_SUMMARY_MAP: SchemaPairMap = Object.freeze({
     total_sub_account_balance: 'ts',
     total_sub_account_equity: 'ts1',
     total_vault_investments_balance: 'tv',
-    total_sub_account_available_balance: 'ts2'
+    total_sub_account_available_balance: 'ts2',
+    total_usd_notional_invested: 'tu'
   },
   LITE_TO_FULL: {
     ma: 'main_account_id',
@@ -22,6 +23,7 @@ export const AGGREGATED_ACCOUNT_SUMMARY_MAP: SchemaPairMap = Object.freeze({
     ts: 'total_sub_account_balance',
     ts1: 'total_sub_account_equity',
     tv: 'total_vault_investments_balance',
-    ts2: 'total_sub_account_available_balance'
+    ts2: 'total_sub_account_available_balance',
+    tu: 'total_usd_notional_invested'
   }
 })
