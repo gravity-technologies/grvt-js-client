@@ -26,7 +26,10 @@ export const FILL_MAP: SchemaPairMap = Object.freeze({
     signer: 's1',
     broker: 'b',
     is_rpi: 'ir1',
-    source: 's2'
+    source: 's2',
+    builder: 'b1',
+    builder_fee_rate: 'bf',
+    builder_fee: 'bf1'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -52,6 +55,9 @@ export const FILL_MAP: SchemaPairMap = Object.freeze({
     s1: 'signer',
     b: 'broker',
     ir1: 'is_rpi',
-    s2: 'source'
+    s2: 'source',
+    b1: 'builder',
+    bf: 'builder_fee_rate',
+    bf1: 'builder_fee'
   }
 })

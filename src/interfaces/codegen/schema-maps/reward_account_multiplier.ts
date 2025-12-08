@@ -15,7 +15,8 @@ export const REWARD_ACCOUNT_MULTIPLIER_MAP: SchemaPairMap = Object.freeze({
     created_by_id: 'cb',
     create_time: 'ct',
     update_time: 'ut',
-    metadata: ['m2', REWARD_ACCOUNT_MULTIPLIER_METADATA_MAP.FULL_TO_LITE]
+    metadata: ['m2', REWARD_ACCOUNT_MULTIPLIER_METADATA_MAP.FULL_TO_LITE],
+    reserve_multiplier: 'rm'
   },
   LITE_TO_FULL: {
     i: 'id',
@@ -29,6 +30,7 @@ export const REWARD_ACCOUNT_MULTIPLIER_MAP: SchemaPairMap = Object.freeze({
     cb: 'created_by_id',
     ct: 'create_time',
     ut: 'update_time',
-    m2: ['metadata', REWARD_ACCOUNT_MULTIPLIER_METADATA_MAP.LITE_TO_FULL]
+    m2: ['metadata', REWARD_ACCOUNT_MULTIPLIER_METADATA_MAP.LITE_TO_FULL],
+    rm: 'reserve_multiplier'
   }
 })

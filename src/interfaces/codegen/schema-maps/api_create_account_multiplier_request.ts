@@ -8,7 +8,8 @@ export const API_CREATE_ACCOUNT_MULTIPLIER_REQUEST_MAP: SchemaPairMap = Object.f
     account_type: 'at',
     multiplier: 'm1',
     effective_epoch_start: 'ee',
-    effective_epoch_end: 'ee1'
+    effective_epoch_end: 'ee1',
+    reserve_multiplier: 'rm'
   },
   LITE_TO_FULL: {
     m: 'metric',
@@ -16,6 +17,7 @@ export const API_CREATE_ACCOUNT_MULTIPLIER_REQUEST_MAP: SchemaPairMap = Object.f
     at: 'account_type',
     m1: 'multiplier',
     ee: 'effective_epoch_start',
-    ee1: 'effective_epoch_end'
+    ee1: 'effective_epoch_end',
+    rm: 'reserve_multiplier'
   }
 })

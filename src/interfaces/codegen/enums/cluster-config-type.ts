@@ -123,6 +123,8 @@ export enum EClusterConfigType {
   FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG = 'FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG',
   // Flag to enable add isolated position margin
   FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN = 'FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN',
+  // Flag builder code
+  FLAG_BUILDER_CODE = 'FLAG_BUILDER_CODE',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -187,5 +189,6 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_MM_CHECK_MULTIPLIER]: 59,
   [EClusterConfigType.FLAG_ISOLATED_MARGIN]: 60,
   [EClusterConfigType.FLAG_ENABLE_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG]: 61,
-  [EClusterConfigType.FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN]: 62
+  [EClusterConfigType.FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN]: 62,
+  [EClusterConfigType.FLAG_BUILDER_CODE]: 63
 })

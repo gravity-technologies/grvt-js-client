@@ -77,6 +77,14 @@ export enum EOrderRejectReason {
   CURRENCY_NOT_DEFINED = 'CURRENCY_NOT_DEFINED',
   // the chain ID is invalid
   INVALID_CHAIN_ID = 'INVALID_CHAIN_ID',
+  // Builder fee exceed the limit
+  BUILDER_ORDER_FEE_EXCEED = 'BUILDER_ORDER_FEE_EXCEED',
+  // Builder fee is below 0
+  BUILDER_ORDER_FEE_NEGATIVE = 'BUILDER_ORDER_FEE_NEGATIVE',
+  // Builder is not an authorized builder for client
+  BUILDER_ORDER_BUILDER_NOT_AUTHORIZED = 'BUILDER_ORDER_BUILDER_NOT_AUTHORIZED',
+  // Builder does not exist
+  BUILDER_ORDER_BUILDER_NOT_EXIST = 'BUILDER_ORDER_BUILDER_NOT_EXIST',
 }
 
 export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.freeze({
@@ -118,5 +126,9 @@ export const EOrderRejectReasonInt: Record<EOrderRejectReason, number> = Object.
   [EOrderRejectReason.DERISK_NOT_SUPPORTED]: 35,
   [EOrderRejectReason.INVALID_ORDER_TYPE]: 36,
   [EOrderRejectReason.CURRENCY_NOT_DEFINED]: 37,
-  [EOrderRejectReason.INVALID_CHAIN_ID]: 38
+  [EOrderRejectReason.INVALID_CHAIN_ID]: 38,
+  [EOrderRejectReason.BUILDER_ORDER_FEE_EXCEED]: 39,
+  [EOrderRejectReason.BUILDER_ORDER_FEE_NEGATIVE]: 40,
+  [EOrderRejectReason.BUILDER_ORDER_BUILDER_NOT_AUTHORIZED]: 41,
+  [EOrderRejectReason.BUILDER_ORDER_BUILDER_NOT_EXIST]: 42
 })

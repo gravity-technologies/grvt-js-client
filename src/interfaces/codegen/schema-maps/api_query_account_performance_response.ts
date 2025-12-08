@@ -1,14 +1,12 @@
 import { type SchemaPairMap } from './types'
 
-// Schema map for the 'API_ACCOUNT_PERFORMANCE_TREND' struct.
-export const API_ACCOUNT_PERFORMANCE_TREND_MAP: SchemaPairMap = Object.freeze({
+// Schema map for the 'API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE' struct.
+export const API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    start_interval: 'si',
     aggregated_pnl: 'ap',
     investment_pnl: 'ip'
   },
   LITE_TO_FULL: {
-    si: 'start_interval',
     ap: 'aggregated_pnl',
     ip: 'investment_pnl'
   }
