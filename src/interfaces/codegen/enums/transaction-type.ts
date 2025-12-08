@@ -51,6 +51,7 @@ export enum ETransactionType {
   UPDATE_FUNDING_INFO = 'UPDATE_FUNDING_INFO',
   SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG = 'SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG',
   ADD_ISOLATED_POSITION_MARGIN = 'ADD_ISOLATED_POSITION_MARGIN',
+  AUTHORIZE_BUILDER = 'AUTHORIZE_BUILDER',
 }
 
 export const ETransactionTypeInt: Record<ETransactionType, number> = Object.freeze({
@@ -105,5 +106,6 @@ export const ETransactionTypeInt: Record<ETransactionType, number> = Object.free
   [ETransactionType.VAULT_CROSS_EXCHANGE_UPDATE]: 49,
   [ETransactionType.UPDATE_FUNDING_INFO]: 50,
   [ETransactionType.SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG]: 51,
-  [ETransactionType.ADD_ISOLATED_POSITION_MARGIN]: 52
+  [ETransactionType.ADD_ISOLATED_POSITION_MARGIN]: 52,
+  [ETransactionType.AUTHORIZE_BUILDER]: 53
 })

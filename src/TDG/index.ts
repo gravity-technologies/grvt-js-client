@@ -53,7 +53,6 @@ import type {
   IApiPreOrderCheckResponse,
   IApiQueryAccountPerformanceTrendRequest,
   IApiQueryAccountPerformanceTrendResponse,
-  IApiQueryAccountTodayPerformanceRequest,
   IApiQueryAccountTodayPerformanceResponse,
   IApiQueryListFundingAccountSummaryRequest,
   IApiQueryListFundingAccountSummaryResponse,
@@ -155,7 +154,6 @@ import { API_PRE_ORDER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-ma
 import { API_PRE_ORDER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_response'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_request'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_response'
-import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_request'
 import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_response'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_request'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_response'
@@ -841,10 +839,10 @@ export class TDG {
    * START: Portfolio
    */
 
-  accountTodayPerformance (payload: IApiQueryAccountTodayPerformanceRequest, config?: AxiosRequestConfig) {
+  accountTodayPerformance (config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/account_today_performance',
-      Utils.schemaMap(payload, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      null,
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountTodayPerformanceResponse

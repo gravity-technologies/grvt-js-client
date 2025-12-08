@@ -113,6 +113,18 @@ export interface IAggregatedAccountPerformance {
   aggregated_pnl?: string
   // Investment PnL of the funding account
   investment_pnl?: string
+  // The total equity at the start of the calculation period
+  equity_start?: string
+  // The total equity at the end of the calculation period
+  equity_end?: string
+  // Net transfer of the funding account
+  net_transfer?: string
+  // The investment balance at the start of the calculation period
+  investment_balance_start?: string
+  // The investment balance at the end of the calculation period
+  investment_balance_end?: string
+  // Net investment of the funding account
+  net_investment?: string
 }
 
 export interface IAggregatedAccountSummary {
@@ -140,10 +152,10 @@ export interface IAggregatedAccountSummary {
 export interface IApiAccountPerformanceTrend {
   // The start time of the interval
   start_interval?: string
-  // The end time of the interval
-  end_interval?: string
   // Aggregated PnL of the funding account and sub accounts
   aggregated_pnl?: string
+  // Investment PnL of the funding account
+  investment_pnl?: string
 }
 
 // The request to add margin to a isolated position
@@ -168,6 +180,33 @@ export interface IApiAddIsolatedPositionMarginResponse {
 export interface IApiAggregatedAccountSummaryResponse {
   // The aggregated account summary
   result?: IAggregatedAccountSummary
+}
+
+// Authorizes a specific Builder to execute transactions on behalf of the Main Account.
+//
+// This endpoint acts as an **upsert** operation:
+// - **New Authorization**: If the builder is not currently authorized, a new record is created.
+// - **Update Limit**: If the builder is already authorized, this request updates the `maxFuturesFeeRate` and `maxSpotFeeRate` to the new values provided.
+export interface IApiAuthorizeBuilderRequest {
+  // The Main Account ID of the user granting the authorization.
+  main_account_id?: string
+  // The Main Account ID of the Builder receiving the authorization.
+  builder_account_id?: string
+  // The maximum fee rate cap for **Futures** trades executed by this builder. The builder cannot charge fees exceeding this limit.
+  max_futures_fee_rate?: string
+  // The maximum fee rate cap for **Spot** trades executed by this builder. The builder cannot charge fees exceeding this limit.
+  max_spot_fee_rate?: string
+  // The cryptographic signature authenticating this request. Must be signed by the private key associated with `mainAccountID`.
+  signature?: ISignature
+}
+
+export interface IApiAuthorizedBuilder {
+  // The main account ID of the builder
+  builder_account_id?: string
+  // The maximum fee rate for the authorized builder
+  max_futures_fee_rate?: string
+  // The maximum fee rate for the authorized builder
+  max_spot_fee_rate?: string
 }
 
 // Request payload for fetching the detail of a vault.
@@ -208,6 +247,30 @@ export interface IApiBatchQueryVaultRiskMetricRequest {
 export interface IApiBatchQueryVaultRiskMetricResponse {
   // The list of vault risk metrics
   result?: IVaultRiskMetric[]
+}
+
+// The request to get the historical builder trade of a builder
+// The history is returned in reverse chronological order
+//
+// Pagination works as follows:<ul><li>We perform a reverse chronological lookup, starting from `end_time`. If `end_time` is not set, we start from the most recent data.</li><li>The lookup is limited to `limit` records. If more data is requested, the response will contain a `next` cursor for you to query the next page.</li><li>If a `cursor` is provided, it will be used to fetch results from that point onwards.</li><li>Pagination will continue until the `start_time` is reached. If `start_time` is not set, pagination will continue as far back as our data retention policy allows.</li></ul>
+export interface IApiBuilderFillHistoryRequest {
+  // Builder main account ID being queried.
+  builder_main_account_id?: string
+  // The start time to query for in unix nanoseconds
+  start_time?: string
+  // The end time to query for in unix nanoseconds
+  end_time?: string
+  // The limit to query for. Defaults to 500; Max 1000
+  limit?: number
+  // The cursor to indicate when to start the next query from
+  cursor?: string
+}
+
+export interface IApiBuilderFillHistoryResponse {
+  // The builder fill history matching the request builder account
+  result?: IBuilderFillHistory[]
+  // The cursor to indicate when to start the next query from
+  next?: string
 }
 
 // Usage Parameters
@@ -393,6 +456,8 @@ export interface IApiCreateAccountMultiplierRequest {
   effective_epoch_start?: number
   // The end epoch when multiplier stops taking effect
   effective_epoch_end?: number
+  // The multiplier value for reserve points, in range from 0 to 1
+  reserve_multiplier?: number
 }
 
 export interface IApiCreateAccountMultiplierResponse {
@@ -1018,6 +1083,12 @@ export interface IApiGetAllInstrumentsResponse {
   result?: IInstrumentDisplay[]
 }
 
+// Returns list of authorized builders and the associated fee
+export interface IApiGetAuthorizedBuildersResponse {
+  // The list of authorized builders
+  results?: IApiAuthorizedBuilder[]
+}
+
 // The response to get all CEV access tiers
 export interface IApiGetCEVAccessTiersResponse {
   // Will be returned false with empty list when the feature is disabled
@@ -1127,6 +1198,24 @@ export interface IApiGetInstrumentRequest {
 export interface IApiGetInstrumentResponse {
   // The instrument matching the request asset
   result?: IInstrumentDisplay
+}
+
+// The request to get the max addable and removable amount for an isolated position
+export interface IApiGetIsolatedPositionMarginLimitsRequest {
+  // The sub account ID to get the margin limits for
+  sub_account_id?: string
+  // The isolated position asset to get the margin limits for
+  instrument?: string
+}
+
+// The response to get the max addable and removable amount for an isolated position request
+export interface IApiGetIsolatedPositionMarginLimitsResponse {
+  // The isolated position asset
+  instrument?: string
+  // The max addable amount that can be added to the isolated position, expressed in quote asset decimal units
+  max_addable_amount?: string
+  // The max removable amount that can be removed from the isolated position, expressed in quote asset decimal units
+  max_removable_amount?: string
 }
 
 export interface IApiGetLPInfoRequest {
@@ -1618,6 +1707,28 @@ export interface IApiPreOrderCheckResponse {
   results?: IPreOrderCheckResult[]
 }
 
+// Request to retrieve the account daily performance
+export interface IApiQueryAccountDailyPerformanceRequest {
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
+}
+
+// Response to retrieve the account daily performance
+export interface IApiQueryAccountDailyPerformanceResponse {
+  // The list of account daily performances
+  result?: IApiAccountPerformanceTrend[]
+}
+
+// Response to retrieve the trading performance
+export interface IApiQueryAccountPerformanceResponse {
+  // Realtime aggregated PnL of the funding account and sub accounts
+  aggregated_pnl?: string
+  // Realtime investment PnL of the funding account in the given interval
+  investment_pnl?: string
+}
+
 // Request to retrieve the trading performance trend
 export interface IApiQueryAccountPerformanceTrendRequest {
   // The time interval to filter by
@@ -1630,7 +1741,7 @@ export interface IApiQueryAccountPerformanceTrendRequest {
 
 // Response to retrieve the trading performance trend
 export interface IApiQueryAccountPerformanceTrendResponse {
-  // The list of trading performance trends
+  // The list of account performance trends
   result?: IApiAccountPerformanceTrend[]
 }
 
@@ -1646,10 +1757,6 @@ export interface IApiQueryAccountSummaryResponse {
   result?: ISnapAccountSummary[]
   // The next cursor to fetch the next page of results
   next?: string
-}
-
-// Request to retrieve the trading volume
-export interface IApiQueryAccountTodayPerformanceRequest {
 }
 
 // Response to retrieve today's performance
@@ -1733,6 +1840,22 @@ export interface IApiQuerySnapVaultPositionResponse {
   event_time?: string
   // The list of positions owned by this vault
   positions?: IPositionSummary[]
+}
+
+// Request to retrieve the sub account daily performance
+export interface IApiQuerySubAccountDailyPerformanceRequest {
+  // The sub account ID to filter by
+  sub_account_id?: string
+  // The start time of the interval
+  start_time?: string
+  // The end time of the interval
+  end_time?: string
+}
+
+// Response to retrieve the sub account daily performance
+export interface IApiQuerySubAccountDailyPerformanceResponse {
+  // The list of sub account daily performances
+  result?: IApiSubAccountDailyPerformance[]
 }
 
 // Request to retrieve the trading volume
@@ -1961,6 +2084,13 @@ export interface IApiRewardLeaderboardItem {
   point?: string
 }
 
+// The request to set Builder code config
+export interface IApiSetBuilderCodeConfig {
+  enabled?: boolean
+  max_futures_fee_rate?: string
+  max_spot_fee_rate?: string
+}
+
 // The request to set CEV access tiers
 export interface IApiSetCEVAccessTiersRequest {
   enabled?: boolean
@@ -2093,6 +2223,14 @@ export interface IApiSocializedLossStatusResponse {
   is_active?: boolean
   // The socialized loss haircut ratio in centi-beeps
   haircut_ratio?: string
+}
+
+// Sub account daily performance returned by the service
+export interface IApiSubAccountDailyPerformance {
+  // The start time of the interval
+  start_interval?: string
+  // PnL of the sub account
+  pnl?: string
 }
 
 // The request to get the history of a sub account
@@ -2285,9 +2423,9 @@ export interface IApiTradingPerformanceTrend {
   end_interval?: string
   // The trading volume of the account
   trading_volume?: string
-  // Realized PnL in USDT
+  // Deprecated. Use cumulativePnl instead
   realized_pnl?: string
-  // PnL in USDT
+  // Deprecated. Use cumulativePnl instead
   pnl?: string
   // Cumulative PnL in USDT
   cumulative_pnl?: string
@@ -2760,6 +2898,31 @@ export interface IBatchCreateAccountMultiplierElement {
   multiplier?: number
   // The metadata/note for this account multiplier
   metadata?: IRewardAccountMultiplierMetadata
+}
+
+export interface IBuilderFillHistory {
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: string
+  // The off chain account id
+  off_chain_account_id?: string
+  // The instrument being represented
+  instrument?: string
+  // The side that the subaccount took on the trade
+  is_buyer?: boolean
+  // The role that the subaccount took on the trade
+  is_taker?: boolean
+  // The number of assets being traded, expressed in base asset decimal units
+  size?: string
+  // The traded price, expressed in `9` decimals
+  price?: string
+  // The mark price of the instrument at point of trade, expressed in `9` decimals
+  mark_price?: string
+  // The index price of the instrument at point of trade, expressed in `9` decimals
+  index_price?: string
+  // Builder fee percentage charged for this order. referred to Order.builder builderFee
+  fee_rate?: string
+  // The builder fee paid on the trade, expressed in quote asset decimal unit. referred to Trade.builderFee
+  fee?: string
 }
 
 export interface ICEVAccessTier {
@@ -3245,6 +3408,12 @@ export interface IFill {
   is_rpi?: boolean
   // Specifies the source of the viewing party of the trade
   source?: ESource
+  // The main account ID of the builder. referred to Order.builder
+  builder?: string
+  // Builder fee percentage charged for this order. referred to Order.builder builderFee
+  builder_fee_rate?: string
+  // The builder fee paid on the trade, expressed in quote asset decimal unit. referred to Trade.builderFee
+  builder_fee?: string
 }
 
 export interface IFlatReferral {
@@ -3416,7 +3585,8 @@ export interface IJSONRPCResponse {
   // The error for the request
   error?: IError
   // Optional Field which is used to match the response by the client.
-  // If not passed, this field will not be returned
+  // If not passed, this field will not be returned.
+  // Range: 0 to 4,294,967,295 (uint32)
   id?: number
   // The method used in the request for this response (eg: `subscribe` / `unsubscribe` / `v1/instrument` )
   method?: string
@@ -3618,6 +3788,10 @@ export interface IOrder {
   // Derisk orders are signed by the insurance fund, and are always reduce only IOC orders.
   // Trade.FeeCharged will mean derisk fee. Sent to insurance fund instead of fee collection fund.
   is_derisk?: boolean
+  // The main account ID of the builder
+  builder?: string
+  // Builder fee charged for this order
+  builder_fee?: string
 }
 
 export interface IOrderLeg {
@@ -3956,12 +4130,16 @@ export interface IQueryListSubAccountHistoryRequest {
   start_time?: string
   // The end time to filter by
   end_time?: string
+  // The limit to query for
+  limit?: number
+  // Optional. Whether to sort the results by startInterval in descending order, default is false
+  sort_by_time_desc?: boolean
 }
 
 // Response to retrieve the sub-account summary for a given sub-account
 export interface IQueryListSubAccountHistoryResponse {
-  // The list of sub-account summaries
-  result?: ISnapSubAccountSummary[]
+  // The list of sub-account histories
+  result?: ISnapSubAccountHistory[]
 }
 
 // Request to retrieve the trading volume
@@ -4091,6 +4269,8 @@ export interface IRewardAccountMultiplier {
   update_time?: string
   // The metadata/note for this account multiplier
   metadata?: IRewardAccountMultiplierMetadata
+  // The multiplier value for reserve points, in range from 0 to 1
+  reserve_multiplier?: number
 }
 
 export interface IRewardAccountMultiplierMetadata {
@@ -4192,6 +4372,7 @@ export interface ISignature {
   // ie. You can send the same exact instruction twice with different nonces.
   // When the same nonce is used, the same payload will generate the same signature.
   // Our system will consider the payload a duplicate, and ignore it.
+  // Range: 0 to 4,294,967,295 (uint32)
   nonce?: number
   // Chain ID used in EIP-712 domain. Zero value fallbacks to GRVT Chain ID.
   chain_id?: string
@@ -4203,6 +4384,21 @@ export interface ISnapAccountSummary {
   start_interval?: string
   // Total equity of the main account and all sub-accounts, denominated in USD
   total_equity?: string
+}
+
+export interface ISnapSubAccountHistory {
+  // The start of the interval in unix nanoseconds
+  start_interval?: string
+  // The sub account ID this entry refers to
+  sub_account_id?: string
+  // The notional value of your account if all positions are closed, excluding trading fees (reported in `settle_currency`).
+  // `total_equity = sum(spot_balance.balance * spot_balance.index_price) / settle_index_price + unrealized_pnl`
+  total_equity?: string
+  // The total unrealized PnL of all positions owned by this subaccount, denominated in quote currency decimal units.
+  // `unrealized_pnl = sum(position.unrealized_pnl * position.quote_index_price) / settle_index_price`
+  unrealized_pnl?: string
+  // Whether this sub account is a vault
+  is_vault?: boolean
 }
 
 export interface ISnapSubAccountSummary {
@@ -5210,7 +5406,8 @@ export interface IWSSubscribeParams {
 // When subscribing to the same primary selector again, the previous secondary selector will be replaced. See `Overview` page for more details.
 export interface IWSSubscribeRequestV1Legacy {
   // Optional Field which is used to match the response by the client.
-  // If not passed, this field will not be returned
+  // If not passed, this field will not be returned.
+  // Range: 0 to 4,294,967,295 (uint32)
   request_id?: number
   // The channel to subscribe to (eg: ticker.s / ticker.d)
   stream?: string
