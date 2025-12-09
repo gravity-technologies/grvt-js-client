@@ -1894,8 +1894,6 @@ export interface IApiQueryTradingAccountRiskMetricResponse {
 export interface IApiQueryTradingPerformanceRequest {
   // Optional: The subaccount ID to filter by
   sub_account_id?: string
-  // The asset to filter by
-  asset?: string
 }
 
 // Response to retrieve the trading volume
@@ -1904,6 +1902,8 @@ export interface IApiQueryTradingPerformanceResponse {
   trading_volume?: string
   // Realized PnL in USDT
   realized_pnl?: string
+  // Nearly real-time cumulative PnL in USDT
+  cumulative_pnl?: string
 }
 
 // Accumulated trading performance returned by the service
@@ -1920,9 +1920,9 @@ export interface IApiQueryTradingPerformanceSummaryRequest {
 
 // Response to retrieve the accumulated trading performance
 export interface IApiQueryTradingPerformanceSummaryResponse {
-  // The total PnL ratio
+  // The total PnL ratio based on the last snapshotted time interval
   total_pnl_ratio?: number
-  // The win rate
+  // The daily win rate, based on the last snapshotted time interval
   win_rate?: number
 }
 
@@ -2693,7 +2693,7 @@ export interface IApiVaultPerformance {
   realized_pnl?: string
   // Deprecated: Use cumulativePnl instead.
   pnl?: string
-  // Cumulative PnL in USDT
+  // Real-time cumulative PnL in USDT
   cumulative_pnl?: string
 }
 
