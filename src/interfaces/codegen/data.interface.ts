@@ -854,11 +854,21 @@ export interface IApiFindAccountMultiplierRequest {
   epoch?: number
   // Filter by status
   status?: EAccountMultiplierStatus
+  // Optional. The page number for pagination
+  page?: number
+  // Optional. The limit of the number of results to return
+  limit?: number
 }
 
 export interface IApiFindAccountMultiplierResponse {
   // The list of account multipliers
   result?: IRewardAccountMultiplier[]
+  // The current page number
+  page?: number
+  // The limit of the number of results to return
+  limit?: number
+  // The total count of matching account multipliers
+  total?: number
 }
 
 export interface IApiFindConflictAccountMultiplierResponse {
@@ -3999,6 +4009,14 @@ export interface IPositions {
   cumulative_fee?: string
   // The cumulative realized funding payment of the position, expressed in quote asset decimal units. Positive if paid, negative if received
   cumulative_realized_funding_payment?: string
+  // The margin type of the position
+  margin_type?: EPositionMarginType
+  // [IsolatedOnly] The wallet balance reserved for this isolated margin position, expressed in quote asset decimal units. If this positions is liquidated, this is the maximal balance that can be lost
+  isolated_balance?: string
+  // [IsolatedOnly] The initial margin of the isolated margin position, expressed in quote asset decimal units. The `total_equity` required to open more size in the position
+  isolated_im?: string
+  // [IsolatedOnly] The maintenance margin of the isolated margin position, expressed in quote asset decimal units. The `total_equity` required to avoid liquidation of the position
+  isolated_mm?: string
 }
 
 // Vault redemption queue section hidden from main view. All requests here have yet to age past the vault's minimum redemption period.

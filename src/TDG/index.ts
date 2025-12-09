@@ -1,7 +1,12 @@
 import type { AxiosRequestConfig } from 'axios'
 import type {
   IAckResponse,
+  IApiAddIsolatedPositionMarginRequest,
+  IApiAddIsolatedPositionMarginResponse,
   IApiAggregatedAccountSummaryResponse,
+  IApiAuthorizeBuilderRequest,
+  IApiBuilderFillHistoryRequest,
+  IApiBuilderFillHistoryResponse,
   IApiCancelAllOrdersRequest,
   IApiCancelAllOrdersResponse,
   IApiCancelOrderRequest,
@@ -35,6 +40,9 @@ import type {
   IApiFundingPaymentHistoryResponse,
   IApiGetAllInitialLeverageRequest,
   IApiGetAllInitialLeverageResponse,
+  IApiGetAuthorizedBuildersResponse,
+  IApiGetIsolatedPositionMarginLimitsRequest,
+  IApiGetIsolatedPositionMarginLimitsResponse,
   IApiGetMarginTiersResponse,
   IApiGetOrderGroupRequest,
   IApiGetOrderGroupResponse,
@@ -76,6 +84,8 @@ import type {
   IApiReplaceOrdersResponse,
   IApiSetInitialLeverageRequest,
   IApiSetInitialLeverageResponse,
+  IApiSetSubAccountPositionMarginConfigRequest,
+  IApiSetSubAccountPositionMarginConfigResponse,
   IApiSocializedLossStatusResponse,
   IApiSubAccountHistoryRequest,
   IApiSubAccountHistoryResponse,
@@ -102,7 +112,12 @@ import type {
 } from '../interfaces'
 import { validConfig } from '../interfaces'
 import { ACK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/ack_response'
+import { API_ADD_ISOLATED_POSITION_MARGIN_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_add_isolated_position_margin_request'
+import { API_ADD_ISOLATED_POSITION_MARGIN_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_add_isolated_position_margin_response'
 import { API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_aggregated_account_summary_response'
+import { API_AUTHORIZE_BUILDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_authorize_builder_request'
+import { API_BUILDER_FILL_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_builder_fill_history_request'
+import { API_BUILDER_FILL_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_builder_fill_history_response'
 import { API_CANCEL_ALL_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_request'
 import { API_CANCEL_ALL_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_response'
 import { API_CANCEL_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_order_request'
@@ -136,6 +151,9 @@ import { API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/s
 import { API_FUNDING_PAYMENT_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_funding_payment_history_response'
 import { API_GET_ALL_INITIAL_LEVERAGE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_all_initial_leverage_request'
 import { API_GET_ALL_INITIAL_LEVERAGE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_all_initial_leverage_response'
+import { API_GET_AUTHORIZED_BUILDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_authorized_builders_response'
+import { API_GET_ISOLATED_POSITION_MARGIN_LIMITS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_isolated_position_margin_limits_request'
+import { API_GET_ISOLATED_POSITION_MARGIN_LIMITS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_isolated_position_margin_limits_response'
 import { API_GET_MARGIN_TIERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_margin_tiers_response'
 import { API_GET_ORDER_GROUP_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_get_order_group_request'
 import { API_GET_ORDER_GROUP_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_get_order_group_response'
@@ -177,6 +195,8 @@ import { API_REPLACE_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-map
 import { API_REPLACE_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_replace_orders_response'
 import { API_SET_INITIAL_LEVERAGE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_set_initial_leverage_request'
 import { API_SET_INITIAL_LEVERAGE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_set_initial_leverage_response'
+import { API_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_set_sub_account_position_margin_config_request'
+import { API_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_set_sub_account_position_margin_config_response'
 import { API_SOCIALIZED_LOSS_STATUS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_socialized_loss_status_response'
 import { API_SUB_ACCOUNT_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_history_request'
 import { API_SUB_ACCOUNT_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_sub_account_history_response'
@@ -319,6 +339,69 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_POSITIONS_RESPONSE_MAP.LITE_TO_FULL) as IApiPositionsResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  setPositionConfig (payload: IApiSetSubAccountPositionMarginConfigRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/set_position_config',
+      Utils.schemaMap(payload, API_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_SET_SUB_ACCOUNT_POSITION_MARGIN_CONFIG_RESPONSE_MAP.LITE_TO_FULL) as IApiSetSubAccountPositionMarginConfigResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  addPositionMargin (payload: IApiAddIsolatedPositionMarginRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/add_position_margin',
+      Utils.schemaMap(payload, API_ADD_ISOLATED_POSITION_MARGIN_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_ADD_ISOLATED_POSITION_MARGIN_RESPONSE_MAP.LITE_TO_FULL) as IApiAddIsolatedPositionMarginResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  getPositionMarginLimits (payload: IApiGetIsolatedPositionMarginLimitsRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/get_position_margin_limits',
+      Utils.schemaMap(payload, API_GET_ISOLATED_POSITION_MARGIN_LIMITS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_ISOLATED_POSITION_MARGIN_LIMITS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetIsolatedPositionMarginLimitsResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  /**
+   * APIs for Builder
+   */
+  authorizeBuilder (payload: IApiAuthorizeBuilderRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/authorize_builder',
+      Utils.schemaMap(payload, API_AUTHORIZE_BUILDER_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, ACK_RESPONSE_MAP.LITE_TO_FULL) as IAckResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  getAuthorizedBuilders (config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/get_authorized_builders',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_GET_AUTHORIZED_BUILDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiGetAuthorizedBuildersResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  builderFillHistory (payload: IApiBuilderFillHistoryRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/builder_fill_history',
+      Utils.schemaMap(payload, API_BUILDER_FILL_HISTORY_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_BUILDER_FILL_HISTORY_RESPONSE_MAP.LITE_TO_FULL) as IApiBuilderFillHistoryResponse
     }).catch(Utils.coverApiError)
   }
 

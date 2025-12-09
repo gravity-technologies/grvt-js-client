@@ -8,7 +8,9 @@ export const API_FIND_ACCOUNT_MULTIPLIER_REQUEST_MAP: SchemaPairMap = Object.fre
     account_type: 'at',
     metric: 'm',
     epoch: 'e',
-    status: 's'
+    status: 's',
+    page: 'p',
+    limit: 'l'
   },
   LITE_TO_FULL: {
     oc: 'off_chain_account_id',
@@ -16,6 +18,8 @@ export const API_FIND_ACCOUNT_MULTIPLIER_REQUEST_MAP: SchemaPairMap = Object.fre
     at: 'account_type',
     m: 'metric',
     e: 'epoch',
-    s: 'status'
+    s: 'status',
+    p: 'page',
+    l: 'limit'
   }
 })
