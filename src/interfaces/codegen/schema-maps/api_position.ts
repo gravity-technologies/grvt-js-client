@@ -19,7 +19,11 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     est_liquidation_price: 'el',
     leverage: 'l',
     cumulative_fee: 'cf',
-    cumulative_realized_funding_payment: 'cr'
+    cumulative_realized_funding_payment: 'cr',
+    margin_type: 'mt',
+    isolated_balance: 'ib',
+    isolated_im: 'ii',
+    isolated_mm: 'im'
   },
   LITE_TO_FULL: {
     et: 'event_time',
@@ -38,6 +42,10 @@ export const POSITIONS_MAP: SchemaPairMap = Object.freeze({
     el: 'est_liquidation_price',
     l: 'leverage',
     cf: 'cumulative_fee',
-    cr: 'cumulative_realized_funding_payment'
+    cr: 'cumulative_realized_funding_payment',
+    mt: 'margin_type',
+    ib: 'isolated_balance',
+    ii: 'isolated_im',
+    im: 'isolated_mm'
   }
 })
