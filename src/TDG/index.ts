@@ -59,6 +59,9 @@ import type {
   IApiPreDepositCheckResponse,
   IApiPreOrderCheckRequest,
   IApiPreOrderCheckResponse,
+  IApiQueryAccountDailyPerformanceRequest,
+  IApiQueryAccountDailyPerformanceResponse,
+  IApiQueryAccountPerformanceResponse,
   IApiQueryAccountPerformanceTrendRequest,
   IApiQueryAccountPerformanceTrendResponse,
   IApiQueryAccountTodayPerformanceResponse,
@@ -66,6 +69,8 @@ import type {
   IApiQueryListFundingAccountSummaryResponse,
   IApiQueryListSubAccountSummaryRequest,
   IApiQueryListSubAccountSummaryResponse,
+  IApiQuerySubAccountDailyPerformanceRequest,
+  IApiQuerySubAccountDailyPerformanceResponse,
   IApiQueryTradingAccountRiskMetricRequest,
   IApiQueryTradingAccountRiskMetricResponse,
   IApiQueryTradingPerformanceRequest,
@@ -170,6 +175,9 @@ import { API_PRE_DEPOSIT_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-
 import { API_PRE_DEPOSIT_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_deposit_check_response'
 import { API_PRE_ORDER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_request'
 import { API_PRE_ORDER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_response'
+import { API_QUERY_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_daily_performance_request'
+import { API_QUERY_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_daily_performance_response'
+import { API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_response'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_request'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_response'
 import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_response'
@@ -177,6 +185,8 @@ import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interface
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_response'
 import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_request'
 import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_response'
+import { API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_daily_performance_request'
+import { API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_daily_performance_response'
 import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_request'
 import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_response'
 import { API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_request'
@@ -969,6 +979,36 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_VAULT_INVESTOR_HISTORY_STATS_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultInvestorHistoryStatsResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  accountPerformance (config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/account_performance',
+      null,
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  accountDailyPerformance (payload: IApiQueryAccountDailyPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/account_daily_performance',
+      Utils.schemaMap(payload, API_QUERY_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountDailyPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  subAccountDailyPerformance (payload: IApiQuerySubAccountDailyPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/sub_account_daily_performance',
+      Utils.schemaMap(payload, API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySubAccountDailyPerformanceResponse
     }).catch(Utils.coverApiError)
   }
 
