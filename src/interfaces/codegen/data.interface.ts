@@ -1868,6 +1868,18 @@ export interface IApiQuerySubAccountDailyPerformanceResponse {
   result?: IApiSubAccountDailyPerformance[]
 }
 
+// Request to retrieve sub account today's performance
+export interface IApiQuerySubAccountTodayPerformanceRequest {
+  // The sub account ID to filter by
+  sub_account_id?: string
+}
+
+// Response to retrieve sub account today's performance
+export interface IApiQuerySubAccountTodayPerformanceResponse {
+  // Nearly realtime PnL of the sub account, calculated by difference between equity at the start and end of the interval
+  pnl?: string
+}
+
 // Request to retrieve the trading volume
 export interface IApiQueryTradingAccountRiskMetricRequest {
   // The sub account ID to filter by
@@ -4522,6 +4534,22 @@ export interface ISubAccount {
   total_cross_equity?: string
   // The unrealized PnL of this sub account for cross margin
   cross_unrealized_pnl?: string
+}
+
+// Sub account performance returned by clickhouse
+export interface ISubAccountPerformance {
+  // The start time of the interval
+  start_interval?: string
+  // The subaccount ID of the user creating the Request
+  sub_account_id?: string
+  // The pnl of the subaccount, calculated by diff of equity at the start and end of the interval
+  pnl?: string
+  // The total equity at the start of the calculation period
+  equity_start?: string
+  // The total equity at the end of the calculation period
+  equity_end?: string
+  // Net transfer of the sub account
+  net_transfer?: string
 }
 
 // Similar to sub-account trade, but not divided by individual assets.

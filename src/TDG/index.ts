@@ -71,6 +71,8 @@ import type {
   IApiQueryListSubAccountSummaryResponse,
   IApiQuerySubAccountDailyPerformanceRequest,
   IApiQuerySubAccountDailyPerformanceResponse,
+  IApiQuerySubAccountTodayPerformanceRequest,
+  IApiQuerySubAccountTodayPerformanceResponse,
   IApiQueryTradingAccountRiskMetricRequest,
   IApiQueryTradingAccountRiskMetricResponse,
   IApiQueryTradingPerformanceRequest,
@@ -187,6 +189,8 @@ import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/co
 import { API_QUERY_LIST_SUB_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_sub_account_summary_response'
 import { API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_daily_performance_request'
 import { API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_daily_performance_response'
+import { API_QUERY_SUB_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_today_performance_request'
+import { API_QUERY_SUB_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_sub_account_today_performance_response'
 import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_request'
 import { API_QUERY_TRADING_ACCOUNT_RISK_METRIC_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_account_risk_metric_response'
 import { API_QUERY_TRADING_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_request'
@@ -1009,6 +1013,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_SUB_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySubAccountDailyPerformanceResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  subAccountTodayPerformance (payload: IApiQuerySubAccountTodayPerformanceRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/sub_account_today_performance',
+      Utils.schemaMap(payload, API_QUERY_SUB_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_QUERY_SUB_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQuerySubAccountTodayPerformanceResponse
     }).catch(Utils.coverApiError)
   }
 
