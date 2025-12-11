@@ -83,8 +83,6 @@ import type {
   IApiQueryTradingPerformanceTrendResponse,
   IApiQueryVaultInvestorHistoryRequest,
   IApiQueryVaultInvestorHistoryResponse,
-  IApiQueryVaultInvestorHistoryStatsRequest,
-  IApiQueryVaultInvestorHistoryStatsResponse,
   IApiQueryVaultManagerInvestorHistoryRequest,
   IApiQueryVaultManagerInvestorHistoryResponse,
   IApiReplaceOrdersRequest,
@@ -201,8 +199,6 @@ import { API_QUERY_TRADING_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/c
 import { API_QUERY_TRADING_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_trading_performance_trend_response'
 import { API_QUERY_VAULT_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_request'
 import { API_QUERY_VAULT_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_response'
-import { API_QUERY_VAULT_INVESTOR_HISTORY_STATS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_stats_request'
-import { API_QUERY_VAULT_INVESTOR_HISTORY_STATS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_investor_history_stats_response'
 import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_request'
 import { API_QUERY_VAULT_MANAGER_INVESTOR_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_vault_manager_investor_history_response'
 import { API_REPLACE_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_replace_orders_request'
@@ -973,16 +969,6 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_TRADING_ACCOUNT_RISK_METRIC_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryTradingAccountRiskMetricResponse
-    }).catch(Utils.coverApiError)
-  }
-
-  vaultInvestorHistoryStats (payload: IApiQueryVaultInvestorHistoryStatsRequest, config?: AxiosRequestConfig) {
-    return this._axios.post(
-      this._liteUrl + '/vault_investor_history_stats',
-      Utils.schemaMap(payload, API_QUERY_VAULT_INVESTOR_HISTORY_STATS_REQUEST_MAP.FULL_TO_LITE, true),
-      config
-    ).then((response) => {
-      return Utils.schemaMap(response.data, API_QUERY_VAULT_INVESTOR_HISTORY_STATS_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryVaultInvestorHistoryStatsResponse
     }).catch(Utils.coverApiError)
   }
 
