@@ -26,7 +26,6 @@ import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
 import type { ERewardProgramType } from './enums/reward-program-type.ts'
 import type { ERewardSession } from './enums/reward-session.ts'
 import type { ESource } from './enums/source.ts'
-import type { ESubAccountTradeInterval } from './enums/sub-account-trade-interval.ts'
 import type { ETimeInForce } from './enums/time-in-force.ts'
 import type { ETimeInterval } from './enums/time-interval.ts'
 import type { ETransactionType } from './enums/transaction-type.ts'
@@ -1495,18 +1494,6 @@ export interface IApiInternalBatchCreateAccountMultiplierResponse {
   ids?: string[]
 }
 
-// The request to get the latest snapshot of list sub account
-//
-export interface IApiLatestSnapSubAccountsRequest {
-  // The list of sub account ids to query
-  sub_account_i_ds?: string[]
-}
-
-export interface IApiLatestSnapSubAccountsResponse {
-  // The sub account history matching the request sub account
-  result?: ISubAccount[]
-}
-
 export interface IApiListAggregatedAccountSummaryRequest {
   // The list of main account ID to request for
   main_account_ids?: string[]
@@ -1755,20 +1742,6 @@ export interface IApiQueryAccountPerformanceTrendResponse {
   result?: IApiAccountPerformanceTrend[]
 }
 
-// Request to retrieve the account summary for a given account
-export interface IApiQueryAccountSummaryRequest {
-  // The time interval to filter
-  time_interval?: ETimeInterval
-}
-
-// Response to retrieve the sub-account summary for a given sub-account
-export interface IApiQueryAccountSummaryResponse {
-  // The list of account summaries
-  result?: ISnapAccountSummary[]
-  // The next cursor to fetch the next page of results
-  next?: string
-}
-
 // Response to retrieve today's performance
 export interface IApiQueryAccountTodayPerformanceResponse {
   // Realtime aggregated PnL of the funding account and sub accounts
@@ -1968,16 +1941,6 @@ export interface IApiQueryVaultInvestorHistoryRequest {
 export interface IApiQueryVaultInvestorHistoryResponse {
   // The list of vault investor history
   result?: IApiVaultInvestorHistory[]
-}
-
-// Response to retrieve the vault summary for a given vault
-export interface IApiQueryVaultInvestorHistoryStatsRequest {
-}
-
-// The vault summary returned by the service to client
-export interface IApiQueryVaultInvestorHistoryStatsResponse {
-  // The total investment in the vault in USD.
-  total_investment_amount?: string
 }
 
 // Request for the manager to retrieve the vault investor history for their vault
@@ -2290,68 +2253,6 @@ export interface IApiSubAccountSummaryRequest {
 export interface IApiSubAccountSummaryResponse {
   // The sub account matching the request sub account
   result?: ISubAccount
-}
-
-// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
-export interface IApiSubAccountTradeAggregationRequest {
-  // Optional. The limit of the number of results to return
-  limit?: number
-  // The interval of each sub account trade
-  interval?: ESubAccountTradeInterval
-  // The list of sub account ids to query
-  sub_account_i_ds?: string[]
-  // Optional. The starting time in unix nanoseconds of a specific interval to query
-  start_interval?: string
-  // Optional. Start time in unix nanoseconds
-  start_time?: string
-  // Optional. End time in unix nanoseconds
-  end_time?: string
-  // Filter on the maker of the trade
-  is_maker?: boolean
-  // Filter on the taker of the trade
-  is_taker?: boolean
-  // The cursor to indicate when to start the next query from
-  cursor?: string
-  // Whether to group trades by signer per sub account
-  group_by_signer?: boolean
-  // source of order
-  sources?: ESource[]
-  // Filter on the liquidation of the trade
-  is_liquidation?: boolean
-}
-
-export interface IApiSubAccountTradeAggregationResponse {
-  // The sub account trade aggregation result set for given interval
-  result?: ISubAccountTradeAggregation[]
-  // The cursor to indicate when to start the next query from
-  next?: string
-}
-
-// startTime are optional parameters. The semantics of these parameters are as follows:<ul>
-export interface IApiSubAccountTradeIntervalAggregationRequest {
-  // The interval of each sub account trade
-  interval?: ESubAccountTradeInterval
-  // The list of sub account ids to query
-  sub_account_i_ds?: string[]
-  // Optional. The starting time in unix nanoseconds of a specific interval to query
-  start_interval?: string
-  // Optional. Start time in unix nanoseconds
-  start_time?: string
-  // Optional. End time in unix nanoseconds
-  end_time?: string
-  // Filter on the maker of the trade
-  is_maker?: boolean
-  // Filter on the taker of the trade
-  is_taker?: boolean
-  // source of order
-  sources?: ESource[]
-  // Filter on the liquidation of the trade
-  is_liquidation?: boolean
-}
-
-export interface IApiSubAccountTradeIntervalAggregationResponse {
-  // The sub account trade aggregation result set for given interval
-  result?: ISubAccountTradeIntervalAggregation[]
 }
 
 export interface IApiTickerFeedDataV1 {
@@ -3524,12 +3425,14 @@ export interface IGetClaimableEcosystemBadgeResponse {
 export interface IInitialLeverageResult {
   // The instrument to get the leverage for
   instrument?: string
-  // The initial leverage of the sub account
+  // The initial leverage of this instrument
   leverage?: string
-  // The min leverage this sub account can set
+  // The min leverage user can set for this instrument
   min_leverage?: string
-  // The max leverage this sub account can set
+  // The max leverage user can set for this instrument
   max_leverage?: string
+  // The margin type of this instrument
+  margin_type?: EPositionMarginType
 }
 
 export interface IInjectedPointRequestElement {
@@ -4058,16 +3961,6 @@ export interface IPriceProtectionBand {
   low_centi_beeps?: string
 }
 
-// Request to retrieve the account summary for a given account
-export interface IQueryAccountSummaryRequest {
-  // The time interval to filter
-  time_interval?: ETimeInterval
-  // The main account ID to request for
-  main_account_id?: string
-  // The list subaccount IDs to filter by
-  sub_account_i_ds?: string[]
-}
-
 // Query list of epoch badges
 export interface IQueryEpochBadgePointDistributionRequest {
   // The numerical epoch index
@@ -4550,48 +4443,6 @@ export interface ISubAccountPerformance {
   equity_end?: string
   // Net transfer of the sub account
   net_transfer?: string
-}
-
-// Similar to sub-account trade, but not divided by individual assets.
-export interface ISubAccountTradeAggregation {
-  // The sub account id
-  sub_account_id?: string
-  // Total fee paid
-  total_fee?: string
-  // Total volume traded
-  total_trade_volume?: string
-  // Number of trades
-  num_traded?: string
-  // Total positive fee paid by user
-  positive_fee?: string
-  // The signer of the trade
-  signer?: string
-  // Realized PnL
-  realized_pnl?: string
-  // source of order
-  source?: ESource
-}
-
-// aggregated sub-account trade at specific interval
-export interface ISubAccountTradeIntervalAggregation {
-  // The sub account id
-  sub_account_id?: string
-  // The starting time in unix nanoseconds of a specific interval
-  start_interval?: string
-  // Total fee paid
-  total_fee?: string
-  // Total volume traded
-  total_trade_volume?: string
-  // Number of trades
-  num_traded?: string
-  // Total positive fee paid by user
-  positive_fee?: string
-  // The signer of the trade
-  signer?: string
-  // Realized PnL
-  realized_pnl?: string
-  // source of order
-  source?: ESource
 }
 
 // Sub account trading performance returned by clickhouse
