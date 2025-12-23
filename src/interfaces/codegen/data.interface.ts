@@ -26,6 +26,7 @@ import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
 import type { ERewardProgramType } from './enums/reward-program-type.ts'
 import type { ERewardSession } from './enums/reward-session.ts'
 import type { ESource } from './enums/source.ts'
+import type { ESubAccountTradeInterval } from './enums/sub-account-trade-interval.ts'
 import type { ETimeInForce } from './enums/time-in-force.ts'
 import type { ETimeInterval } from './enums/time-interval.ts'
 import type { ETransactionType } from './enums/transaction-type.ts'
@@ -151,6 +152,8 @@ export interface IAggregatedAccountSummary {
 export interface IApiAccountPerformanceTrend {
   // The start time of the interval
   start_interval?: string
+  // The end time of the interval
+  end_interval?: string
   // Aggregated PnL of the funding account and sub accounts
   aggregated_pnl?: string
   // Investment PnL of the funding account
@@ -1740,6 +1743,8 @@ export interface IApiQueryAccountPerformanceTrendRequest {
 export interface IApiQueryAccountPerformanceTrendResponse {
   // The list of account performance trends
   result?: IApiAccountPerformanceTrend[]
+  // The aggregated interval
+  interval?: ESubAccountTradeInterval
 }
 
 // Response to retrieve today's performance
@@ -2182,24 +2187,8 @@ export interface IApiSnapAggregatedAccountSummary {
   event_time?: string
   // The start of the interval in unix nanoseconds
   start_interval?: string
-  // The main account ID of the account to which the summary belongs
-  main_account_id?: string
   // Total equity of the main account, denominated in USD
   total_equity?: string
-  // The list of spot assets owned by this main account, and their balances
-  spot_balances?: ISpotBalance[]
-  // The list of vault investments held by this main account
-  vault_investments?: IVaultInvestment[]
-  // Depreciated: Use fundingAccountEquity instead
-  funding_account_balance?: string
-  // Depreciated: Use totalSubAccountEquity instead
-  total_sub_account_balance?: string
-  // Depreciated: Use totalVaultInvestmentsEquity instead
-  total_vault_investments_balance?: string
-  // Total equity of the main account, denominated in USD
-  funding_account_equity?: string
-  // Total equity of the sub accounts, denominated in USD
-  total_sub_account_equity?: string
 }
 
 // The socialized loss status.
@@ -3589,6 +3578,16 @@ export interface IListRewardEpochResponse {
   result?: IAdminRewardEpoch[]
 }
 
+// The lite vault summary snapshot, only includes share price for now
+export interface ILiteSnapVaultSummary {
+  // The start of the interval in unix nanoseconds
+  start_interval?: string
+  // The unique identifier of the vault.
+  vault_id?: string
+  // The share price of the vault LP token at point of vault investment
+  share_price?: string
+}
+
 export interface ILiveFundingRateComparisonEntry {
   instrument?: string
   // Next funding time in unix nanoseconds (from GRVT ticker)
@@ -4018,6 +4017,18 @@ export interface IQueryFindEpochResponse {
   epoch?: IEpoch
 }
 
+// Request to retrieve the first vault snapshot for a batch of vault IDs
+export interface IQueryFirstVaultSnapshotsRequest {
+  // The list of vault IDs to filter by
+  vault_i_ds?: string[]
+}
+
+// Response to retrieve the first vault snapshots for a batch of vault IDs
+export interface IQueryFirstVaultSnapshotsResponse {
+  // The list of first vault snapshots
+  result?: ILiteSnapVaultSummary[]
+}
+
 export interface IQueryGetLatestLPSnapshotResponse {
   // The latest LP snapshot
   snapshot?: ILPSnapshot
@@ -4043,6 +4054,18 @@ export interface IQueryLatestSubAccountSummaryRequest {
 export interface IQueryLatestSubAccountSummaryResponse {
   // The latest sub-account summary
   result?: ISnapSubAccountSummary
+}
+
+// Request to retrieve the latest vault snapshot for a given vault
+export interface IQueryLatestVaultSnapshotRequest {
+  // The list of vault IDs to filter by
+  vault_i_ds?: string[]
+}
+
+// Response to retrieve the latest vault snapshots for a batch of vault IDs
+export interface IQueryLatestVaultSnapshotsResponse {
+  // The list of latest vault snapshots
+  result?: ILiteSnapVaultSummary[]
 }
 
 // Request to retrieve the sub-account summary for a given sub-account

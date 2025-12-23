@@ -10,6 +10,8 @@ export enum ETimeInterval {
   INTERVAL_90_D = 'INTERVAL_90_D',
   // Lifetime
   INTERVAL_LIFETIME = 'INTERVAL_LIFETIME',
+  // 14 days
+  INTERVAL_14_D = 'INTERVAL_14_D',
 }
 
 export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
@@ -17,5 +19,6 @@ export const ETimeIntervalInt: Record<ETimeInterval, number> = Object.freeze({
   [ETimeInterval.INTERVAL_7_D]: 2,
   [ETimeInterval.INTERVAL_30_D]: 3,
   [ETimeInterval.INTERVAL_90_D]: 4,
-  [ETimeInterval.INTERVAL_LIFETIME]: 5
+  [ETimeInterval.INTERVAL_LIFETIME]: 5,
+  [ETimeInterval.INTERVAL_14_D]: 6
 })
