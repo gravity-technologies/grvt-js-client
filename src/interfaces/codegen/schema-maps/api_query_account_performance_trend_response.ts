@@ -4,9 +4,11 @@ import { API_ACCOUNT_PERFORMANCE_TREND_MAP } from './api_account_performance_tre
 // Schema map for the 'API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE' struct.
 export const API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP: SchemaPairMap = Object.freeze({
   FULL_TO_LITE: {
-    result: ['r', [API_ACCOUNT_PERFORMANCE_TREND_MAP.FULL_TO_LITE]]
+    result: ['r', [API_ACCOUNT_PERFORMANCE_TREND_MAP.FULL_TO_LITE]],
+    interval: 'i'
   },
   LITE_TO_FULL: {
-    r: ['result', [API_ACCOUNT_PERFORMANCE_TREND_MAP.LITE_TO_FULL]]
+    r: ['result', [API_ACCOUNT_PERFORMANCE_TREND_MAP.LITE_TO_FULL]],
+    i: 'interval'
   }
 })
