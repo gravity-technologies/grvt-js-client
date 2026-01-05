@@ -129,6 +129,8 @@ export enum EClusterConfigType {
   FLAG_ENABLE_ADJUST_IS_REDUCING_POSITION = 'FLAG_ENABLE_ADJUST_IS_REDUCING_POSITION',
   // Flag to fix cross liquidation post trade
   FLAG_FIX_CROSS_LIQUIDATION_POST_TRADE = 'FLAG_FIX_CROSS_LIQUIDATION_POST_TRADE',
+  // Flag to allow keeping session keys for 180 days
+  FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS = 'FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -196,5 +198,6 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_ADD_ISOLATED_POSITION_MARGIN]: 62,
   [EClusterConfigType.FLAG_BUILDER_CODE]: 63,
   [EClusterConfigType.FLAG_ENABLE_ADJUST_IS_REDUCING_POSITION]: 64,
-  [EClusterConfigType.FLAG_FIX_CROSS_LIQUIDATION_POST_TRADE]: 65
+  [EClusterConfigType.FLAG_FIX_CROSS_LIQUIDATION_POST_TRADE]: 65,
+  [EClusterConfigType.FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS]: 66
 })

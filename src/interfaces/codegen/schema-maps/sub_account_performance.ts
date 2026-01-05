@@ -8,7 +8,8 @@ export const SUB_ACCOUNT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     pnl: 'p',
     equity_start: 'es',
     equity_end: 'ee',
-    net_transfer: 'nt'
+    net_transfer: 'nt',
+    currency: 'c'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
@@ -16,6 +17,7 @@ export const SUB_ACCOUNT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     p: 'pnl',
     es: 'equity_start',
     ee: 'equity_end',
-    nt: 'net_transfer'
+    nt: 'net_transfer',
+    c: 'currency'
   }
 })

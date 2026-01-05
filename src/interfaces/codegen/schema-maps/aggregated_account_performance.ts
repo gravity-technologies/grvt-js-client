@@ -12,7 +12,8 @@ export const AGGREGATED_ACCOUNT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     net_transfer: 'nt',
     investment_balance_start: 'ib',
     investment_balance_end: 'ib1',
-    net_investment: 'ni'
+    net_investment: 'ni',
+    currency: 'c'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
@@ -24,6 +25,7 @@ export const AGGREGATED_ACCOUNT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     nt: 'net_transfer',
     ib: 'investment_balance_start',
     ib1: 'investment_balance_end',
-    ni: 'net_investment'
+    ni: 'net_investment',
+    c: 'currency'
   }
 })

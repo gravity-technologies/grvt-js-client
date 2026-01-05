@@ -8,7 +8,10 @@ export const API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP: SchemaPairMap = Object.fre
     start_time: 'st',
     end_time: 'et',
     limit: 'l',
-    cursor: 'c'
+    cursor: 'c',
+    kind: 'k',
+    base: 'b',
+    quote: 'q'
   },
   LITE_TO_FULL: {
     sa: 'sub_account_id',
@@ -16,6 +19,9 @@ export const API_FUNDING_PAYMENT_HISTORY_REQUEST_MAP: SchemaPairMap = Object.fre
     st: 'start_time',
     et: 'end_time',
     l: 'limit',
-    c: 'cursor'
+    c: 'cursor',
+    k: 'kind',
+    b: 'base',
+    q: 'quote'
   }
 })

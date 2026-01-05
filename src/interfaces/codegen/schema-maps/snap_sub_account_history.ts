@@ -7,13 +7,15 @@ export const SNAP_SUB_ACCOUNT_HISTORY_MAP: SchemaPairMap = Object.freeze({
     sub_account_id: 'sa',
     total_equity: 'te',
     unrealized_pnl: 'up',
-    is_vault: 'iv'
+    is_vault: 'iv',
+    event_time: 'et'
   },
   LITE_TO_FULL: {
     si: 'start_interval',
     sa: 'sub_account_id',
     te: 'total_equity',
     up: 'unrealized_pnl',
-    iv: 'is_vault'
+    iv: 'is_vault',
+    et: 'event_time'
   }
 })
