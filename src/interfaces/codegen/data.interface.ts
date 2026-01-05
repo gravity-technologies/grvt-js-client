@@ -125,6 +125,8 @@ export interface IAggregatedAccountPerformance {
   investment_balance_end?: string
   // Net investment of the funding account
   net_investment?: string
+  // The currency of pnl, equity, net transfer, investment balance, net investment
+  currency?: number
 }
 
 export interface IAggregatedAccountSummary {
@@ -993,6 +995,12 @@ export interface IApiFundingPaymentHistoryRequest {
   limit?: number
   // The cursor to indicate when to start the query from
   cursor?: string
+  // The kind filter to apply. If nil, this defaults to all kinds. Otherwise, only entries matching the filter will be returned
+  kind?: EKind[]
+  // The base filter to apply. If nil, this defaults to all bases. Otherwise, only entries matching the filter will be returned
+  base?: string[]
+  // The quote filter to apply. If nil, this defaults to all quotes. Otherwise, only entries matching the filter will be returned
+  quote?: string[]
 }
 
 export interface IApiFundingPaymentHistoryResponse {
@@ -1107,6 +1115,8 @@ export interface IApiGetCEVAccessTiersResponse {
   enabled?: boolean
   // Validated to start from tier 1 and be ordered in ascending tier without gaps, e.g. Tiers 1-6.
   tiers?: ICEVAccessTier[]
+  // Access tier overwrites to be used ONLY BY THE TRADING ENGINEERING TEAM
+  overwrites?: ICEVAccessTierOverwrite[]
 }
 
 // The response to get all client tiers
@@ -4345,6 +4355,8 @@ export interface ISnapSubAccountHistory {
   unrealized_pnl?: string
   // Whether this sub account is a vault
   is_vault?: boolean
+  // Time at which the event was emitted in unix nanoseconds
+  event_time?: string
 }
 
 export interface ISnapSubAccountSummary {
@@ -4466,6 +4478,8 @@ export interface ISubAccountPerformance {
   equity_end?: string
   // Net transfer of the sub account
   net_transfer?: string
+  // The currency of pnl, equity, net transfer
+  currency?: number
 }
 
 // Sub account trading performance returned by clickhouse
