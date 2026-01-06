@@ -5,11 +5,15 @@ export const API_TIMED_VAULT_ASSET_EXPOSURE_REQUEST_MAP: SchemaPairMap = Object.
   FULL_TO_LITE: {
     vault_id: 'vi',
     is_gross_exposure: 'ig',
-    time_interval: 'ti'
+    time_interval: 'ti',
+    start_time: 'st',
+    end_time: 'et'
   },
   LITE_TO_FULL: {
     vi: 'vault_id',
     ig: 'is_gross_exposure',
-    ti: 'time_interval'
+    ti: 'time_interval',
+    st: 'start_time',
+    et: 'end_time'
   }
 })

@@ -20,6 +20,7 @@ import type { EMetricType } from './enums/metric-type.ts'
 import type { EOrderRejectReason } from './enums/order-reject-reason.ts'
 import type { EOrderStatus } from './enums/order-status.ts'
 import type { EPointType } from './enums/point-type.ts'
+import type { EPortfolioCurrency } from './enums/portfolio-currency.ts'
 import type { EPositionMarginType } from './enums/position-margin-type.ts'
 import type { EQueryMainAccountLeaderboardOrderBy } from './enums/query-main-account-leaderboard-order-by.ts'
 import type { ERewardEpochStatus } from './enums/reward-epoch-status.ts'
@@ -1719,6 +1720,8 @@ export interface IApiPreOrderCheckResponse {
 
 // Request to retrieve the account daily performance
 export interface IApiQueryAccountDailyPerformanceRequest {
+  // The currency to retrieve the daily performance in, defaults to USD
+  currency?: EPortfolioCurrency
   // The start time of the interval
   start_time?: string
   // The end time of the interval
@@ -1755,6 +1758,12 @@ export interface IApiQueryAccountPerformanceTrendResponse {
   result?: IApiAccountPerformanceTrend[]
   // The aggregated interval
   interval?: ESubAccountTradeInterval
+}
+
+// Request to retrieve today's performance
+export interface IApiQueryAccountTodayPerformanceRequest {
+  // The currency to retrieve the today performance in, defaults to USD
+  currency?: EPortfolioCurrency
 }
 
 // Response to retrieve today's performance
@@ -1802,6 +1811,10 @@ export interface IApiQueryListSubAccountSummaryRequest {
   time_interval?: ETimeInterval
   // The subaccount ID to filter by
   sub_account_id?: string
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Response to retrieve the sub-account summary for a given sub-account
@@ -1818,6 +1831,10 @@ export interface IApiQueryListVaultSubAccountSummaryRequest {
   vault_id?: string
   // The time interval to filter
   time_interval?: ETimeInterval
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Response to retrieve the sub-account summary for a given sub-account
@@ -1842,6 +1859,8 @@ export interface IApiQuerySnapVaultPositionResponse {
 
 // Request to retrieve the sub account daily performance
 export interface IApiQuerySubAccountDailyPerformanceRequest {
+  // The currency to retrieve the daily performance in, defaults to USDT
+  currency?: EPortfolioCurrency
   // The sub account ID to filter by
   sub_account_id?: string
   // The start time of the interval
@@ -1860,6 +1879,8 @@ export interface IApiQuerySubAccountDailyPerformanceResponse {
 export interface IApiQuerySubAccountTodayPerformanceRequest {
   // The sub account ID to filter by
   sub_account_id?: string
+  // The currency to retrieve the today performance in, defaults to USD
+  currency?: EPortfolioCurrency
 }
 
 // Response to retrieve sub account today's performance
@@ -1932,6 +1953,10 @@ export interface IApiQueryTradingPerformanceTrendRequest {
   sub_account_id?: string
   // The time interval to filter by
   time_interval?: ETimeInterval
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Response to retrieve the trading performance trend
@@ -2000,6 +2025,10 @@ export interface IApiQueryVaultPerformanceTrendRequest {
   vault_id?: string
   // The time interval to filter by
   time_interval?: ETimeInterval
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Response to retrieve the trading performance trend
@@ -2032,6 +2061,10 @@ export interface IApiQueryVaultSummaryHistoryRequest {
   vault_id?: string
   // The time interval to filter
   time_interval?: ETimeInterval
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Response to retrieve the vault summary for a given vault
@@ -2278,6 +2311,10 @@ export interface IApiTimedAssetExposureRequest {
   time_interval?: ETimeInterval
   // Optional: The subaccount ID to filter by
   sub_account_id?: string
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Returns the list of assets traded by users.
@@ -2296,6 +2333,10 @@ export interface IApiTimedVaultAssetExposureRequest {
   is_gross_exposure?: boolean
   // The time interval to filter
   time_interval?: ETimeInterval
+  // The start time to filter by
+  start_time?: string
+  // The end time to filter by
+  end_time?: string
 }
 
 // Perform historical lookup of public trades in any given instrument.
@@ -3482,6 +3523,8 @@ export interface IInstrumentDisplay {
   adjusted_funding_rate_cap?: string
   // Funding rate floor over the defined `intervalHours`.
   adjusted_funding_rate_floor?: string
+  // The minimum order notional value, expressed in quote currency decimal units
+  min_notional?: string
 }
 
 // All Websocket JSON RPC Requests are housed in this wrapper. You may specify a stream, and a list of feeds to subscribe to.
