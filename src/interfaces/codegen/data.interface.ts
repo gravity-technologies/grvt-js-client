@@ -1744,6 +1744,8 @@ export interface IApiQueryAccountPerformanceResponse {
 
 // Request to retrieve the trading performance trend
 export interface IApiQueryAccountPerformanceTrendRequest {
+  // The currency to retrieve the performance in, defaults to USD
+  currency?: EPortfolioCurrency
   // The time interval to filter by
   time_interval?: ETimeInterval
   // The start time of the interval
