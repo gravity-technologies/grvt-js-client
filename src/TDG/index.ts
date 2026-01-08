@@ -64,6 +64,7 @@ import type {
   IApiQueryAccountPerformanceResponse,
   IApiQueryAccountPerformanceTrendRequest,
   IApiQueryAccountPerformanceTrendResponse,
+  IApiQueryAccountTodayPerformanceRequest,
   IApiQueryAccountTodayPerformanceResponse,
   IApiQueryListFundingAccountSummaryRequest,
   IApiQueryListFundingAccountSummaryResponse,
@@ -180,6 +181,7 @@ import { API_QUERY_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/
 import { API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_response'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_request'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_response'
+import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_request'
 import { API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_today_performance_response'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_request'
 import { API_QUERY_LIST_FUNDING_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_list_funding_account_summary_response'
@@ -932,10 +934,10 @@ export class TDG {
    * START: Portfolio
    */
 
-  accountTodayPerformance (config?: AxiosRequestConfig) {
+  accountTodayPerformance (payload: IApiQueryAccountTodayPerformanceRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/account_today_performance',
-      null,
+      Utils.schemaMap(payload, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_TODAY_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountTodayPerformanceResponse
