@@ -8,7 +8,11 @@ export const API_VAULT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     apr: 'a',
     realized_pnl: 'rp',
     pnl: 'p',
-    cumulative_pnl: 'cp'
+    cumulative_pnl: 'cp',
+    return_since_interception: 'rs',
+    return_30_d: 'r3',
+    return_90_d: 'r9',
+    return_ytd: 'ry'
   },
   LITE_TO_FULL: {
     vi: 'vault_id',
@@ -16,6 +20,10 @@ export const API_VAULT_PERFORMANCE_MAP: SchemaPairMap = Object.freeze({
     a: 'apr',
     rp: 'realized_pnl',
     p: 'pnl',
-    cp: 'cumulative_pnl'
+    cp: 'cumulative_pnl',
+    rs: 'return_since_interception',
+    r3: 'return_30_d',
+    r9: 'return_90_d',
+    ry: 'return_ytd'
   }
 })
