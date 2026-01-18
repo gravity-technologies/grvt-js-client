@@ -61,6 +61,7 @@ import type {
   IApiPreOrderCheckResponse,
   IApiQueryAccountDailyPerformanceRequest,
   IApiQueryAccountDailyPerformanceResponse,
+  IApiQueryAccountPerformanceRequest,
   IApiQueryAccountPerformanceResponse,
   IApiQueryAccountPerformanceTrendRequest,
   IApiQueryAccountPerformanceTrendResponse,
@@ -178,6 +179,7 @@ import { API_PRE_ORDER_CHECK_REQUEST_MAP } from '../interfaces/codegen/schema-ma
 import { API_PRE_ORDER_CHECK_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_pre_order_check_response'
 import { API_QUERY_ACCOUNT_DAILY_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_daily_performance_request'
 import { API_QUERY_ACCOUNT_DAILY_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_daily_performance_response'
+import { API_QUERY_ACCOUNT_PERFORMANCE_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_request'
 import { API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_response'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_request'
 import { API_QUERY_ACCOUNT_PERFORMANCE_TREND_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_query_account_performance_trend_response'
@@ -974,10 +976,10 @@ export class TDG {
     }).catch(Utils.coverApiError)
   }
 
-  accountPerformance (config?: AxiosRequestConfig) {
+  accountPerformance (payload: IApiQueryAccountPerformanceRequest, config?: AxiosRequestConfig) {
     return this._axios.post(
       this._liteUrl + '/account_performance',
-      null,
+      Utils.schemaMap(payload, API_QUERY_ACCOUNT_PERFORMANCE_REQUEST_MAP.FULL_TO_LITE, true),
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_QUERY_ACCOUNT_PERFORMANCE_RESPONSE_MAP.LITE_TO_FULL) as IApiQueryAccountPerformanceResponse

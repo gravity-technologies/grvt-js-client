@@ -234,6 +234,8 @@ export interface IApiBatchQueryVaultDetailResponse {
 export interface IApiBatchQueryVaultPerformanceRequest {
   // The list of vault IDs to filter by
   vault_i_ds?: string[]
+  // Whether to use annualized yield for the returns
+  use_annualized_returns?: boolean
 }
 
 // Response to retrieve the trading volume
@@ -1734,6 +1736,12 @@ export interface IApiQueryAccountDailyPerformanceResponse {
   result?: IApiAccountPerformanceTrend[]
 }
 
+// Request to retrieve the trading performance
+export interface IApiQueryAccountPerformanceRequest {
+  // The currency to retrieve the performance in, defaults to USD
+  currency?: EPortfolioCurrency
+}
+
 // Response to retrieve the trading performance
 export interface IApiQueryAccountPerformanceResponse {
   // Realtime aggregated PnL of the funding account and sub accounts
@@ -2650,6 +2658,14 @@ export interface IApiVaultPerformance {
   pnl?: string
   // Real-time cumulative PnL in USDT
   cumulative_pnl?: string
+  // Total return in USDT since strategy inception; annualized if useAnnualizedReturns is true.
+  return_since_interception?: number
+  // Total return in USDT for the most recent 30 days; annualized if useAnnualizedReturns is true.
+  return_30_d?: number
+  // Total return in USDT for the most recent 90 days; annualized if useAnnualizedReturns is true.
+  return_90_d?: number
+  // Total return in USDT since the beginning of the current year (YTD); annualized if useAnnualizedReturns is true.
+  return_ytd?: number
 }
 
 // Trading performance trend returned by the service
@@ -4076,6 +4092,8 @@ export interface IQueryFindEpochResponse {
 export interface IQueryFirstVaultSnapshotsRequest {
   // The list of vault IDs to filter by
   vault_i_ds?: string[]
+  // Only return the first snapshots after this time
+  start_time?: string
 }
 
 // Response to retrieve the first vault snapshots for a batch of vault IDs
