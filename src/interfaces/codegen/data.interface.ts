@@ -1429,9 +1429,9 @@ export interface IApiGetUserEpochPointStatsResponse {
   // The epoch number
   epoch?: number
   // The point
-  epoch_point?: string
+  epoch_point?: number
   // The cumulative point
-  cumulative_point?: string
+  cumulative_point?: number
   // The rank of the epoch
   epoch_rank?: number
   // The cumulative rank of the epoch
@@ -1441,9 +1441,9 @@ export interface IApiGetUserEpochPointStatsResponse {
   // The time in unix nanoseconds when the points were last calculated
   last_calculated_time?: string
   // The community referral point earned of the account
-  epoch_referral_point?: string
+  epoch_referral_point?: number
   // The cumulative community referral point earned of the account
-  cumulative_referral_point?: string
+  cumulative_referral_point?: number
 }
 
 export interface IApiGetUserVaultRewardPointResponse {
@@ -2124,7 +2124,7 @@ export interface IApiRewardLeaderboardItem {
   // The rank
   rank?: number
   // The point
-  point?: string
+  point?: number
 }
 
 // The request to set Builder code config

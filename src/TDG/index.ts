@@ -7,6 +7,8 @@ import type {
   IApiAuthorizeBuilderRequest,
   IApiBuilderFillHistoryRequest,
   IApiBuilderFillHistoryResponse,
+  IApiBulkOrdersRequest,
+  IApiBulkOrdersResponse,
   IApiCancelAllOrdersRequest,
   IApiCancelAllOrdersResponse,
   IApiCancelOrderRequest,
@@ -125,6 +127,8 @@ import { API_AGGREGATED_ACCOUNT_SUMMARY_RESPONSE_MAP } from '../interfaces/codeg
 import { API_AUTHORIZE_BUILDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_authorize_builder_request'
 import { API_BUILDER_FILL_HISTORY_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_builder_fill_history_request'
 import { API_BUILDER_FILL_HISTORY_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_builder_fill_history_response'
+import { API_BULK_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_bulk_orders_request'
+import { API_BULK_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_bulk_orders_response'
 import { API_CANCEL_ALL_ORDERS_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_request'
 import { API_CANCEL_ALL_ORDERS_RESPONSE_MAP } from '../interfaces/codegen/schema-maps/api_cancel_all_orders_response'
 import { API_CANCEL_ORDER_REQUEST_MAP } from '../interfaces/codegen/schema-maps/api_cancel_order_request'
@@ -490,6 +494,16 @@ export class TDG {
       config
     ).then((response) => {
       return Utils.schemaMap(response.data, API_CREATE_BULK_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiCreateBulkOrdersResponse
+    }).catch(Utils.coverApiError)
+  }
+
+  bulkOrders (payload: IApiBulkOrdersRequest, config?: AxiosRequestConfig) {
+    return this._axios.post(
+      this._liteUrl + '/bulk_orders',
+      Utils.schemaMap(payload, API_BULK_ORDERS_REQUEST_MAP.FULL_TO_LITE, true),
+      config
+    ).then((response) => {
+      return Utils.schemaMap(response.data, API_BULK_ORDERS_RESPONSE_MAP.LITE_TO_FULL) as IApiBulkOrdersResponse
     }).catch(Utils.coverApiError)
   }
 
