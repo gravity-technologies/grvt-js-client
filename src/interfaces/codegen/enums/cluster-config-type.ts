@@ -133,6 +133,8 @@ export enum EClusterConfigType {
   FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS = 'FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS',
   // Flag Trigger Order Cancellation V2
   FLAG_TRIGGER_ORDER_CANCELLATION_V_2 = 'FLAG_TRIGGER_ORDER_CANCELLATION_V_2',
+  // Flag to fix oid assignment
+  FLAG_FIX_OID_ASSIGNMENT = 'FLAG_FIX_OID_ASSIGNMENT',
 }
 
 export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.freeze({
@@ -202,5 +204,6 @@ export const EClusterConfigTypeInt: Record<EClusterConfigType, number> = Object.
   [EClusterConfigType.FLAG_ENABLE_ADJUST_IS_REDUCING_POSITION]: 64,
   [EClusterConfigType.FLAG_FIX_CROSS_LIQUIDATION_POST_TRADE]: 65,
   [EClusterConfigType.FLAG_KEEP_EXPIRED_SESSION_KEYS_FOR_180_DAYS]: 66,
-  [EClusterConfigType.FLAG_TRIGGER_ORDER_CANCELLATION_V_2]: 67
+  [EClusterConfigType.FLAG_TRIGGER_ORDER_CANCELLATION_V_2]: 67,
+  [EClusterConfigType.FLAG_FIX_OID_ASSIGNMENT]: 68
 })
