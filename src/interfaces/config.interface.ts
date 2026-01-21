@@ -1,6 +1,6 @@
 export interface IConfig {
-  // version: `v${number}`
   host: string
+  version?: `v${number}`
 }
 
 export const validConfig = (config: IConfig) => {
@@ -14,6 +14,6 @@ export const validConfig = (config: IConfig) => {
 
   return {
     ...config,
-    version: 'v1'
+    version: config.version ?? 'v1'
   }
 }
